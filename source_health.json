@@ -3,11 +3,11 @@
     "source_id": "tfasc_gold",
     "name": "台灣金融資產服務公司 (TFASC 金拍屋)",
     "mode": "自動同步",
-    "status": "正常同步 (抓取 4 筆)",
-    "records_fetched": 4,
-    "note": "公開列表擷取完成",
+    "status": "連線受限 (TimeoutError)",
+    "records_fetched": 0,
+    "note": "The read operation timed out",
     "url": "https://www.tfasc.com.tw/",
-    "checked_at": "2026-10-28 17:51"
+    "checked_at": "2026-10-28 17:59"
   },
   "uhomes": {
     "source_id": "uhomes",
@@ -17,7 +17,7 @@
     "records_fetched": 5,
     "note": "已交叉比對屋齡與主建坪數",
     "url": "https://uhomes.com.tw/",
-    "checked_at": "2026-10-28 17:51"
+    "checked_at": "2026-10-28 17:59"
   },
   "judicial_aomp": {
     "source_id": "judicial_aomp",
@@ -27,7 +27,7 @@
     "records_fetched": 0,
     "note": "低頻合規巡檢完成",
     "url": "https://aomp109.judicial.gov.tw/judbp/wkw/WHD1A02.htm",
-    "checked_at": "2026-10-28 17:52"
+    "checked_at": "2026-10-28 18:00"
   },
   "tcb_silver": {
     "source_id": "tcb_silver",
@@ -37,7 +37,7 @@
     "records_fetched": 0,
     "note": "低頻合規巡檢完成",
     "url": "https://www.tcb-bank.com.tw/about-tcb/announcement/items/foreclosure",
-    "checked_at": "2026-10-28 17:52"
+    "checked_at": "2026-10-28 18:00"
   },
   "bot_foreclosure": {
     "source_id": "bot_foreclosure",
@@ -47,7 +47,7 @@
     "records_fetched": 0,
     "note": "低頻合規巡檢完成",
     "url": "https://wwwap.bot.com.tw/house/",
-    "checked_at": "2026-10-28 17:52"
+    "checked_at": "2026-10-28 18:00"
   },
   "woo104": {
     "source_id": "woo104",
@@ -57,7 +57,7 @@
     "records_fetched": 0,
     "note": "低頻合規巡檢完成",
     "url": "https://www.104woo.com.tw/",
-    "checked_at": "2026-10-28 17:52"
+    "checked_at": "2026-10-28 18:00"
   },
   "moj_tpkonsale": {
     "source_id": "moj_tpkonsale",
@@ -67,7 +67,7 @@
     "records_fetched": 0,
     "note": "低頻合規巡檢完成",
     "url": "https://www.tpkonsale.moj.gov.tw/",
-    "checked_at": "2026-10-28 17:52"
+    "checked_at": "2026-10-28 18:00"
   },
   "moi_pip": {
     "source_id": "moi_pip",
@@ -77,6 +77,6 @@
     "records_fetched": 0,
     "note": "低頻合規巡檢完成",
     "url": "https://pip.moi.gov.tw/Publicize/Info/D1010",
-    "checked_at": "2026-10-28 17:52"
+    "checked_at": "2026-10-28 18:00"
   }
 }
