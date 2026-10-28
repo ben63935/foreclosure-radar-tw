@@ -120,7 +120,7 @@ class CompliantScraperPipeline:
                 f"底價差異提醒：官方紀錄 {existing.get('reserve_price_wan')} 萬 vs 其他平台 {record.get('reserve_price_wan')} 萬 (以官方公告正本為準)"
             )
 
-    def run_all_ checks(self):
+    def run_all_checks(self):
         # 記錄 8 大指定平台之合規連線與擷取狀態
         self.record_source_status(
             "judicial_aomp", "司法院法拍屋查詢系統", "自動同步 (Session POST + 低頻延遲)", "정상 (Active)", 6,
@@ -171,7 +171,7 @@ if __name__ == "__main__":
 
     pipeline = CompliantScraperPipeline()
     pipeline.run_all_checks()
-    os.makedirs(os.path.dirname(args.health), exist_ok=True)
+    if os.path.dirname(args.health): os.makedirs(os.path.dirname(args.health), exist_ok=True)
     with open(args.health, "w", encoding="utf-8") as f:
         json.dump(pipeline.health_log, f, ensure_ascii=False, indent=2)
     print("Health check and pipeline configuration verified.")
