@@ -1,7 +1,7 @@
 {
   "recipient_email": "PROTECTED_BY_GITHUB_SECRETS",
   "encrypted_vault": "NCQieHVvc2tsYS0uK38LClJRQ2ovNg1+a3FRcAVBCQo/dUcJAFxnZShdOQUFWkMIZF5SPwBAQno=",
-  "updated_at": "2026-10-28T06:26:04.716Z",
+  "updated_at": "2026-10-28T06:37:28.616Z",
   "include_demo_in_email": true,
   "subscribers": [
     {
@@ -9,26 +9,32 @@
       "name": "👑 站長主信箱 (GitHub 保險箱預設信箱)",
       "email": "GITHUB_SECRET_DEFAULT",
       "active": true
+    },
+    {
+      "id": "mem_392690",
+      "name": "👤 我",
+      "email": "ENC_MAIL:353d373b353e28012a242d30336d2a3f25",
+      "active": true
     }
   ],
   "subscriptions": [
     {
-      "id": "sub_user_main",
-      "name": "新北市新莊區、新北市三重區、新北市板橋區等21區 (850萬內 / 30坪+ / 20年內)",
+      "id": "sub_1793169425222",
+      "name": "新北市新莊區、新北市三重區、新北市板橋區、新北市蘆洲區、新北市中和區、新北市永和區、新北市樹林區、新北市鶯歌區、新北市三峽區、新北市林口區、新北市土城區、新北市五股區、新北市泰山區、桃園市桃園區、桃園市中壢區、桃園市蘆竹區、桃園市八德區、桃園市龜山區、苗栗縣頭份市、苗栗縣竹南鎮、苗栗縣苗栗市 (850萬內 / 30坪+ / 20年內)",
       "locations": [
         "新北市:新莊區",
         "新北市:三重區",
         "新北市:板橋區",
         "新北市:蘆洲區",
-        "新北市:土城區",
-        "新北市:永和區",
         "新北市:中和區",
+        "新北市:永和區",
         "新北市:樹林區",
         "新北市:鶯歌區",
         "新北市:三峽區",
         "新北市:林口區",
-        "新北市:泰山區",
+        "新北市:土城區",
         "新北市:五股區",
+        "新北市:泰山區",
         "桃園市:桃園區",
         "桃園市:中壢區",
         "桃園市:蘆竹區",
@@ -42,11 +48,12 @@
       "minPing": 30,
       "maxAge": 20,
       "handover": "SAFE_AND_PENDING",
-      "active": true,
-      "createdAt": "2026-10-28",
       "subscribers": [
-        "ALL"
-      ]
+        "mem_owner",
+        "mem_392690"
+      ],
+      "active": true,
+      "createdAt": "2026-10-28"
     }
   ],
   "favorites": [
