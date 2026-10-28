@@ -1,7 +1,7 @@
 {
   "recipient_email": "PROTECTED_BY_GITHUB_SECRETS",
   "encrypted_vault": "NCQieHVvc2tsYS0uK38LClJRQ2ovNg1+a3FRcAVBCQo/dUcJAFxnZShdOQUFWkMIZF5SPwBAQno=",
-  "updated_at": "2026-10-28T06:37:28.616Z",
+  "updated_at": "2026-10-28T06:38:28.172Z",
   "include_demo_in_email": true,
   "subscribers": [
     {
@@ -56,11 +56,7 @@
       "createdAt": "2026-10-28"
     }
   ],
-  "favorites": [
-    "PCD_114_42910_甲",
-    "PCD_114_51033_1",
-    "MLD_114_11208_1"
-  ],
+  "favorites": [],
   "custom_notes": {
     "PCD_114_42910_甲": "新莊頭前重劃區 11 年屋，目前處於『應買公告期』最後倒數，不用跟人加價搶標，但債權銀行有優先承買權需注意。",
     "PCD_114_51033_1": "新莊中平路生活圈機能極佳，三拍底價剛好壓在 845 萬、屋齡 17 年、24.2 坪且明確點交！",
