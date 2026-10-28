@@ -102,7 +102,7 @@ def evaluate_case_bucket(case: dict, rule: dict, show_demo: bool = True) -> tupl
     elif h_mode == "SAFE_AND_PENDING":
         if h_status == "不點交":
             return ("EXCLUDED", ["不點交排除"])
-        if h_status in ("部分點交", "點交條件不明(待查)"):
+        if h_status == "點交條件不明(待查)":
             pending_reasons.append(f"點交狀態為「{h_status}」")
 
     if case.get("status") == "停拍/撤回":
