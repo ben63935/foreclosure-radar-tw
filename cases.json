@@ -1,5 +1,229 @@
 [
   {
+    "dedup_key": "LIVE_TFASC_454881",
+    "is_demo": false,
+    "case_id": "台灣金服金拍公告 (臺東縣大武鄉)",
+    "court": "台灣金融資產服務公司 (TFASC 金拍屋)",
+    "division": "金拍組",
+    "section": "公開標",
+    "auction_type": "金拍屋(TFASC)",
+    "status": "公告中",
+    "city": "臺東縣",
+    "district": "大武鄉",
+    "address": "臺東縣大武鄉尚武段997、1004、1103",
+    "property_type": "透天厝",
+    "auction_round": "2拍",
+    "auction_date_roc": "近期開標(詳見金服公告)",
+    "auction_date_ad": "2026-10-28",
+    "reserve_price_wan": 600.0,
+    "deposit_wan": 120.0,
+    "unit_price_wan": 20.0,
+    "area_total_ping": null,
+    "area_main_ping": null,
+    "area_land_ping": null,
+    "handover_status": "點交條件不明(待查)",
+    "handover_raw_note": "由系統自動自台灣金服 (TFASC) 官網即時抓取之拍賣中物件：臺東縣大武鄉尚武段997、1004、1103，總底價 600.0 萬。",
+    "age_years": null,
+    "completion_date_source": "台灣金服官網即時抓取 (待查謄本)",
+    "conflict_notes": [],
+    "price_history": [
+      {
+        "round": "金拍公告",
+        "date": "2026-10-28",
+        "price_wan": 600.0,
+        "result": "官網拍賣中"
+      }
+    ],
+    "sources": [
+      {
+        "platform": "台灣金服 TFASC 即時抓取",
+        "url": "https://www.tfasc.com.tw/",
+        "tier": "Tier-1 官方權威",
+        "fetched_at": "2026-10-28 15:35"
+      }
+    ],
+    "user_note": "雲端爬蟲自動自台灣金服官網抓取之最新物件。",
+    "due_diligence": {
+      "confirmed_facts": [
+        "【台灣金服官網即時同步】門牌：臺東縣大武鄉尚武段997、1004、1103，公告底價：600.0 萬。"
+      ],
+      "pending_leads": [
+        "請點擊台灣金服連結核對完整拍賣筆錄 PDF 與建坪明細。"
+      ],
+      "manual_verification_required": [
+        "投標前請確認保證金票據抬頭與開標分處。"
+      ]
+    }
+  },
+  {
+    "dedup_key": "LIVE_TFASC_122038",
+    "is_demo": false,
+    "case_id": "台灣金服金拍公告 (臺東縣大武鄉)",
+    "court": "台灣金融資產服務公司 (TFASC 金拍屋)",
+    "division": "金拍組",
+    "section": "公開標",
+    "auction_type": "金拍屋(TFASC)",
+    "status": "公告中",
+    "city": "臺東縣",
+    "district": "大武鄉",
+    "address": "臺東縣大武鄉尚武段1008、1019、1016、1018、1012",
+    "property_type": "透天厝",
+    "auction_round": "2拍",
+    "auction_date_roc": "近期開標(詳見金服公告)",
+    "auction_date_ad": "2026-10-28",
+    "reserve_price_wan": 2800.0,
+    "deposit_wan": 560.0,
+    "unit_price_wan": 93.3,
+    "area_total_ping": null,
+    "area_main_ping": null,
+    "area_land_ping": null,
+    "handover_status": "點交條件不明(待查)",
+    "handover_raw_note": "由系統自動自台灣金服 (TFASC) 官網即時抓取之拍賣中物件：臺東縣大武鄉尚武段1008、1019、1016、1018、1012，總底價 2800.0 萬。",
+    "age_years": null,
+    "completion_date_source": "台灣金服官網即時抓取 (待查謄本)",
+    "conflict_notes": [],
+    "price_history": [
+      {
+        "round": "金拍公告",
+        "date": "2026-10-28",
+        "price_wan": 2800.0,
+        "result": "官網拍賣中"
+      }
+    ],
+    "sources": [
+      {
+        "platform": "台灣金服 TFASC 即時抓取",
+        "url": "https://www.tfasc.com.tw/",
+        "tier": "Tier-1 官方權威",
+        "fetched_at": "2026-10-28 15:35"
+      }
+    ],
+    "user_note": "雲端爬蟲自動自台灣金服官網抓取之最新物件。",
+    "due_diligence": {
+      "confirmed_facts": [
+        "【台灣金服官網即時同步】門牌：臺東縣大武鄉尚武段1008、1019、1016、1018、1012，公告底價：2800.0 萬。"
+      ],
+      "pending_leads": [
+        "請點擊台灣金服連結核對完整拍賣筆錄 PDF 與建坪明細。"
+      ],
+      "manual_verification_required": [
+        "投標前請確認保證金票據抬頭與開標分處。"
+      ]
+    }
+  },
+  {
+    "dedup_key": "LIVE_TFASC_423657",
+    "is_demo": false,
+    "case_id": "台灣金服金拍公告 (新北市三重區)",
+    "court": "台灣金融資產服務公司 (TFASC 金拍屋)",
+    "division": "金拍組",
+    "section": "公開標",
+    "auction_type": "金拍屋(TFASC)",
+    "status": "公告中",
+    "city": "新北市",
+    "district": "三重區",
+    "address": "新北市三重區福隆路10號2樓",
+    "property_type": "電梯大樓/華廈",
+    "auction_round": "2拍",
+    "auction_date_roc": "近期開標(詳見金服公告)",
+    "auction_date_ad": "2026-10-28",
+    "reserve_price_wan": 1584.0,
+    "deposit_wan": 316.8,
+    "unit_price_wan": 52.8,
+    "area_total_ping": null,
+    "area_main_ping": null,
+    "area_land_ping": null,
+    "handover_status": "點交條件不明(待查)",
+    "handover_raw_note": "由系統自動自台灣金服 (TFASC) 官網即時抓取之拍賣中物件：新北市三重區福隆路10號2樓，總底價 1584.0 萬。",
+    "age_years": null,
+    "completion_date_source": "台灣金服官網即時抓取 (待查謄本)",
+    "conflict_notes": [],
+    "price_history": [
+      {
+        "round": "金拍公告",
+        "date": "2026-10-28",
+        "price_wan": 1584.0,
+        "result": "官網拍賣中"
+      }
+    ],
+    "sources": [
+      {
+        "platform": "台灣金服 TFASC 即時抓取",
+        "url": "https://www.tfasc.com.tw/",
+        "tier": "Tier-1 官方權威",
+        "fetched_at": "2026-10-28 15:35"
+      }
+    ],
+    "user_note": "雲端爬蟲自動自台灣金服官網抓取之最新物件。",
+    "due_diligence": {
+      "confirmed_facts": [
+        "【台灣金服官網即時同步】門牌：新北市三重區福隆路10號2樓，公告底價：1584.0 萬。"
+      ],
+      "pending_leads": [
+        "請點擊台灣金服連結核對完整拍賣筆錄 PDF 與建坪明細。"
+      ],
+      "manual_verification_required": [
+        "投標前請確認保證金票據抬頭與開標分處。"
+      ]
+    }
+  },
+  {
+    "dedup_key": "LIVE_TFASC_939635",
+    "is_demo": false,
+    "case_id": "台灣金服金拍公告 (雲林縣斗南鎮)",
+    "court": "台灣金融資產服務公司 (TFASC 金拍屋)",
+    "division": "金拍組",
+    "section": "公開標",
+    "auction_type": "金拍屋(TFASC)",
+    "status": "公告中",
+    "city": "雲林縣",
+    "district": "斗南鎮",
+    "address": "雲林縣斗南鎮中興段436、436-6、436-7、436-8、436",
+    "property_type": "透天厝",
+    "auction_round": "2拍",
+    "auction_date_roc": "近期開標(詳見金服公告)",
+    "auction_date_ad": "2026-10-28",
+    "reserve_price_wan": 52.0,
+    "deposit_wan": 10.4,
+    "unit_price_wan": 1.7,
+    "area_total_ping": null,
+    "area_main_ping": null,
+    "area_land_ping": null,
+    "handover_status": "點交條件不明(待查)",
+    "handover_raw_note": "由系統自動自台灣金服 (TFASC) 官網即時抓取之拍賣中物件：雲林縣斗南鎮中興段436、436-6、436-7、436-8、436，總底價 52.0 萬。",
+    "age_years": null,
+    "completion_date_source": "台灣金服官網即時抓取 (待查謄本)",
+    "conflict_notes": [],
+    "price_history": [
+      {
+        "round": "金拍公告",
+        "date": "2026-10-28",
+        "price_wan": 52.0,
+        "result": "官網拍賣中"
+      }
+    ],
+    "sources": [
+      {
+        "platform": "台灣金服 TFASC 即時抓取",
+        "url": "https://www.tfasc.com.tw/",
+        "tier": "Tier-1 官方權威",
+        "fetched_at": "2026-10-28 15:35"
+      }
+    ],
+    "user_note": "雲端爬蟲自動自台灣金服官網抓取之最新物件。",
+    "due_diligence": {
+      "confirmed_facts": [
+        "【台灣金服官網即時同步】門牌：雲林縣斗南鎮中興段436、436-6、436-7、436-8、436，公告底價：52.0 萬。"
+      ],
+      "pending_leads": [
+        "請點擊台灣金服連結核對完整拍賣筆錄 PDF 與建坪明細。"
+      ],
+      "manual_verification_required": [
+        "投標前請確認保證金票據抬頭與開標分處。"
+      ]
+    }
+  },
+  {
     "dedup_key": "LIVE_TFASC_407936",
     "is_demo": false,
     "case_id": "台灣金服金拍公告 (臺東縣大武鄉)",
