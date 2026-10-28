@@ -42,7 +42,7 @@ def normalize_city_district(addr: str) -> tuple:
 def call_github_models_ai(case_obj: dict, github_token: str) -> str:
     if not github_token:
         return ""
-    url = "https://models.inference.ai.azure.com/chat/completions"
+    url = "https://models.github.ai/inference/chat/completions"
     prompt = (
         f"請針對以下台灣法拍案件提供 150 字內之精要風險預審（含點交細節、底價折數與投標前必查事項）：\n"
         f"案號：{case_obj.get('case_id')} ({case_obj.get('court')})\n"
@@ -51,7 +51,7 @@ def call_github_models_ai(case_obj: dict, github_token: str) -> str:
         f"點交與筆錄：{case_obj.get('handover_status')} - {case_obj.get('handover_raw_note')}"
     )
     payload = json.dumps({
-        "model": "gpt-4o-mini",
+        "model": "openai/gpt-4o-mini",
         "messages": [
             {"role": "system", "content": "你是台灣不動產強制執行與法拍屋產權分析師。"},
             {"role": "user", "content": prompt}
@@ -221,8 +221,10 @@ if __name__ == "__main__":
     gh_token = (os.environ.get("GITHUB_TOKEN") or "").strip()
     if gh_token and existing_cases:
         enriched = 0
+        attempts = 0
         for c in existing_cases:
-            if not c.get("is_demo") and not c.get("gh_ai_analysis") and enriched < 2:
+            if not c.get("is_demo") and not c.get("gh_ai_analysis") and enriched < 2 and attempts < 2:
+                attempts += 1
                 ai_note = call_github_models_ai(c, gh_token)
                 if ai_note:
                     c["gh_ai_analysis"] = ai_note

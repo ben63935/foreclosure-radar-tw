@@ -599,8 +599,8 @@
             </p>
             <div class="flex items-center gap-2">
               <select id="ghAiModelSelect" class="rounded-lg bg-slate-800 border border-slate-700 text-xs text-slate-200 px-2.5 py-2 focus:outline-none">
-                <option value="gpt-4o-mini">gpt-4o-mini (速度快・免費額度高)</option>
-                <option value="gpt-4o">gpt-4o (深度推理・高精準度)</option>
+                <option value="openai/gpt-4o-mini">openai/gpt-4o-mini (速度快・免費額度高)</option>
+                <option value="openai/gpt-4o">openai/gpt-4o (深度推理・高精準度)</option>
               </select>
               <button id="btnRunGithubAi" type="button" class="flex-1 py-2 px-3 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs transition shadow-sm flex items-center justify-center gap-1.5">
                 <span>🤖 立即執行免費 AI 初步調查</span>
@@ -5588,7 +5588,7 @@
           var c = getSelectedDdCase();
           if (!c) return;
           var token = (state.ghToken || "").trim();
-          var modelName = document.getElementById("ghAiModelSelect").value || "gpt-4o-mini";
+          var modelName = document.getElementById("ghAiModelSelect").value || "openai/gpt-4o-mini";
           var resBox = document.getElementById("ghAiResultBox");
           resBox.classList.remove("hidden");
 
@@ -5613,7 +5613,7 @@
             "- 點交狀態與筆錄原文：" + c.handover_status + " — " + c.handover_raw_note;
 
           try {
-            var response = await fetch("https://models.inference.ai.azure.com/chat/completions", {
+            var response = await fetch("https://models.github.ai/inference/chat/completions", {
               method: "POST",
               headers: {
                 "Authorization": "Bearer " + token,
