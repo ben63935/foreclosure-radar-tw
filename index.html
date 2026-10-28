@@ -1,0 +1,3041 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ForeclosureRadar TW｜台灣跨平台法拍・金拍・銀拍・稅拍智慧檢索系統</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: #f8fafc;
+      color: #0f172a;
+    }
+    .scrollbar-thin::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .scrollbar-thin::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    .scrollbar-thin::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 3px;
+    }
+    .badge-pulse {
+      animation: pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+    @keyframes pulse-ring {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.65; }
+    }
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button {
+      opacity: 1;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col selection:bg-indigo-600 selection:text-white">
+
+  <!-- Top Disclaimer & Sync Status Bar -->
+  <div class="bg-slate-900 text-slate-300 text-xs py-2 px-4 border-b border-slate-800">
+    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2">
+      <div class="flex items-center gap-2">
+        <span class="inline-flex items-center px-2 py-0.5 rounded font-medium bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 mr-1.5 badge-pulse"></span>
+          官方來源優先・三態容錯防漏
+        </span>
+        <span>資訊僅供參考，投標前請務必以各執行法院、行政執行署及主辦銀行<strong>公告正本與最新地政謄本</strong>為準。</span>
+      </div>
+      <div class="flex items-center gap-3 text-slate-400">
+        <span>時區：<strong class="text-slate-200">Asia/Taipei (民國/西元雙軌)</strong></span>
+        <span>｜</span>
+        <span>最後同步：<strong id="lastSyncTimeDisplay" class="text-emerald-400">2026-10-28 07:30 (115/10/28)</strong></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Header & Streamlined 4-Tab Navigation -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex flex-wrap items-center justify-between py-3 gap-3">
+        <!-- Brand -->
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-slate-900 to-indigo-800 flex items-center justify-center text-white font-bold text-lg shadow-sm">
+            法拍
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h1 class="text-lg font-bold tracking-tight text-slate-900">ForeclosureRadar TW</h1>
+              <span class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200">跨縣市行政區複選＋雙軌篩選版</span>
+            </div>
+            <p class="text-xs text-slate-500">司法院法拍・台灣金服金拍・合庫/臺銀銀拍・法務部行政執行署稅拍 跨平台整合系統</p>
+          </div>
+        </div>
+
+        <!-- Clean 4 Main Tabs -->
+        <nav class="flex items-center gap-1.5 overflow-x-auto py-1" aria-label="主要功能導覽">
+          <button id="navTabSearch" data-tab="search" class="nav-tab-btn px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all bg-slate-900 text-white shadow-sm flex items-center gap-1.5">
+            <span>🔍 案件自由篩選</span>
+            <span id="navCountTotal" class="px-1.5 py-0.2 rounded-full text-[11px] bg-white/20 text-white">14</span>
+          </button>
+          <button id="navTabDueDiligence" data-tab="duediligence" class="nav-tab-btn px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all text-slate-600 hover:bg-slate-100 flex items-center gap-1.5">
+            <span>🕵️ 案件深度調查 & AI 匯出</span>
+            <span class="px-1.5 py-0.2 rounded-full text-[11px] bg-indigo-100 text-indigo-700">JSON/Prompt</span>
+          </button>
+          <button id="navTabSubscription" data-tab="subscription" class="nav-tab-btn px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all text-slate-600 hover:bg-slate-100 flex items-center gap-1.5">
+            <span>🔔 條件訂閱 & Email 日報</span>
+            <span id="navCountFav" class="px-1.5 py-0.2 rounded-full text-[11px] bg-amber-100 text-amber-800">3</span>
+          </button>
+          <button id="navTabSources" data-tab="sources" class="nav-tab-btn px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all text-slate-600 hover:bg-slate-100 flex items-center gap-1.5">
+            <span>📡 資料源狀態 & 稅拍手動匯入</span>
+          </button>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <!-- Toast Notification -->
+  <div id="toastBanner" class="fixed bottom-5 right-5 z-50 hidden max-w-sm bg-slate-900 text-white px-4 py-3 rounded-xl shadow-xl border border-slate-700 text-sm flex items-center gap-3">
+    <span class="w-2 h-2 rounded-full bg-emerald-400 shrink-0"></span>
+    <span id="toastMessage">操作已成功執行</span>
+  </div>
+
+  <!-- Main Workspace Container -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-5">
+
+    <!-- ========================================== -->
+    <!-- TAB 1: 跨平台自由篩選總覽                    -->
+    <!-- ========================================== -->
+    <section id="view-search" class="space-y-4">
+
+      <!-- Clean & Flexible Filter Control Panel -->
+      <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm space-y-4">
+        <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3">
+          <div class="space-y-0.5">
+            <h2 class="text-sm font-bold text-slate-900">🎯 跨平台精準篩選（支援「跨縣市＋行政區複選」與「下拉快速選單＋自訂數字雙軌輸入」）</h2>
+            <p class="text-[11px] text-slate-500">說明：先由後端匯集全量官方與民間資料至本地庫，前端篩選採用「三態容錯防漏」，自訂輸入<strong>絕對不會導致漏抓或案件變少</strong>。</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button id="btnSaveCurrentAsSub" type="button" class="text-xs font-semibold text-indigo-700 hover:text-indigo-900 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-lg border border-indigo-200 transition">
+              + 將目前篩選條件存為每日 Email 訂閱
+            </button>
+            <button id="btnResetFilters" type="button" class="text-xs font-medium text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-lg transition">
+              清空重置全部條件
+            </button>
+          </div>
+        </div>
+
+        <!-- Row 1: Multi-Select City & District Picker + Selected Location Tags -->
+        <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/90 space-y-3">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-bold text-slate-800">1. 地區複選器（可跨多個縣市＆指定多個行政區，例如同時勾選「新北市新莊區、三重區」＋「苗栗縣頭份市、竹南鎮」）：</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <button id="btnToggleLocPanel" type="button" class="px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold transition flex items-center gap-1.5 shadow-sm">
+                <span>📍 展開 / 收合「縣市＆行政區」複選面板</span>
+                <span id="locSelectedCountBadge" class="px-1.5 py-0.2 rounded-full bg-emerald-500 text-white text-[11px]">全台灣 (不限)</span>
+              </button>
+              <button id="btnClearLocations" type="button" class="px-2.5 py-1.5 rounded-lg bg-white border border-slate-300 hover:bg-slate-100 text-xs text-slate-600 transition">
+                清空地區(查全台)
+              </button>
+            </div>
+          </div>
+
+          <!-- Active Selected Location Chips Bar -->
+          <div id="selectedLocationChips" class="flex flex-wrap items-center gap-1.5">
+            <!-- Populated by JS -->
+          </div>
+
+          <!-- Collapsible 2-Column Multi-Select City & District Panel -->
+          <div id="locMultiSelectPanel" class="hidden pt-3 border-t border-slate-200 grid grid-cols-1 md:grid-cols-12 gap-4">
+            <!-- Left 5 cols: 22 Cities grouped by region -->
+            <div class="md:col-span-5 bg-white p-3 rounded-lg border border-slate-200 max-h-64 overflow-y-auto scrollbar-thin space-y-2.5">
+              <div class="text-xs font-bold text-slate-700 border-b border-slate-100 pb-1.5 flex items-center justify-between">
+                <span>步驟 A：點擊縣市載入行政區（打勾可選整縣市）</span>
+              </div>
+              <div id="cityListMultiContainer" class="space-y-2 text-xs">
+                <!-- Populated by JS -->
+              </div>
+            </div>
+
+            <!-- Right 7 cols: Districts of active focused city -->
+            <div class="md:col-span-7 bg-white p-3 rounded-lg border border-slate-200 max-h-64 overflow-y-auto scrollbar-thin flex flex-col justify-between">
+              <div>
+                <div class="text-xs font-bold text-indigo-900 border-b border-slate-100 pb-1.5 flex items-center justify-between">
+                  <span id="activeCityDistrictTitle">步驟 B：勾選行政區（可複選多個區）</span>
+                  <div class="flex items-center gap-2">
+                    <button id="btnSelectAllDistrictsCity" type="button" class="text-[11px] text-indigo-600 hover:underline font-semibold">全選本縣市</button>
+                    <span class="text-slate-300">|</span>
+                    <button id="btnClearDistrictsCity" type="button" class="text-[11px] text-slate-500 hover:underline">取消本縣市</button>
+                  </div>
+                </div>
+                <div id="districtCheckboxesContainer" class="grid grid-cols-3 sm:grid-cols-4 gap-2 pt-2.5 text-xs">
+                  <!-- Populated by JS -->
+                </div>
+              </div>
+              <div class="pt-3 mt-3 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
+                <span>提示：直接勾選「新莊區」、「三重區」後，可再點左側「苗栗縣」繼續勾選「竹南鎮」、「頭份市」。</span>
+                <button id="btnCloseLocPanel" type="button" class="px-3 py-1 rounded bg-indigo-600 text-white font-semibold text-xs">完成地區選擇</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Row 2: Hybrid Dual-Mode Controls (Quick Select Dropdown + Custom Min/Max Input) -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5">
+
+          <!-- 2. 點交狀態 -->
+          <div class="p-3 rounded-xl border border-slate-200 bg-white space-y-2">
+            <label for="filterHandover" class="block text-xs font-bold text-slate-800">2. 點交條件</label>
+            <select id="filterHandover" class="w-full rounded-lg border border-slate-300 bg-slate-50 px-2.5 py-1.5 text-xs font-medium text-slate-800 focus:border-indigo-600 focus:outline-none">
+              <option value="ALL">不限點交狀態</option>
+              <option value="SAFE_AND_PENDING">點交 + 部分點交/待查 (推薦防漏)</option>
+              <option value="STRICT_HANDOVER">僅限「明確點交」</option>
+              <option value="PARTIAL_ONLY">僅看「部分點交 / 點交待查」</option>
+              <option value="NO_HANDOVER">僅看「不點交」</option>
+            </select>
+            <div class="text-[11px] text-slate-500 leading-tight">
+              建議選「點交+待查」，避免主建物點交但公設不點交的好案被誤刪。
+            </div>
+          </div>
+
+          <!-- 3. 總底價：快速下拉 + 自由輸入雙軌 -->
+          <div class="p-3 rounded-xl border border-slate-200 bg-white space-y-2">
+            <div class="flex items-center justify-between">
+              <label for="quickPriceSelect" class="text-xs font-bold text-slate-800">3. 總底價 (萬元)</label>
+              <span class="text-[10px] text-indigo-600 font-semibold">下拉或自訂皆可</span>
+            </div>
+            <select id="quickPriceSelect" class="w-full rounded-lg border border-slate-300 bg-slate-50 px-2 py-1.5 text-xs text-slate-700 focus:border-indigo-600 focus:outline-none">
+              <option value="ALL">快速選擇：不限底價</option>
+              <option value="0-600">600 萬以內</option>
+              <option value="0-850">850 萬以內 (自住熱門)</option>
+              <option value="0-1200">1,200 萬以內</option>
+              <option value="0-1600">1,600 萬以內</option>
+              <option value="0-2500">2,500 萬以內</option>
+              <option value="CUSTOM">✏️ 自訂輸入上下限...</option>
+            </select>
+            <div class="flex items-center gap-1.5">
+              <input id="filterMinPrice" type="number" min="0" step="50" placeholder="最低(萬)" class="w-1/2 rounded-lg border border-slate-300 px-2 py-1.5 text-xs text-slate-800 focus:border-indigo-600 focus:outline-none" />
+              <span class="text-slate-400 text-xs">~</span>
+              <input id="filterMaxPrice" type="number" min="0" step="50" placeholder="最高(例850)" class="w-1/2 rounded-lg border border-slate-300 px-2 py-1.5 text-xs text-slate-800 focus:border-indigo-600 focus:outline-none" />
+            </div>
+          </div>
+
+          <!-- 4. 屋齡：快速下拉 + 自由輸入雙軌 -->
+          <div class="p-3 rounded-xl border border-slate-200 bg-white space-y-2">
+            <div class="flex items-center justify-between">
+              <label for="quickAgeSelect" class="text-xs font-bold text-slate-800">4. 屋齡區間 (年)</label>
+              <span class="text-[10px] text-indigo-600 font-semibold">下拉或自訂皆可</span>
+            </div>
+            <select id="quickAgeSelect" class="w-full rounded-lg border border-slate-300 bg-slate-50 px-2 py-1.5 text-xs text-slate-700 focus:border-indigo-600 focus:outline-none">
+              <option value="ALL">快速選擇：不限屋齡</option>
+              <option value="0-10">10 年內 (新古屋)</option>
+              <option value="0-20">20 年內 (自住主流)</option>
+              <option value="0-30">30 年內</option>
+              <option value="0-40">40 年內</option>
+              <option value="CUSTOM">✏️ 自訂輸入屋齡...</option>
+            </select>
+            <div class="flex items-center gap-1.5">
+              <input id="filterMinAge" type="number" min="0" step="1" placeholder="最小(年)" class="w-1/2 rounded-lg border border-slate-300 px-2 py-1.5 text-xs text-slate-800 focus:border-indigo-600 focus:outline-none" />
+              <span class="text-slate-400 text-xs">~</span>
+              <input id="filterMaxAge" type="number" min="0" step="1" placeholder="最大(例20)" class="w-1/2 rounded-lg border border-slate-300 px-2 py-1.5 text-xs text-slate-800 focus:border-indigo-600 focus:outline-none" />
+            </div>
+          </div>
+
+          <!-- 5. 權狀建坪：快速下拉 + 自由輸入雙軌 -->
+          <div class="p-3 rounded-xl border border-slate-200 bg-white space-y-2">
+            <div class="flex items-center justify-between">
+              <label for="quickPingSelect" class="text-xs font-bold text-slate-800">5. 權狀總建坪 (坪)</label>
+              <span class="text-[10px] text-indigo-600 font-semibold">下拉或自訂皆可</span>
+            </div>
+            <select id="quickPingSelect" class="w-full rounded-lg border border-slate-300 bg-slate-50 px-2 py-1.5 text-xs text-slate-700 focus:border-indigo-600 focus:outline-none">
+              <option value="ALL">快速選擇：不限坪數</option>
+              <option value="15-">15 坪以上</option>
+              <option value="20-">20 坪以上 (標準兩房+)</option>
+              <option value="30-">30 坪以上 (標準三房+)</option>
+              <option value="45-">45 坪以上 (大坪數/透天)</option>
+              <option value="CUSTOM">✏️ 自訂輸入坪數...</option>
+            </select>
+            <div class="flex items-center gap-1.5">
+              <input id="filterMinPing" type="number" min="0" step="1" placeholder="最小(例20)" class="w-1/2 rounded-lg border border-slate-300 px-2 py-1.5 text-xs text-slate-800 focus:border-indigo-600 focus:outline-none" />
+              <span class="text-slate-400 text-xs">~</span>
+              <input id="filterMaxPing" type="number" min="0" step="5" placeholder="最大(坪)" class="w-1/2 rounded-lg border border-slate-300 px-2 py-1.5 text-xs text-slate-800 focus:border-indigo-600 focus:outline-none" />
+            </div>
+          </div>
+
+          <!-- 6. 拍賣管道與拍次 -->
+          <div class="p-3 rounded-xl border border-slate-200 bg-white space-y-2">
+            <label for="filterChannel" class="block text-xs font-bold text-slate-800">6. 拍賣來源與拍次</label>
+            <select id="filterChannel" class="w-full rounded-lg border border-slate-300 bg-slate-50 px-2 py-1.5 text-xs text-slate-800 focus:border-indigo-600 focus:outline-none">
+              <option value="ALL">全部官方管道 (含法院+金銀拍+稅拍)</option>
+              <option value="法院法拍">司法院地方法院法拍</option>
+              <option value="金拍屋(TFASC)">台灣金服 (TFASC 金拍屋)</option>
+              <option value="銀拍屋/行有標售">銀行銀拍屋 / 臺銀法拍</option>
+              <option value="稅務行政執行拍賣">法務部行政執行署 (稅務拍賣)</option>
+            </select>
+            <select id="filterRound" class="w-full rounded-lg border border-slate-300 bg-white px-2 py-1.5 text-xs text-slate-700 focus:border-indigo-600 focus:outline-none">
+              <option value="ALL">全部拍次 (1~4拍 / 應買 / 銀拍)</option>
+              <option value="1拍">1拍</option>
+              <option value="2拍">2拍</option>
+              <option value="3拍">3拍</option>
+              <option value="應買公告">應買公告 (免競價先遞狀得標)</option>
+              <option value="銀拍公開標售">銀拍公開標售</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Row 3: Property Type, Keyword, Unknown Toggle, Sort -->
+        <div class="pt-3 border-t border-slate-100 grid grid-cols-1 md:grid-cols-12 gap-3 items-center">
+          <div class="md:col-span-2">
+            <select id="filterPropType" class="w-full rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 text-xs font-medium text-slate-700">
+              <option value="ALL">全部建物類型</option>
+              <option value="電梯大樓/華廈">電梯大樓 / 華廈</option>
+              <option value="公寓">公寓</option>
+              <option value="透天厝">透天厝 / 別墅</option>
+            </select>
+          </div>
+
+          <div class="md:col-span-4">
+            <input id="filterKeyword" type="text" placeholder="搜尋路名、社區、重劃區或案號 (例：頭前、中路、尚順、三重)..." class="w-full rounded-lg border border-slate-300 px-3 py-1.5 text-xs sm:text-sm focus:border-indigo-600 focus:outline-none" />
+          </div>
+
+          <div class="md:col-span-4">
+            <label class="inline-flex items-center gap-1.5 text-xs font-medium text-slate-700 bg-amber-50/80 border border-amber-200 px-2.5 py-1.5 rounded-lg cursor-pointer w-full">
+              <input id="toggleKeepUnknown" type="checkbox" checked class="rounded text-amber-600 focus:ring-0" />
+              <span class="truncate">缺屋齡/部分點交保留於【待確認】防漏標</span>
+            </label>
+          </div>
+
+          <div class="md:col-span-2 flex items-center justify-end gap-1.5">
+            <select id="sortOrder" class="w-full rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 text-xs font-medium text-slate-700">
+              <option value="date_asc">排序：開標日由近到遠</option>
+              <option value="price_asc">排序：總底價由低到高</option>
+              <option value="price_desc">排序：總底價由高到低</option>
+              <option value="unit_asc">排序：單價(萬/坪)低到高</option>
+              <option value="age_asc">排序：屋齡由新到舊</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Three-State Result Sub-tabs (Confirmed / Pending Verification / Favorites) -->
+      <div class="flex flex-wrap items-center justify-between gap-3 bg-slate-100 p-1.5 rounded-xl border border-slate-200">
+        <div class="flex flex-wrap items-center gap-1">
+          <button id="subTabConfirmed" data-bucket="CONFIRMED" class="bucket-tab-btn px-4 py-2 rounded-lg text-xs sm:text-sm font-bold bg-white text-emerald-800 shadow-sm border border-emerald-200 flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+            <span>✅ 已確認符合條件</span>
+            <span id="countConfirmedBadge" class="px-2 py-0.5 rounded-full text-xs bg-emerald-100 text-emerald-800">0</span>
+          </button>
+          <button id="subTabPending" data-bucket="PENDING" class="bucket-tab-btn px-4 py-2 rounded-lg text-xs sm:text-sm font-bold text-amber-900 hover:bg-white/60 flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+            <span>⚠️ 資訊不足・待人工確認 (防漏標保護區)</span>
+            <span id="countPendingBadge" class="px-2 py-0.5 rounded-full text-xs bg-amber-200/80 text-amber-900">0</span>
+          </button>
+          <button id="subTabFavorites" data-bucket="FAVORITES" class="bucket-tab-btn px-4 py-2 rounded-lg text-xs sm:text-sm font-bold text-indigo-900 hover:bg-white/60 flex items-center gap-2">
+            <span>⭐ 已收藏追蹤案件 (不受篩選限制・降價停拍監控)</span>
+            <span id="countFavoritesBadge" class="px-2 py-0.5 rounded-full text-xs bg-indigo-200/80 text-indigo-900">0</span>
+          </button>
+        </div>
+        <div class="px-3 text-xs text-slate-500">
+          跨站去重主鍵：<code class="text-slate-700 font-mono bg-white px-1.5 py-0.5 rounded border border-slate-200">法院/機關代碼 + 年度案號 + 標別</code>
+        </div>
+      </div>
+
+      <!-- Case Cards Grid -->
+      <div id="casesListContainer" class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <!-- Populated by JS -->
+      </div>
+
+    </section>
+
+    <!-- ========================================== -->
+    <!-- TAB 2: 案件深度調查 & AI 匯出工作台           -->
+    <!-- ========================================== -->
+    <section id="view-duediligence" class="hidden space-y-6">
+      <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
+        <div class="flex flex-wrap items-center justify-between gap-4 border-b border-slate-100 pb-4">
+          <div>
+            <span class="text-xs font-bold uppercase tracking-wider text-indigo-700 bg-indigo-50 px-2.5 py-1 rounded-md">單案件深度挖掘模組</span>
+            <h2 class="text-lg font-bold text-slate-900 mt-1">案件產權・訴訟・社區事故三級證據調查 ＆ AI 分析匯出工作台</h2>
+            <p class="text-xs text-slate-500 mt-0.5">
+              將查核資料嚴格區分為「已確認事實」、「待查證線索（防範裁判書同名同姓誤判）」與「須人工實地核實事項」，並可一鍵複製完整 JSON 與分析指令交給外部 AI。
+            </p>
+          </div>
+          <div class="flex items-center gap-2">
+            <label for="ddCaseSelector" class="text-xs font-semibold text-slate-600">切換調查案件：</label>
+            <select id="ddCaseSelector" class="rounded-lg border border-slate-300 bg-slate-50 px-3 py-2 text-xs sm:text-sm font-semibold text-slate-900 focus:border-indigo-600 focus:outline-none">
+              <!-- Populated by JS -->
+            </select>
+          </div>
+        </div>
+
+        <!-- Selected Case Summary Header -->
+        <div id="ddCaseSummaryBox" class="mt-4">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <!-- 3-Tier Evidence Grid + Cost Estimator -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+        <!-- Left 2 Columns: 3 Evidence Tiers + 6 Direct Official Investigation Launchers -->
+        <div class="lg:col-span-2 space-y-4" id="ddEvidenceContainer">
+          <!-- Populated by JS -->
+        </div>
+
+        <!-- Right 1 Column: Export Box + Acquisition Cost Calculator + Custom Note -->
+        <div class="space-y-4">
+          <!-- Export to AI Prompt / JSON Card -->
+          <div class="bg-slate-900 text-white rounded-xl p-5 shadow-md border border-slate-800">
+            <div class="flex items-center justify-between mb-2">
+              <h3 class="text-sm font-bold text-emerald-400">🤖 匯出給外部 AI 深度分析</h3>
+              <span class="text-[11px] bg-white/10 px-2 py-0.5 rounded text-slate-300">支援 GPT / Claude / Gemini</span>
+            </div>
+            <p class="text-xs text-slate-300 leading-relaxed mb-4">
+              已將本案跨平台去重欄位、歷次拍賣底價、筆錄原文、三級證據清單與待查缺口整理為結構化格式，點擊下方按鈕即可複製並直接貼給任何 AI 進行評估。
+            </p>
+            <div class="grid grid-cols-1 gap-2">
+              <button id="btnCopyAiPrompt" type="button" class="w-full py-2.5 px-3 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs flex items-center justify-center gap-2 transition shadow-sm">
+                <span>📋 一鍵複製「AI 深度法律與估價分析 Prompt + 完整 JSON」</span>
+              </button>
+              <div class="grid grid-cols-2 gap-2">
+                <button id="btnDownloadJson" type="button" class="py-2 px-3 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium text-xs border border-slate-700 transition">
+                  ⬇️ 下載結構化 .JSON
+                </button>
+                <button id="btnDownloadMd" type="button" class="py-2 px-3 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium text-xs border border-slate-700 transition">
+                  ⬇️ 下載調查報告 .MD
+                </button>
+              </div>
+            </div>
+            <div class="mt-3 pt-3 border-t border-slate-800">
+              <label class="block text-[11px] text-slate-400 mb-1">匯出預覽 (結構化 JSON + 推理指令)：</label>
+              <textarea id="ddExportPreview" readonly rows="7" class="w-full rounded-lg bg-slate-950 text-emerald-300 font-mono text-[11px] p-2.5 border border-slate-800 focus:outline-none scrollbar-thin"></textarea>
+            </div>
+          </div>
+
+          <!-- Interactive Acquisition Cost & Cashflow Risk Calculator -->
+          <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
+            <h3 class="text-sm font-bold text-slate-900 mb-1">💰 取得成本與 7 日尾款試算器</h3>
+            <p class="text-xs text-slate-500 mb-3">法拍得標後須於 <strong>7 日內繳清尾款</strong>；可自由調整預計加價投標金額、搬遷與整修預算：</p>
+            <div class="space-y-2.5 text-xs">
+              <div class="flex items-center justify-between">
+                <span class="text-slate-600">預計加價投標金額 (萬元)：</span>
+                <input id="calcBidPriceInput" type="number" step="10" class="w-28 rounded border border-slate-300 px-2 py-1 text-right font-bold text-slate-900" />
+              </div>
+              <div class="flex items-center justify-between">
+                <span class="text-slate-600">投標保證金 (開標當日本票)：</span>
+                <strong id="calcDepositVal" class="text-slate-900">-- 萬</strong>
+              </div>
+              <div class="flex items-center justify-between">
+                <span class="text-slate-600">7日內應補足拍定尾款：</span>
+                <strong id="calcBalanceVal" class="text-rose-600">-- 萬</strong>
+              </div>
+              <div class="flex items-center justify-between">
+                <span class="text-slate-600">契稅 + 印花稅 + 規費預估 (約 1.2%)：</span>
+                <strong id="calcTaxVal" class="text-slate-800">-- 萬</strong>
+              </div>
+              <div class="flex items-center justify-between">
+                <span class="text-slate-600">預留搬遷協調 / 點交強制執行費：</span>
+                <input id="calcEvictInput" type="number" step="5" value="15" class="w-24 rounded border border-slate-300 px-2 py-1 text-right font-semibold text-slate-800" />
+              </div>
+              <div class="flex items-center justify-between">
+                <span class="text-slate-600">基礎整修與水電整理預估：</span>
+                <input id="calcRenovInput" type="number" step="5" value="45" class="w-24 rounded border border-slate-300 px-2 py-1 text-right font-semibold text-slate-800" />
+              </div>
+              <div class="pt-2 border-t border-slate-200 flex items-center justify-between text-sm">
+                <span class="font-bold text-slate-900">預估總持有落地成本：</span>
+                <strong id="calcTotalCostVal" class="text-indigo-700 text-base">-- 萬</strong>
+              </div>
+              <div class="flex items-center justify-between text-xs pt-1">
+                <span class="text-slate-500">折合落地建坪實質單價：</span>
+                <strong id="calcRealUnitVal" class="text-emerald-700">-- 萬/坪</strong>
+              </div>
+            </div>
+          </div>
+
+          <!-- Custom Field Inspection Note -->
+          <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
+            <h3 class="text-sm font-bold text-slate-900 mb-1">📝 實地勘查與看屋自訂備註</h3>
+            <p class="text-xs text-slate-500 mb-2">記錄管理員訪談、水電錶是否轉動、信箱塞滿程度等一手情報（自動儲存並納入 AI 匯出）：</p>
+            <textarea id="ddUserCustomNote" rows="3" placeholder="例如：現場勘查管理員表示屋主已搬離半年、無積欠大額管理費..." class="w-full rounded-lg border border-slate-300 p-2.5 text-xs text-slate-800 focus:border-indigo-600 focus:outline-none"></textarea>
+            <button id="btnSaveCustomNote" type="button" class="mt-2 w-full py-2 rounded-lg bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold transition">
+              💾 儲存此案勘查筆記
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- TAB 3: 條件訂閱、異動監控與每日 Email 日報      -->
+    <!-- ========================================== -->
+    <section id="view-subscription" class="hidden space-y-6">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Left: Subscription Rules List & Editor -->
+        <div class="lg:col-span-2 space-y-4">
+          <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+              <div>
+                <h2 class="text-base font-bold text-slate-900">📬 多組條件訂閱管理 & 狀態異動觸發器</h2>
+                <p class="text-xs text-slate-500">支援儲存「跨縣市＋指定多行政區」訂閱條件！系統每日 07:30 比對新案，並針對收藏案件監控停拍與降價。</p>
+              </div>
+              <button id="btnOpenNewRuleModal" type="button" class="px-3.5 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold transition shadow-sm">
+                + 新增自訂訂閱條件組
+              </button>
+            </div>
+
+            <!-- Add New Rule Inline Panel -->
+            <div id="newRuleFormPanel" class="hidden mb-5 p-4 rounded-xl bg-indigo-50/70 border border-indigo-200 space-y-3">
+              <h4 class="text-xs font-bold text-indigo-900">建立新訂閱條件組（可輸入多個指定縣市或行政區，如：新北市新莊區, 新北市三重區）</h4>
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div>
+                  <label class="block text-[11px] font-semibold text-slate-700 mb-1">規則名稱</label>
+                  <input id="newRuleName" type="text" placeholder="例：新莊三重＋竹南頭份自住監控" class="w-full rounded border border-slate-300 px-2.5 py-1.5 text-xs" />
+                </div>
+                <div class="sm:col-span-2">
+                  <label class="block text-[11px] font-semibold text-slate-700 mb-1">目標縣市或行政區（多個請用逗號分隔，留空代表全台）</label>
+                  <input id="newRuleLocations" type="text" placeholder="例：新北市:新莊區, 新北市:三重區, 苗栗縣:竹南鎮, 苗栗縣:頭份市" class="w-full rounded border border-slate-300 bg-white px-2.5 py-1.5 text-xs" />
+                </div>
+                <div>
+                  <label class="block text-[11px] font-semibold text-slate-700 mb-1">總底價上限 (萬，留空不限)</label>
+                  <input id="newRuleMaxPrice" type="number" value="1200" class="w-full rounded border border-slate-300 px-2.5 py-1.5 text-xs" />
+                </div>
+                <div>
+                  <label class="block text-[11px] font-semibold text-slate-700 mb-1">最小建坪 (坪，留空不限)</label>
+                  <input id="newRuleMinPing" type="number" value="20" class="w-full rounded border border-slate-300 px-2.5 py-1.5 text-xs" />
+                </div>
+                <div>
+                  <label class="block text-[11px] font-semibold text-slate-700 mb-1">最大屋齡 (年，留空不限)</label>
+                  <input id="newRuleMaxAge" type="number" value="20" class="w-full rounded border border-slate-300 px-2.5 py-1.5 text-xs" />
+                </div>
+                <div>
+                  <label class="block text-[11px] font-semibold text-slate-700 mb-1">點交要求</label>
+                  <select id="newRuleHandover" class="w-full rounded border border-slate-300 bg-white px-2.5 py-1.5 text-xs">
+                    <option value="SAFE_AND_PENDING">點交 + 待確認(防漏)</option>
+                    <option value="STRICT_HANDOVER">僅限明確點交</option>
+                    <option value="ALL">不限點交</option>
+                  </select>
+                </div>
+              </div>
+              <div class="flex justify-end gap-2 pt-2">
+                <button id="btnCancelNewRule" type="button" class="px-3 py-1.5 rounded bg-white border border-slate-300 text-xs text-slate-600">取消</button>
+                <button id="btnConfirmNewRule" type="button" class="px-3.5 py-1.5 rounded bg-indigo-600 text-white text-xs font-semibold">儲存訂閱規則</button>
+              </div>
+            </div>
+
+            <!-- Subscription Rules Cards -->
+            <div id="subscriptionRulesList" class="space-y-3">
+              <!-- Populated by JS -->
+            </div>
+          </div>
+
+          <!-- Status Change Tracking Timeline Log -->
+          <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
+            <h3 class="text-sm font-bold text-slate-900 mb-1">📉 案件狀態異動監控日誌 (流標降價 / 停拍 / 改期 / 應買到期)</h3>
+            <p class="text-xs text-slate-500 mb-3">針對「已收藏案件」及「訂閱條件命中案件」，每日比對司法院、金服與執行署公告狀態差異：</p>
+            <div id="statusChangeLogContainer" class="space-y-2.5">
+              <!-- Populated by JS -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Daily Email Digest Live Preview & Settings -->
+        <div class="space-y-4">
+          <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
+            <h3 class="text-sm font-bold text-slate-900 mb-1">✉️ 接收信箱與通知偏好設定</h3>
+            <p class="text-xs text-slate-500 mb-3">透過 GitHub Actions 排程 + Gmail SMTP 或 Resend 免費發送每日篩選結果到您的信箱。</p>
+            <div class="space-y-3 text-xs">
+              <div>
+                <label class="block font-semibold text-slate-700 mb-1">收件人 Email</label>
+                <input id="subRecipientEmail" type="email" value="buyer.research@example.com" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-xs text-slate-800" />
+              </div>
+              <div class="space-y-1.5 pt-1">
+                <label class="flex items-center gap-2">
+                  <input type="checkbox" checked class="rounded text-indigo-600" />
+                  <span>每日 07:30 寄送「新增符合案件 + 待確認防漏清單」</span>
+                </label>
+                <label class="flex items-center gap-2">
+                  <input type="checkbox" checked class="rounded text-indigo-600" />
+                  <span>收藏案件發生「流標進入下一拍 (打8折) / 停拍 / 改期」立即通知</span>
+                </label>
+                <label class="flex items-center gap-2">
+                  <input type="checkbox" checked class="rounded text-indigo-600" />
+                  <span>當某資料來源連線異常時於信末附上健康度警告 (防誤判無新案)</span>
+                </label>
+              </div>
+              <button id="btnPreviewEmailNow" type="button" class="w-full py-2 rounded-lg bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs transition">
+                🔄 依據目前規則重新產出今日 Email 日報預覽
+              </button>
+            </div>
+          </div>
+
+          <!-- Simulated Email Digest Preview -->
+          <div class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
+            <div class="bg-slate-800 text-white px-4 py-2.5 flex items-center justify-between text-xs">
+              <span class="font-semibold">📧 每日 Email 日報實際寄出格式預覽</span>
+              <span class="text-emerald-400">HTML 信件預覽</span>
+            </div>
+            <div id="emailDigestPreviewBox" class="p-4 text-xs space-y-3 max-h-[520px] overflow-y-auto scrollbar-thin">
+              <!-- Populated by JS -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- TAB 4: 8大資料源監控 & 稅拍驗證碼橋接與手動匯入 -->
+    <!-- ========================================== -->
+    <section id="view-sources" class="hidden space-y-6">
+      <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
+        <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+          <div>
+            <span class="text-xs font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-md border border-emerald-200">跨平台資料源狀態</span>
+            <h2 class="text-lg font-bold text-slate-900 mt-1">8 大官方與民間資料來源即時連線監控</h2>
+            <p class="text-xs text-slate-500 mt-0.5">
+              包含司法院、法務部行政執行署（稅拍）、內政部平台、台灣金服（金拍）、合作金庫、臺灣銀行，以及輔助補齊屋齡的 104 法拍網與優室法拍。
+            </p>
+          </div>
+          <button id="btnSimulateHealthCheck" type="button" class="px-3.5 py-2 rounded-lg bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold transition">
+            ⚡ 執行跨平台來源連線健康度自檢
+          </button>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse text-xs">
+            <thead>
+              <tr class="bg-slate-100 text-slate-700 border-y border-slate-200">
+                <th class="py-2.5 px-3 font-bold">平台名稱與層級</th>
+                <th class="py-2.5 px-3 font-bold">技術機制與反爬限制</th>
+                <th class="py-2.5 px-3 font-bold">本系統採行合規策略</th>
+                <th class="py-2.5 px-3 font-bold">欄位相容性 (點交/屋齡/坪數)</th>
+                <th class="py-2.5 px-3 font-bold">監控狀態</th>
+                <th class="py-2.5 px-3 font-bold">官方入口核驗</th>
+              </tr>
+            </thead>
+            <tbody id="sourcesHealthTableBody" class="divide-y divide-slate-200">
+              <!-- Populated by JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Manual Bridge & Quick Importer for CAPTCHA Sources (MOJ tpkonsale & MOI pip) -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+        <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
+          <span class="text-[11px] font-bold text-amber-800 bg-amber-100 px-2 py-0.5 rounded">針對稅務拍賣 CAPTCHA 驗證碼之輔助解法</span>
+          <h3 class="text-sm font-bold text-slate-900 mt-1.5">🏛️ 法務部行政執行署 (稅拍) ＆ 內政部整合頁 一鍵查詢跳轉</h3>
+          <p class="text-xs text-slate-600 mt-1 mb-3 leading-relaxed">
+            法務部行政執行署 (<code class="bg-slate-100 px-1 rounded">tpkonsale.moj.gov.tw</code>) 已納入本系統「全部官方管道」分類中！但因該網站查詢頁每次皆須人工輸入 4 碼圖形驗證碼，除了內建同步之稅拍公告外，您也可在此直接開啟官方查詢頁核對最新一期「123 聯合拍賣會」標的：
+          </p>
+          <div class="grid grid-cols-2 gap-3 text-xs mb-3">
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">目標執行分署</label>
+              <select id="bridgeMojCity" class="w-full rounded border border-slate-300 bg-white px-2.5 py-1.5">
+                <option value="臺北分署">臺北分署 (北市/金門/連江)</option>
+                <option value="新北分署">新北分署 (新北市)</option>
+                <option value="士林分署">士林分署 (北投/士林/內湖/南港/基隆)</option>
+                <option value="桃園分署">桃園分署 (桃園市)</option>
+                <option value="新竹分署">新竹分署 (新竹/苗栗)</option>
+                <option value="臺中分署">臺中分署 (臺中市)</option>
+                <option value="彰化分署">彰化分署 (彰化/南投)</option>
+                <option value="嘉義分署">嘉義分署 (嘉義/雲林)</option>
+                <option value="臺南分署">臺南分署 (臺南市)</option>
+                <option value="高雄分署">高雄分署 (高雄市/澎湖)</option>
+                <option value="屏東分署">屏東分署 (屏東縣)</option>
+                <option value="花蓮分署">花蓮分署 (花蓮/臺東)</option>
+                <option value="宜蘭分署">宜蘭分署 (宜蘭/基隆部分)</option>
+              </select>
+            </div>
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">提醒事項</label>
+              <div class="p-1.5 rounded bg-slate-50 border border-slate-200 text-slate-600 text-[11px]">
+                進入官網輸入 4 碼驗證碼查得物件後，可於右側卡片一鍵匯入本系統做三級深度調查。
+              </div>
+            </div>
+          </div>
+          <div class="flex flex-wrap gap-2">
+            <a href="https://www.tpkonsale.moj.gov.tw/" target="_blank" rel="noopener noreferrer" class="px-3.5 py-2 rounded-lg bg-amber-600 hover:bg-amber-500 text-white text-xs font-semibold transition inline-flex items-center gap-1.5">
+              <span>🔗 開啟法務部行政執行署拍賣公告系統 ↗</span>
+            </a>
+            <a href="https://pip.moi.gov.tw/Publicize/Info/D1010" target="_blank" rel="noopener noreferrer" class="px-3.5 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-white text-xs font-semibold transition inline-flex items-center gap-1.5">
+              <span>🔗 開啟內政部不動產拍賣資訊整合頁 ↗</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Quick Manual Case Importer (All 22 Cities + District Input) -->
+        <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
+          <span class="text-[11px] font-bold text-indigo-800 bg-indigo-100 px-2 py-0.5 rounded">跨來源手動補充匯入</span>
+          <h3 class="text-sm font-bold text-slate-900 mt-1.5">📥 快速手動匯入外部案件 (行政執行署稅拍 / 各銀行銀拍公告)</h3>
+          <p class="text-xs text-slate-600 mt-1 mb-3">
+            在行政執行署或各銀行銀拍公告看到感興趣的物件時，填入下方欄位即可納入統一案件庫、執行去重並開放「三級深度調查與 AI 匯出」：
+          </p>
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5 text-xs mb-3">
+            <input id="impCaseId" type="text" placeholder="案號 (例: 114年度執字第9981號)" class="rounded border border-slate-300 px-2.5 py-1.5" />
+            <select id="impCity" class="rounded border border-slate-300 bg-white px-2.5 py-1.5">
+              <option value="新北市">新北市</option>
+              <option value="桃園市">桃園市</option>
+              <option value="苗栗縣">苗栗縣</option>
+              <option value="臺北市">臺北市</option>
+              <option value="新竹市">新竹市</option>
+              <option value="新竹縣">新竹縣</option>
+              <option value="基隆市">基隆市</option>
+              <option value="宜蘭縣">宜蘭縣</option>
+              <option value="臺中市">臺中市</option>
+              <option value="彰化縣">彰化縣</option>
+              <option value="南投縣">南投縣</option>
+              <option value="雲林縣">雲林縣</option>
+              <option value="嘉義市">嘉義市</option>
+              <option value="嘉義縣">嘉義縣</option>
+              <option value="臺南市">臺南市</option>
+              <option value="高雄市">高雄市</option>
+              <option value="屏東縣">屏東縣</option>
+              <option value="花蓮縣">花蓮縣</option>
+              <option value="臺東縣">臺東縣</option>
+              <option value="澎湖縣">澎湖縣</option>
+              <option value="金門縣">金門縣</option>
+              <option value="連江縣">連江縣</option>
+            </select>
+            <input id="impDistrict" type="text" placeholder="行政區 (例: 新莊區、頭份市)" class="rounded border border-slate-300 px-2.5 py-1.5" />
+            <input id="impAddress" type="text" placeholder="門牌地址與樓層" class="rounded border border-slate-300 px-2.5 py-1.5" />
+            <input id="impPrice" type="number" placeholder="總底價 (萬元)" class="rounded border border-slate-300 px-2.5 py-1.5" />
+            <input id="impPing" type="number" step="0.1" placeholder="總建坪 (可留空待查)" class="rounded border border-slate-300 px-2.5 py-1.5" />
+            <select id="impHandover" class="rounded border border-slate-300 bg-white px-2.5 py-1.5 sm:col-span-3">
+              <option value="點交">點交</option>
+              <option value="部分點交">部分點交</option>
+              <option value="點交條件不明(待查)">點交條件不明(待查)</option>
+              <option value="不點交">不點交</option>
+            </select>
+          </div>
+          <button id="btnImportManualCase" type="button" class="w-full py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold transition">
+            + 立即匯入至統一案件庫並建立深度調查卡
+          </button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-white border-t border-slate-200 py-4 px-4 text-xs text-slate-500 mt-8">
+    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2">
+      <div>
+        <strong>ForeclosureRadar TW</strong> — 個人不動產法拍跨平台研究系統 ｜ 遵循 robots.txt、低頻率存取與個資合規邊界
+      </div>
+      <div>
+        官方與輔助資料來源：<a href="https://aomp109.judicial.gov.tw/judbp/wkw/WHD1A02.htm" target="_blank" class="underline hover:text-slate-800">司法院</a>・
+        <a href="https://www.tpkonsale.moj.gov.tw/" target="_blank" class="underline hover:text-slate-800">法務部行政執行署(稅拍)</a>・
+        <a href="https://pip.moi.gov.tw/Publicize/Info/D1010" target="_blank" class="underline hover:text-slate-800">內政部不動產平台</a>・
+        <a href="https://www.tfasc.com.tw/" target="_blank" class="underline hover:text-slate-800">台灣金服(金拍)</a>・
+        <a href="https://www.tcb-bank.com.tw/about-tcb/announcement/items/foreclosure" target="_blank" class="underline hover:text-slate-800">合作金庫</a>・
+        <a href="https://wwwap.bot.com.tw/house/" target="_blank" class="underline hover:text-slate-800">臺灣銀行</a>・
+        <a href="https://www.104woo.com.tw/" target="_blank" class="underline hover:text-slate-800">104法拍</a>・
+        <a href="https://uhomes.com.tw/" target="_blank" class="underline hover:text-slate-800">優室法拍</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ========================================== -->
+  <!-- APPLICATION LOGIC & GROUNDED DATASET       -->
+  <!-- ========================================== -->
+  <script>
+    (function() {
+      // Safe LocalStorage helper
+      function saveLocal(key, val) {
+        try { localStorage.setItem(key, JSON.stringify(val)); } catch (e) {}
+      }
+      function loadLocal(key, fallback) {
+        try {
+          var v = localStorage.getItem(key);
+          return v ? JSON.parse(v) : fallback;
+        } catch (e) { return fallback; }
+      }
+
+      function showToast(msg) {
+        var el = document.getElementById('toastBanner');
+        var txt = document.getElementById('toastMessage');
+        if (!el || !txt) return;
+        txt.textContent = msg;
+        el.classList.remove('hidden');
+        if (window._toastTimer) clearTimeout(window._toastTimer);
+        window._toastTimer = setTimeout(function() {
+          el.classList.add('hidden');
+        }, 3200);
+      }
+
+      // Complete Taiwan 22 Cities & Administrative Districts Dictionary
+      var TAIWAN_ADMIN_DIVISIONS = [
+        {
+          region: "北部地區",
+          cities: [
+            { name: "新北市", districts: ["新莊區", "三重區", "板橋區", "蘆洲區", "中和區", "永和區", "新店區", "土城區", "樹林區", "鶯歌區", "三峽區", "林口區", "五股區", "泰山區", "淡水區", "汐止區", "瑞芳區", "八里區", "深坑區"] },
+            { name: "桃園市", districts: ["桃園區", "中壢區", "蘆竹區", "八德區", "平鎮區", "楊梅區", "龜山區", "大園區", "龍潭區", "大溪區", "觀音區", "新屋區", "復興區"] },
+            { name: "臺北市", districts: ["大安區", "信義區", "中山區", "內湖區", "士林區", "北投區", "松山區", "中正區", "萬華區", "文山區", "南港區", "大同區"] },
+            { name: "新竹縣", districts: ["竹北市", "竹東鎮", "湖口鄉", "新豐鄉", "新埔鎮", "關西鎮", "芎林鄉", "寶山鄉"] },
+            { name: "新竹市", districts: ["東區", "北區", "香山區"] },
+            { name: "基隆市", districts: ["仁愛區", "信義區", "中正區", "中山區", "安樂區", "暖暖區", "七堵區"] },
+            { name: "宜蘭縣", districts: ["宜蘭市", "羅東鎮", "礁溪鄉", "頭城鎮", "蘇澳鎮", "冬山鄉", "五結鄉"] }
+          ]
+        },
+        {
+          region: "中部地區",
+          cities: [
+            { name: "苗栗縣", districts: ["頭份市", "竹南鎮", "苗栗市", "後龍鎮", "苑裡鎮", "通霄鎮", "公館鄉", "造橋鄉", "三義鄉", "銅鑼鄉"] },
+            { name: "臺中市", districts: ["西屯區", "北屯區", "南屯區", "西區", "北區", "南區", "東區", "中區", "豐原區", "大里區", "太平區", "沙鹿區", "烏日區", "潭子區", "雅潭區"] },
+            { name: "彰化縣", districts: ["彰化市", "員林市", "和美鎮", "鹿港鎮", "溪湖鎮", "北斗鎮"] },
+            { name: "南投縣", districts: ["南投市", "草屯鎮", "埔里鎮", "竹山鎮"] },
+            { name: "雲林縣", districts: ["斗六市", "虎尾鎮", "北港鎮", "麥寮鄉"] }
+          ]
+        },
+        {
+          region: "南部地區",
+          cities: [
+            { name: "臺南市", districts: ["東區", "永康區", "安平區", "北區", "中西區", "南區", "安南區", "善化區", "新市區", "仁德區", "歸仁區"] },
+            { name: "高雄市", districts: ["左營區", "鼓山區", "三民區", "前鎮區", "苓雅區", "鳳山區", "楠梓區", "仁武區", "新興區", "前金區"] },
+            { name: "嘉義市", districts: ["東區", "西區"] },
+            { name: "嘉義縣", districts: ["太保市", "朴子市", "民雄鄉", "水上鄉"] },
+            { name: "屏東縣", districts: ["屏東市", "潮州鎮", "東港鎮", "恆春鎮"] }
+          ]
+        },
+        {
+          region: "東部及離島",
+          cities: [
+            { name: "花蓮縣", districts: ["花蓮市", "吉安鄉", "壽豐鄉", "玉里鎮"] },
+            { name: "臺東縣", districts: ["臺東市", "卑南鄉", "成功鎮"] },
+            { name: "澎湖縣", districts: ["馬公市", "湖西鄉"] },
+            { name: "金門縣", districts: ["金城鎮", "金寧鄉", "金湖鎮"] },
+            { name: "連江縣", districts: ["南竿鄉", "北竿鄉"] }
+          ]
+        }
+      ];
+
+      function getDistrictsByCity(cityName) {
+        for (var i = 0; i < TAIWAN_ADMIN_DIVISIONS.length; i++) {
+          var group = TAIWAN_ADMIN_DIVISIONS[i];
+          for (var j = 0; j < group.cities.length; j++) {
+            if (group.cities[j].name === cityName) return group.cities[j].districts;
+          }
+        }
+        return [];
+      }
+
+      // 8 Official & Auxiliary Data Sources Health Matrix
+      var SOURCE_HEALTH_DATA = [
+        {
+          id: "judicial_aomp",
+          name: "司法院法拍屋查詢系統",
+          tier: "Tier-1 官方權威",
+          tech: "JSP 狀態表單 POST / 民國年曆",
+          strategy: "每日 07:30 低頻同步 1 次 (間隔 3~5 秒)；作為所有案件案號、底價與筆錄之唯一最終核驗基準",
+          fields: "點交(有)、底價(有)、坪數(有)、屋齡(無，須二次比對)",
+          status: "正常同步 (Active)",
+          statusColor: "emerald",
+          url: "https://aomp109.judicial.gov.tw/judbp/wkw/WHD1A02.htm"
+        },
+        {
+          id: "moj_tpkonsale",
+          name: "法務部行政執行署拍賣公告系統 (稅務拍賣)",
+          tier: "Tier-1 官方權威 (已納入全部官方管道)",
+          tech: "查詢頁設有圖形驗證碼 (CAPTCHA)",
+          strategy: "納入『全部官方管道』篩選分類；除同步公開聯合拍賣標的，亦提供驗證碼跳轉與手動匯入卡，絕不違法暴力破解",
+          fields: "底價(有)、坪數(有)、地址(有)、點交(有)",
+          status: "官方同步 + 驗證碼橋接",
+          statusColor: "emerald",
+          url: "https://www.tpkonsale.moj.gov.tw/"
+        },
+        {
+          id: "tfasc_gold",
+          name: "台灣金融資產服務公司 (TFASC 金拍屋)",
+          tier: "Tier-1 官方權威",
+          tech: "公開結構化列表 / 受法院委託公正第三人",
+          strategy: "自動同步金拍屋、未辦繼承標售與國產署物件；注意僅部分公告註明物件開放看屋，不可預設全部可看",
+          fields: "點交(有)、底價(有)、坪數(有)、屋齡(部分有)",
+          status: "正常同步 (Active)",
+          statusColor: "emerald",
+          url: "https://www.tfasc.com.tw/"
+        },
+        {
+          id: "tcb_silver",
+          name: "合作金庫銀行—銀拍屋及法拍屋專區",
+          tier: "Tier-1 銀行官方",
+          tech: "官網公告列表 (區分本行銀拍屋 vs 聲請法拍屋)",
+          strategy: "分別擷取「銀拍屋(銀行承受自有產權)」與「法拍屋」；銀拍屋產權清楚但仍需核對標售契約點交條款",
+          fields: "底價/開價(有)、坪數(有)、屋齡(依物件公告)",
+          status: "正常同步 (Active)",
+          statusColor: "emerald",
+          url: "https://www.tcb-bank.com.tw/about-tcb/announcement/items/foreclosure"
+        },
+        {
+          id: "bot_foreclosure",
+          name: "臺灣銀行—法拍屋資訊查詢",
+          tier: "Tier-1 銀行官方",
+          tech: "wwwap.bot.com.tw/house/ 表單查詢",
+          strategy: "【重要認知修正】該網址實際為「臺銀聲請法院拍賣之法拍屋查詢」，已於系統內與司法院案號建立自動去重",
+          fields: "案號(有)、底價(有)、坪數(有)、點交(有)",
+          status: "正常同步 (Active)",
+          statusColor: "emerald",
+          url: "https://wwwap.bot.com.tw/house/"
+        },
+        {
+          id: "moi_pip",
+          name: "內政部不動產資訊平台 (拍賣整合頁)",
+          tier: "Tier-1 官方總入口",
+          tech: "政府跨部會整合目錄 / WAF 連線防護",
+          strategy: "作為跨來源官方核驗目錄與實價登錄、都市計畫分區之對照基準",
+          fields: "官方總入口目錄與實價登錄基準",
+          status: "官方目錄基準",
+          statusColor: "slate",
+          url: "https://pip.moi.gov.tw/Publicize/Info/D1010"
+        },
+        {
+          id: "woo104",
+          name: "透明房訊 / 104法拍網",
+          tier: "Tier-2 民間結構化輔助",
+          tech: "含屋齡、點交、拍次與歷次流標紀錄",
+          strategy: "不作為單一來源，僅透過「法院+案號」與司法院交叉比對，補齊官方缺乏之屋齡與歷次拍賣時間軸",
+          fields: "點交(有)、屋齡(有)、坪數(有)、歷次拍賣(完整)",
+          status: "交叉比對正常",
+          statusColor: "indigo",
+          url: "https://www.104woo.com.tw/"
+        },
+        {
+          id: "uhomes",
+          name: "優室法拍屋案件查詢系統",
+          tier: "Tier-2 民間結構化輔助",
+          tech: "支援屋齡年數、建物坪數、拍次與實價對照",
+          strategy: "輔助補齊建築完成日(屋齡)與周邊社區實價登錄行情；公開列表點交欄位仍以司法院筆錄正本覆核為準",
+          fields: "屋齡(明確)、建坪(有)、拍次(含應買/特拍)",
+          status: "交叉比對正常",
+          statusColor: "indigo",
+          url: "https://uhomes.com.tw/"
+        }
+      ];
+
+      // Comprehensive Multi-Platform Deduplicated Cases Dataset (Including Xinzhuang, Sanchong, Zhunan, Toufen, Taoyuan, etc.)
+      var INITIAL_CASES = [
+        {
+          dedup_key: "PCD_114_42910_甲",
+          case_id: "114年度司執字第42910號",
+          court: "臺灣新北地方法院",
+          division: "實股",
+          section: "甲標",
+          auction_type: "法院法拍",
+          status: "應買公告中",
+          city: "新北市",
+          district: "新莊區",
+          address: "新北市新莊區中原東路118號11樓（頭前重劃區・捷運幸福站生活圈）",
+          property_type: "電梯大樓/華廈",
+          auction_round: "應買公告",
+          auction_date_roc: "115/11/08",
+          auction_date_ad: "2026-11-08",
+          reserve_price_wan: 1180,
+          deposit_wan: 236,
+          unit_price_wan: 44.0,
+          area_total_ping: 26.8,
+          area_main_ping: 16.5,
+          area_land_ping: 3.4,
+          handover_status: "點交",
+          handover_raw_note: "三拍流標後進入三個月特別變賣程序（應買公告），先遞狀聲明應買並繳足保證金者優先得標，拍定後點交。",
+          age_years: 11,
+          completion_date_source: "優室法拍 & 新北地政實價登錄 (104年完工)",
+          conflict_notes: [],
+          price_history: [
+            { round: "1拍", date: "115/06/18", price_wan: 1840, result: "流標" },
+            { round: "2拍", date: "115/07/23", price_wan: 1472, result: "流標" },
+            { round: "3拍", date: "115/08/27", price_wan: 1180, result: "流標進入應買公告" },
+            { round: "應買公告", date: "115/11/08 到期", price_wan: 1180, result: "應買倒數 11 天 (免競價，依底價即買)" }
+          ],
+          sources: [
+            { platform: "司法院法拍公告", url: "https://aomp109.judicial.gov.tw/judbp/wkw/WHD1A02.htm", tier: "Tier-1 官方權威", fetched_at: "2026-10-28 07:30" },
+            { platform: "優室法拍", url: "https://uhomes.com.tw/", tier: "Tier-2 輔助校驗", fetched_at: "2026-10-28 07:32" }
+          ],
+          user_note: "新莊頭前重劃區 11 年屋，目前處於『應買公告期』最後倒數，不用跟人加價搶標，但債權銀行有優先承買權需注意。",
+          due_diligence: {
+            confirmed_facts: [
+              "【應買程序特性】依強制執行法第 95 條第 1 項，應買期間內按第 3 拍底價（1,180 萬）聲明應買即可，無須加價競標，拍定後點交。",
+              "【周邊行情對照】新莊中原東路同屋齡大樓實價登錄約 54~58 萬/坪，本案單價 44.0 萬/坪。"
+            ],
+            pending_leads: [
+              "【債權人承受意願】應買期間法院會詢問債權人（銀行）是否願意承受，遞狀前可先洽詢書記官目前有無其他人遞狀。"
+            ],
+            manual_verification_required: [
+              "【室內裝況與滲漏水】屋齡 11 年，建議向社區物業詢問公設維護狀況。"
+            ]
+          }
+        },
+        {
+          dedup_key: "PCD_114_51033_1",
+          case_id: "114年度司執字第51033號",
+          court: "臺灣新北地方法院",
+          division: "安股",
+          section: "第1標",
+          auction_type: "法院法拍",
+          status: "公告中",
+          city: "新北市",
+          district: "新莊區",
+          address: "新北市新莊區中平路270巷15號8樓（新莊副都心・中平國中學區）",
+          property_type: "電梯大樓/華廈",
+          auction_round: "3拍",
+          auction_date_roc: "115/11/13",
+          auction_date_ad: "2026-11-13",
+          reserve_price_wan: 845,
+          deposit_wan: 169,
+          unit_price_wan: 34.9,
+          area_total_ping: 24.2,
+          area_main_ping: 16.8,
+          area_land_ping: 3.1,
+          handover_status: "點交",
+          handover_raw_note: "查封時債務人自住，無出租情事，拍定後點交。",
+          age_years: 17,
+          completion_date_source: "104法拍網 & 新北地政實價登錄 (98年完工)",
+          conflict_notes: [],
+          price_history: [
+            { round: "1拍", date: "115/09/11", price_wan: 1320, result: "流標" },
+            { round: "2拍", date: "115/10/16", price_wan: 1056, result: "流標" },
+            { round: "3拍", date: "115/11/13", price_wan: 845, result: "本次公告開標 (跌破850萬門檻)" }
+          ],
+          sources: [
+            { platform: "司法院法拍公告", url: "https://aomp109.judicial.gov.tw/judbp/wkw/WHD1A02.htm", tier: "Tier-1 官方權威", fetched_at: "2026-10-28 07:30" },
+            { platform: "104法拍網", url: "https://www.104woo.com.tw/", tier: "Tier-2 輔助校驗", fetched_at: "2026-10-28 07:31" }
+          ],
+          user_note: "新莊中平路生活圈機能極佳，三拍底價剛好壓在 845 萬、屋齡 17 年、24.2 坪且明確點交！",
+          due_diligence: {
+            confirmed_facts: [
+              "【明確點交】債務人自住無租約，拍定後法院核發權利移轉證書並點交。",
+              "【實價行情價差】中平路同社區近期實價登錄約 46~49 萬/坪，本案三拍底價僅 34.9 萬/坪。"
+            ],
+            pending_leads: [
+              "【搶標熱度評估】新莊區總價 850 萬內電梯兩房極為稀有，三拍預計吸引多組自住客投標。"
+            ],
+            manual_verification_required: [
+              "【調閱最新二類謄本】確認有無其他假扣押或欠繳管理費情形。"
+            ]
+          }
+        },
+        {
+          dedup_key: "PCD_114_55820_1",
+          case_id: "114年度司執字第55820號",
+          court: "臺灣新北地方法院",
+          division: "富股",
+          section: "第1標",
+          auction_type: "法院法拍",
+          status: "公告中",
+          city: "新北市",
+          district: "三重區",
+          address: "新北市三重區集賢路152號7樓（重陽重劃區・家樂福旁電梯華廈）",
+          property_type: "電梯大樓/華廈",
+          auction_round: "2拍",
+          auction_date_roc: "115/11/17",
+          auction_date_ad: "2026-11-17",
+          reserve_price_wan: 1120,
+          deposit_wan: 224,
+          unit_price_wan: 39.4,
+          area_total_ping: 28.4,
+          area_main_ping: 19.5,
+          area_land_ping: 3.8,
+          handover_status: "點交",
+          handover_raw_note: "空屋無人居住，水電已停，拍定後依現況點交。",
+          age_years: 15,
+          completion_date_source: "104法拍網 & 優室法拍 (100年完工)",
+          conflict_notes: [],
+          price_history: [
+            { round: "1拍", date: "115/10/20", price_wan: 1400, result: "流標" },
+            { round: "2拍", date: "115/11/17", price_wan: 1120, result: "本次公告開標" }
+          ],
+          sources: [
+            { platform: "司法院法拍公告", url: "https://aomp109.judicial.gov.tw/judbp/wkw/WHD1A02.htm", tier: "Tier-1 官方權威", fetched_at: "2026-10-28 07:30" },
+            { platform: "104法拍網", url: "https://www.104woo.com.tw/", tier: "Tier-2 輔助校驗", fetched_at: "2026-10-28 07:31" },
+            { platform: "優室法拍", url: "https://uhomes.com.tw/", tier: "Tier-2 輔助校驗", fetched_at: "2026-10-28 07:32" }
+          ],
+          user_note: "三重重陽重劃區集賢路標準兩房加車位，一橋進台北市士林北投，空屋點交最單純。",
+          due_diligence: {
+            confirmed_facts: [
+              "【空屋點交】法院履勘確認屋內已騰空，拍定後點交。",
+              "【社區行情】集賢路同屋齡社區實價登錄約 52~56 萬/坪，本案 2 拍單價 39.4 萬/坪。"
+            ],
+            pending_leads: [
+              "【環狀線北環段題材】鄰近未來捷運 Y22 五華國小站預定地，保值性強。"
+            ],
+            manual_verification_required: [
+              "【管理費確認】向社區管委會確認空屋期間管理費結算方式。"
+            ]
+          }
+        },
+        {
+          dedup_key: "PCD_114_39104_1",
+          case_id: "114年度司執字第39104號",
+          court: "臺灣新北地方法院",
+          division: "菊股",
+          section: "第1標",
+          auction_type: "法院法拍",
+          status: "公告中",
+          city: "新北市",
+          district: "鶯歌區",
+          address: "新北市鶯歌區鳳鳴路88號6樓（鳳鳴重劃區・台鐵捷運雙軌區）",
+          property_type: "電梯大樓/華廈",
+          auction_round: "2拍",
+          auction_date_roc: "115/11/16",
+          auction_date_ad: "2026-11-16",
+          reserve_price_wan: 832,
+          deposit_wan: 167,
+          unit_price_wan: 28.5,
+          area_total_ping: 29.2,
+          area_main_ping: 19.0,
+          area_land_ping: 4.2,
+          handover_status: "部分點交",
+          handover_raw_note: "主建物6樓拍定後點交；惟共同使用部分（地下室車位及公設）係拍賣應有部分，分管位置不明確，該部分不點交。",
+          age_years: 5,
+          completion_date_source: "104法拍網 & 優室法拍 (110年完工新古屋)",
+          conflict_notes: [
+            "點交精準判定：某民間平台摘要簡寫為『點交』，但司法院原始筆錄為『主建物點交、公設車位不點交（部分點交）』。系統保留原文並歸入待確認/部分點交，絕不直接當成不點交排除，亦不誤導為完全點交。"
+          ],
+          price_history: [
+            { round: "1拍", date: "115/10/19", price_wan: 1040, result: "流標" },
+            { round: "2拍", date: "115/11/16", price_wan: 832, result: "本次公告開標" }
+          ],
+          sources: [
+            { platform: "司法院法拍公告", url: "https://aomp109.judicial.gov.tw/judbp/wkw/WHD1A02.htm", tier: "Tier-1 官方權威", fetched_at: "2026-10-28 07:30" },
+            { platform: "104法拍網", url: "https://www.104woo.com.tw/", tier: "Tier-2 輔助校驗", fetched_at: "2026-10-28 07:31" }
+          ],
+          user_note: "這就是為什麼『部分點交』絕對不能直接當成不點交濾掉！在多數大樓法拍中，『主建物點交、公設不點交』其實是標準筆錄寫法，房子本身完全可以點交自住！",
+          due_diligence: {
+            confirmed_facts: [
+              "【部分點交實務解析】本案 6 樓住家本體（19.0 坪）明確點交！法院筆錄寫『公設不點交』係因大樓共同使用部分屬全體住戶共有，法律上本來就無法單獨點交走廊與電梯。",
+              "【極新屋齡】民國 110 年完工，屋齡僅 5 年，位於鳳鳴重劃區核心。"
+            ],
+            pending_leads: [
+              "【車位分管編號】請向社區管委會查明 6 樓配屬之平面車位號碼，確認無遭他人占用。"
+            ],
+            manual_verification_required: [
+              "【建商保固與規約】向管委會索取住戶規約，確認管理費計算標準。"
+            ]
+          }
+        },
+        {
+          dedup_key: "MLD_114_11208_1",
+          case_id: "114年度司執字第11208號",
+          court: "臺灣苗栗地方法院",
+          division: "誠股",
+          section: "第1標",
+          auction_type: "法院法拍",
+          status: "公告中",
+          city: "苗栗縣",
+          district: "頭份市",
+          address: "苗栗縣頭份市中央路256巷18號（尚順育樂世界旁・透天別墅）",
+          property_type: "透天厝",
+          auction_round: "3拍",
+          auction_date_roc: "115/11/20",
+          auction_date_ad: "2026-11-20",
+          reserve_price_wan: 768,
+          deposit_wan: 154,
+          unit_price_wan: 14.7,
+          area_total_ping: 52.3,
+          area_main_ping: 46.8,
+          area_land_ping: 26.5,
+          handover_status: "點交",
+          handover_raw_note: "債務人及其家屬自行居住，拍定後點交；頂樓及後院有增建（建號1892號，未辦保存登記，面積約 8.5 坪）一併拍賣。",
+          age_years: 14,
+          completion_date_source: "104法拍網 & 內政部實價登錄 (101年完工)",
+          conflict_notes: [],
+          price_history: [
+            { round: "1拍", date: "115/09/18", price_wan: 1200, result: "流標" },
+            { round: "2拍", date: "115/10/16", price_wan: 960, result: "流標" },
+            { round: "3拍", date: "115/11/20", price_wan: 768, result: "本次公告開標 (極高性價比機會物件)" }
+          ],
+          sources: [
+            { platform: "司法院法拍公告", url: "https://aomp109.judicial.gov.tw/judbp/wkw/WHD1A02.htm", tier: "Tier-1 官方權威", fetched_at: "2026-10-28 07:30" },
+            { platform: "104法拍網", url: "https://www.104woo.com.tw/", tier: "Tier-2 輔助校驗", fetched_at: "2026-10-28 07:31" }
+          ],
+          user_note: "苗栗頭份尚順商圈 14 年整棟透天，土地實坪 26.5 坪、建坪 52.3 坪，三拍底價才 768 萬且點交！",
+          due_diligence: {
+            confirmed_facts: [
+              "【土地與建物完全產權】基地 26.5 坪（都市計畫住宅區 1/1 全部持分）+ 保存登記建坪 43.8 坪 + 未保存增建 8.5 坪一併拍賣點交。",
+              "【價格折讓幅度】頭份中央路周邊同屋齡透天實價登錄約 1,280~1,450 萬，本案 3 拍底價 768 萬（約市價 58 折）。"
+            ],
+            pending_leads: [
+              "【未保存登記增建風險】第 1892 建號（頂樓遮雨棚與後院外推 8.5 坪）屬未辦保存登記建物，拍定人無法持權利移轉證書辦理產權第一次登記，且依法仍有被建管機關列管查報拆除之潛在風險。"
+            ],
+            manual_verification_required: [
+              "【地界與袋地通行確認】現場勘查門前 256 巷私設道路是否已有既成巷道公用地役權或共同持分。",
+              "【苗栗縣違章建築查報紀錄】建議至苗栗縣政府工商發展處使用管理科查詢有無既存違建排拆紀錄。"
+            ]
+          }
+        },
+        {
+          dedup_key: "MLD_114_13502_1",
+          case_id: "114年度司執字第13502號",
+          court: "臺灣苗栗地方法院",
+          division: "義股",
+          section: "第1標",
+          auction_type: "法院法拍",
+          status: "公告中",
+          city: "苗栗縣",
+          district: "竹南鎮",
+          address: "苗栗縣竹南鎮科專七路66號8樓（竹南科學園區・大埔重劃區）",
+          property_type: "電梯大樓/華廈",
+          auction_round: "2拍",
+          auction_date_roc: "115/11/24",
+          auction_date_ad: "2026-11-24",
+          reserve_price_wan: 624,
+          deposit_wan: 125,
+          unit_price_wan: 20.1,
+          area_total_ping: 31.0,
+          area_main_ping: 20.4,
+          area_land_ping: 4.8,
+          handover_status: "點交",
+          handover_raw_note: "查封時為空屋，債務人未居住，拍定後點交。",
+          age_years: 7,
+          completion_date_source: "優室法拍 & 實價登錄 (108年完工)",
+          conflict_notes: [],
+          price_history: [
+            { round: "1拍", date: "115/10/20", price_wan: 780, result: "流標" },
+            { round: "2拍", date: "115/11/24", price_wan: 624, result: "本次公告開標" }
+          ],
+          sources: [
+            { platform: "司法院法拍公告", url: "https://aomp109.judicial.gov.tw/judbp/wkw/WHD1A02.htm", tier: "Tier-1 官方權威", fetched_at: "2026-10-28 07:30" },
+            { platform: "優室法拍", url: "https://uhomes.com.tw/", tier: "Tier-2 輔助校驗", fetched_at: "2026-10-28 07:32" }
+          ],
+          user_note: "竹南園區 7 年新古屋三房，二拍底價 624 萬、單價僅 20.1 萬/坪，自住或出租園區工程師皆宜。",
+          due_diligence: {
+            confirmed_facts: [
+              "【空屋點交】法院履勘筆錄載明屋內清空、無租約，拍定後點交。",
+              "【園區剛性需求】位於竹南科學園區旁，同社區實價登錄約 26~28 萬/坪。"
+            ],
+            pending_leads: [
+              "【債務人公司背景】債務人登記為科技設備商負責人，因週轉不靈遭銀行聲請拍賣，產權單純無私人借貸二胎設定。"
+            ],
+            manual_verification_required: [
+              "【社區管理規約】確認有無積欠管理費與車位清潔費。"
+            ]
+          }
+        },
+        {
+          dedup_key: "TYD_114_58291_甲",
+          case_id: "114年度司執字第58291號",
+          court: "臺灣桃園地方法院",
+          division: "順股",
+          section: "甲標",
+          auction_type: "法院法拍",
+          status: "公告中",
+          city: "桃園市",
+          district: "桃園區",
+          address: "桃園市桃園區正光路186號9樓（中路特區・權視界社區）",
+          property_type: "電梯大樓/華廈",
+          auction_round: "2拍",
+          auction_date_roc: "115/11/11",
+          auction_date_ad: "2026-11-11",
+          reserve_price_wan: 784,
+          deposit_wan: 157,
+          unit_price_wan: 27.6,
+          area_total_ping: 28.4,
+          area_main_ping: 18.2,
+          area_land_ping: 4.1,
+          handover_status: "點交",
+          handover_raw_note: "查封時債務人自住使用，無出租或出借他人情事，拍定後依現況點交。",
+          age_years: 9,
+          completion_date_source: "104法拍網 & 優室法拍交叉比對 (106年10月建築完成 / 司法院公告未直接載明屋齡)",
+          conflict_notes: [],
+          price_history: [
+            { round: "1拍", date: "115/10/14", price_wan: 980, result: "無人應買流標 (-20%)" },
+            { round: "2拍", date: "115/11/11", price_wan: 784, result: "本次公告開標 (底價打8折)" }
+          ],
+          sources: [
+            { platform: "司法院法拍公告", url: "https://aomp109.judicial.gov.tw/judbp/wkw/WHD1A02.htm", tier: "Tier-1 官方權威", fetched_at: "2026-10-28 07:30" },
+            { platform: "104法拍網", url: "https://www.104woo.com.tw/", tier: "Tier-2 輔助校驗", fetched_at: "2026-10-28 07:31" },
+            { platform: "優室法拍", url: "https://uhomes.com.tw/", tier: "Tier-2 輔助校驗", fetched_at: "2026-10-28 07:32" }
+          ],
+          user_note: "中路重劃區少見 800 萬內兩房含車位，二拍底價已低於實價登錄約 82 折，值得優先進場。",
+          due_diligence: {
+            confirmed_facts: [
+              "【點交與占有】桃園地院 114司執58291號查封筆錄載明：債務人自住、無租約，拍定後核發權利移轉證書並點交。",
+              "【建物與土地範圍】主建物 18.2 坪 + 附屬陽台 2.1 坪 + 公設與平面車位 8.1 坪，合計 28.4 坪，俱為全部持分 (1/1)。",
+              "【社區實價行情】內政部實價登錄近一年同社區成交單價約 33.5~35.2 萬/坪（總價約 950~1,000 萬），本案 2 拍單價 27.6 萬/坪。"
+            ],
+            pending_leads: [
+              "【債務人關聯訴訟】於司法院裁判書系統以案號關聯查得本件聲請人為合作金庫銀行（清償房貸抵押債務），另有信貸支付命令 2 件；注意同名同姓之刑事判決與本案屋主無關。",
+              "【社區管理費積欠】筆錄未載明欠繳管理費金額；依公寓大廈管理條例與實務見解，前手欠費原則不當然由拍定人繼受，但建議向管委會確認水電卡控管情形。"
+            ],
+            manual_verification_required: [
+              "【事故屋(凶宅)核實限制】內政部並無全國公開非自然死亡資料庫；經搜尋桃園區正光路社區新聞與凶宅網無事故紀錄，但「查無新聞不等於零風險」，務必實地詢問管理員與鄰居。",
+              "【最新第一類/第二類登記謄本】投標前須至地政事務所或全國地政電子謄本系統調閱最新建物/土地二類謄本，確認有無限制登記（如刑事扣押禁止處分）。"
+            ]
+          }
+        },
+        {
+          dedup_key: "TYD_114_61042_1",
+          case_id: "114年度司執字第61042號",
+          court: "臺灣桃園地方法院",
+          division: "仁股",
+          section: "第1標",
+          auction_type: "法院法拍",
+          status: "公告中",
+          city: "桃園市",
+          district: "中壢區",
+          address: "桃園市中壢區環北路395巷12號7樓（海華SOGO生活圈）",
+          property_type: "電梯大樓/華廈",
+          auction_round: "3拍",
+          auction_date_roc: "115/11/18",
+          auction_date_ad: "2026-11-18",
+          reserve_price_wan: 692,
+          deposit_wan: 139,
+          unit_price_wan: 22.0,
+          area_total_ping: 31.5,
+          area_main_ping: 22.8,
+          area_land_ping: 3.9,
+          handover_status: "點交",
+          handover_raw_note: "第三人租賃關係業經執行法院除去租賃權裁定確定，拍定後點交。",
+          age_years: null,
+          completion_date_source: "未知（司法院公告未載明建築完成日，且門牌整編待地政建號反查）",
+          conflict_notes: [
+            "屋齡缺失保護：本案司法院公告未載屋齡，當您設定屋齡上限（如 20 年）時，系統會自動將本案保留於『⚠️ 資訊不足・待人工確認』分頁，避免誤刪好案！"
+          ],
+          price_history: [
+            { round: "1拍", date: "115/09/16", price_wan: 1080, result: "流標" },
+            { round: "2拍", date: "115/10/14", price_wan: 864, result: "流標" },
+            { round: "3拍", date: "115/11/18", price_wan: 692, result: "本次公告開標 (底價約1拍之64折)" }
+          ],
+          sources: [
+            { platform: "司法院法拍公告", url: "https://aomp109.judicial.gov.tw/judbp/wkw/WHD1A02.htm", tier: "Tier-1 官方權威", fetched_at: "2026-10-28 07:30" }
+          ],
+          user_note: "雖然屋齡欄位在官方公告缺失（需調閱謄本確認使用執照年度），但室內主建物高達 22.8 坪且已除去租賃權點交！",
+          due_diligence: {
+            confirmed_facts: [
+              "【除租點交確認】原第三人租約於查封後或有礙抵押權行使，業經桃園地院裁定除去租賃權確定，拍定後點交。",
+              "【坪數結構優異】主建物 22.8 坪，公設比僅約 21%，標準三房格局。"
+            ],
+            pending_leads: [
+              "【除去租賃之聲明異議風險】雖已裁定除租，仍須於開標前一日再次向法院仁股書記官確認佔有人有無提出抗告並停止執行。",
+              "【推算屋齡線索】依環北路周邊同地段大樓使用執照推估約為民國 96~99 年建造（屋齡約 16~19 年），高度可能符合 20 年內自住條件。"
+            ],
+            manual_verification_required: [
+              "【建物登記謄本核驗】請以『中壢區興南段建號』調閱第二類建物謄本，核實建築完成日期。",
+              "【現場占有狀況】原承租人是否仍在屋內居住，建議預留 10~15 萬搬遷協調與強制執行履勘預算。"
+            ]
+          }
+        },
+        {
+          dedup_key: "TFASC_114_北金職_108_2",
+          case_id: "114年度北金職字第108號",
+          court: "台灣金融資產服務公司 (受桃園地院委託)",
+          division: "金拍二組",
+          section: "第2標",
+          auction_type: "金拍屋(TFASC)",
+          status: "公告中",
+          city: "桃園市",
+          district: "蘆竹區",
+          address: "桃園市蘆竹區奉化路102號5樓（南崁特區優質三房）",
+          property_type: "電梯大樓/華廈",
+          auction_round: "2拍",
+          auction_date_roc: "115/11/19",
+          auction_date_ad: "2026-11-19",
+          reserve_price_wan: 816,
+          deposit_wan: 164,
+          unit_price_wan: 24.5,
+          area_total_ping: 33.3,
+          area_main_ping: 23.1,
+          area_land_ping: 4.5,
+          handover_status: "點交",
+          handover_raw_note: "金拍屋公告載明：空屋無人居住，拍定後依現況點交（本件未註明開放看屋，以筆錄現況為準）。",
+          age_years: 16,
+          completion_date_source: "台灣金服公告 & 實價登錄交叉核實 (99年完工)",
+          conflict_notes: [],
+          price_history: [
+            { round: "1拍", date: "115/10/22", price_wan: 1020, result: "流標" },
+            { round: "2拍", date: "115/11/19", price_wan: 816, result: "金拍公告中" }
+          ],
+          sources: [
+            { platform: "台灣金服 TFASC", url: "https://www.tfasc.com.tw/", tier: "Tier-1 官方權威", fetched_at: "2026-10-28 07:30" },
+            { platform: "104法拍網", url: "https://www.104woo.com.tw/", tier: "Tier-2 輔助校驗", fetched_at: "2026-10-28 07:31" }
+          ],
+          user_note: "完全符合『桃園 850萬內、20坪以上、屋齡20年內、明確點交』四大自住黃金指標！空屋點交最單純。",
+          due_diligence: {
+            confirmed_facts: [
+              "【空屋點交】台灣金服查封筆錄確認屋內已斷水斷電、無家具遺留，拍定後點交程序極快。",
+              "【學區與機能】鄰近光明國小、南崁交流道，同社區近期實價登錄成交約 980~1,030 萬。"
+            ],
+            pending_leads: [
+              "【投標地點注意】本案為台灣金服（TFASC）受託拍賣，投標地點與保證金匯票抬頭皆依台灣金服公告規定辦理，切勿誤投至地方法院投標室。"
+            ],
+            manual_verification_required: [
+              "【車位使用權核實】公設含地下室機械或平面車位編號，請向管委會確認車位分管協議。"
+            ]
+          }
+        },
+        {
+          dedup_key: "MOJ_114_桃執_08821_1",
+          case_id: "114年度牌稅執特專字第08821號",
+          court: "法務部行政執行署桃園分署",
+          division: "愛股",
+          section: "甲標",
+          auction_type: "稅務行政執行拍賣",
+          status: "公告中",
+          city: "桃園市",
+          district: "楊梅區",
+          address: "桃園市楊梅區金山街120號3樓（楊梅交流道旁電梯華廈）",
+          property_type: "電梯大樓/華廈",
+          auction_round: "2拍",
+          auction_date_roc: "115/11/12",
+          auction_date_ad: "2026-11-12",
+          reserve_price_wan: 540,
+          deposit_wan: 108,
+          unit_price_wan: 18.9,
+          area_total_ping: 28.6,
+          area_main_ping: 19.8,
+          area_land_ping: 5.1,
+          handover_status: "點交",
+          handover_raw_note: "滯欠營業稅及營所稅行政執行事件，義務人自住無出租，拍定後由行政執行分署點交。",
+          age_years: 15,
+          completion_date_source: "內政部實價登錄門牌比對 (100年完工)",
+          conflict_notes: [],
+          price_history: [
+            { round: "1拍", date: "115/10/15", price_wan: 675, result: "流標" },
+            { round: "2拍", date: "115/11/12", price_wan: 540, result: "行政執行署聯合拍賣會開標" }
+          ],
+          sources: [
+            { platform: "法務部行政執行署 (稅拍)", url: "https://www.tpkonsale.moj.gov.tw/", tier: "Tier-1 官方權威", fetched_at: "2026-10-28 07:30" },
+            { platform: "內政部不動產資訊平台", url: "https://pip.moi.gov.tw/Publicize/Info/D1010", tier: "Tier-1 官方權威", fetched_at: "2026-10-28 07:30" }
+          ],
+          user_note: "稅務拍賣（行政執行署）已納入『全部官方管道』！關注人數通常比法院法拍少，容易用接近底價得標。",
+          due_diligence: {
+            confirmed_facts: [
+              "【稅務拍賣點交】法務部行政執行署桃園分署依行政執行法準用強制執行法規定辦理拍賣，拍定後負責點交。",
+              "【低總價門檻】總底價僅 540 萬，保證金 108 萬。"
+            ],
+            pending_leads: [
+              "【聯合拍賣會時間】行政執行署常於每月『123 聯合拍賣日（第1週星期二下午3時）』或指定期日開標，須確認是否開放通訊投標或僅限現場投標。"
+            ],
+            manual_verification_required: [
+              "【優先扣繳稅款】拍賣價金由執行分署依法分配扣繳土地增值稅、地價稅與房屋稅，拍定人僅負責取得權利移轉證書後之契稅。"
+            ]
+          }
+        },
+        {
+          dedup_key: "TCB_115_銀拍_桃03",
+          case_id: "合庫銀拍字第115-桃03號",
+          court: "合作金庫商業銀行 (承受銀拍屋標售)",
+          division: "資產管理部",
+          section: "全標",
+          auction_type: "銀拍屋/行有標售",
+          status: "公告中",
+          city: "桃園市",
+          district: "八德區",
+          address: "桃園市八德區介壽路二段135巷22號4樓（廣豐新天地生活圈）",
+          property_type: "電梯大樓/華廈",
+          auction_round: "銀拍公開標售",
+          auction_date_roc: "115/11/25",
+          auction_date_ad: "2026-11-25",
+          reserve_price_wan: 790,
+          deposit_wan: 80,
+          unit_price_wan: 25.0,
+          area_total_ping: 31.6,
+          area_main_ping: 21.9,
+          area_land_ping: 4.3,
+          handover_status: "點交",
+          handover_raw_note: "本行因行使抵押權承受之自有不動產（銀拍屋），已完成產權移轉登記為合作金庫所有並騰空，可預約看屋、得標後依契約點交。",
+          age_years: 18,
+          completion_date_source: "合作金庫銀拍公告直接載明 (97年建築完成)",
+          conflict_notes: [],
+          price_history: [
+            { round: "銀拍公開標售", date: "115/11/25", price_wan: 790, result: "開放預約看屋中 (可辦一般房貸)" }
+          ],
+          sources: [
+            { platform: "合作金庫銀拍屋專區", url: "https://www.tcb-bank.com.tw/about-tcb/announcement/items/foreclosure", tier: "Tier-1 官方權威", fetched_at: "2026-10-28 07:30" }
+          ],
+          user_note: "合庫真正的『銀拍屋』！產權已經在合庫銀行名下，可以事先打電話給合庫分行預約開門看屋況，也不必擔心 7 天內湊不出全額現金，可依一般房貸流程核貸！",
+          due_diligence: {
+            confirmed_facts: [
+              "【銀拍屋核心優勢】所有權人已登記為『合作金庫商業銀行股份有限公司』，前手查封與抵押權均已塗銷完畢，可預約看屋。",
+              "【貸款與付款彈性】不同於法院法拍須 7 日繳清，合庫銀拍屋得標後可依投標須知申請銀行分期房貸。"
+            ],
+            pending_leads: [
+              "【現況交屋條款】雖騰空點交，但銀拍屋標售契約通常約定『按現況交屋，本行不負物之瑕疵擔保責任（如漏水壁癌）』，因此看屋時務必仔細檢查窗框與衛浴防水。"
+            ],
+            manual_verification_required: [
+              "【預約實地看屋】請直接撥打合作金庫官網公告之承辦分行電話預約內部看屋。"
+            ]
+          }
+        },
+        {
+          dedup_key: "TYD_114_49811_1",
+          case_id: "114年度司執字第49811號 (臺銀聲請)",
+          court: "臺灣桃園地方法院 (臺灣銀行法拍查詢同步)",
+          division: "良股",
+          section: "第1標",
+          auction_type: "銀拍屋/行有標售",
+          status: "公告中",
+          city: "桃園市",
+          district: "平鎮區",
+          address: "桃園市平鎮區環南路二段89號10樓",
+          property_type: "電梯大樓/華廈",
+          auction_round: "2拍",
+          auction_date_roc: "115/11/17",
+          auction_date_ad: "2026-11-17",
+          reserve_price_wan: 680,
+          deposit_wan: 136,
+          unit_price_wan: 20.0,
+          area_total_ping: 34.0,
+          area_main_ping: 24.5,
+          area_land_ping: 4.6,
+          handover_status: "點交條件不明(待查)",
+          handover_raw_note: "臺銀法拍網頁摘錄：查封時大門深鎖無人應門，正由債權銀行（臺灣銀行）具狀查報實際占有使用情形中，點交與否待法院補充公告。",
+          age_years: 19,
+          completion_date_source: "臺灣銀行法拍查詢 & 104法拍網 (96年完工)",
+          conflict_notes: [
+            "跨站去重與認知修正：本案同時出現於『臺灣銀行 wwwap.bot.com.tw/house/』與『司法院法拍系統』，實為臺銀聲請桃園地院拍賣之同一案件，系統已自動合併為單一筆紀錄，並將『點交待查』放入待確認清單。"
+          ],
+          price_history: [
+            { round: "1拍", date: "115/10/20", price_wan: 850, result: "流標" },
+            { round: "2拍", date: "115/11/17", price_wan: 680, result: "本次公告開標" }
+          ],
+          sources: [
+            { platform: "臺灣銀行法拍查詢", url: "https://wwwap.bot.com.tw/house/", tier: "Tier-1 官方權威", fetched_at: "2026-10-28 07:30" },
+            { platform: "司法院法拍公告", url: "https://aomp109.judicial.gov.tw/judbp/wkw/WHD1A02.htm", tier: "Tier-1 官方權威", fetched_at: "2026-10-28 07:30" }
+          ],
+          user_note: "完美驗證跨平台去重與臺銀法拍性質修正！目前點交狀態待法院補充履勘筆錄，先放入待確認清單追蹤。",
+          due_diligence: {
+            confirmed_facts: [
+              "【跨平台同案確認】臺銀網站刊登之案號即為桃園地院 114司執49811號，債權人為臺灣銀行。",
+              "【空間坪數】主建物達 24.5 坪，總價 680 萬非常實惠。"
+            ],
+            pending_leads: [
+              "【警察局查訪結果】法院已函請轄區派出所查訪現住人身分，開標前 5 天可電詢桃園地院良股書記官是否已改列為點交。"
+            ],
+            manual_verification_required: [
+              "【水電錶與信箱勘查】實地觀察電錶轉速與管理室掛號信領取紀錄，研判是否為空屋。"
+            ]
+          }
+        },
+        {
+          dedup_key: "TPD_114_77102_1",
+          case_id: "114年度司執字第77102號",
+          court: "臺灣臺北地方法院",
+          division: "木股",
+          section: "第1標",
+          auction_type: "法院法拍",
+          status: "停拍/撤回",
+          city: "臺北市",
+          district: "文山區",
+          address: "臺北市文山區興隆路三段112巷8號5樓（萬芳醫院站公寓）",
+          property_type: "公寓",
+          auction_round: "2拍",
+          auction_date_roc: "115/11/05",
+          auction_date_ad: "2026-11-05",
+          reserve_price_wan: 1420,
+          deposit_wan: 284,
+          unit_price_wan: 47.0,
+          area_total_ping: 30.2,
+          area_main_ping: 27.1,
+          area_land_ping: 9.2,
+          handover_status: "不點交",
+          handover_raw_note: "查封前已出租予第三人使用（租期至117年6月），且債權人於115/10/27具狀聲請延緩執行（停拍）。",
+          age_years: 38,
+          completion_date_source: "104法拍網 & 臺北地政 (77年完工)",
+          conflict_notes: [
+            "狀態異動警示：民間平台快取頁面仍顯示『11/05 二拍正常開標』，但司法院停拍公告已於 10/27 發布『延緩執行停拍』，本系統自動覆寫狀態為【停拍/撤回】防止白跑一趟！"
+          ],
+          price_history: [
+            { round: "1拍", date: "115/10/01", price_wan: 1775, result: "流標" },
+            { round: "2拍", date: "115/11/05", price_wan: 1420, result: "⚠️ 10/27 公告停拍 (延緩執行)" }
+          ],
+          sources: [
+            { platform: "司法院停拍公告", url: "https://aomp109.judicial.gov.tw/judbp/wkw/WHD1A02.htm", tier: "Tier-1 官方權威", fetched_at: "2026-10-28 07:30" }
+          ],
+          user_note: "展示系統對『停拍異動』與『不點交＋高屋齡』的精準攔截能力。",
+          due_diligence: {
+            confirmed_facts: [
+              "【已公告停拍】臺北地院木股已公告本件因債權人聲請延緩執行而停止拍賣，11/05 不開標。",
+              "【買賣不破租賃不點交】查封前已有長約租賃，不點交。"
+            ],
+            pending_leads: [
+              "【後續啟封追蹤】若債務人協商破局，債權人須於 3 個月內聲請續行拍賣，屆時仍從 2 拍底價起拍。"
+            ],
+            manual_verification_required: [
+              "無須開立本票保證金，靜待是否續行拍賣即可。"
+            ]
+          }
+        },
+        {
+          dedup_key: "SCD_114_20419_1",
+          case_id: "114年度司執字第20419號",
+          court: "臺灣新竹地方法院",
+          division: "平股",
+          section: "第1標",
+          auction_type: "法院法拍",
+          status: "公告中",
+          city: "新竹縣",
+          district: "竹北市",
+          address: "新竹縣竹北市六家五路二段90號12樓（高鐵特區・極光三房）",
+          property_type: "電梯大樓/華廈",
+          auction_round: "2拍",
+          auction_date_roc: "115/11/19",
+          auction_date_ad: "2026-11-19",
+          reserve_price_wan: 1560,
+          deposit_wan: 312,
+          unit_price_wan: 41.2,
+          area_total_ping: 37.9,
+          area_main_ping: 24.1,
+          area_land_ping: 5.2,
+          handover_status: "點交",
+          handover_raw_note: "債務人自住，拍定後點交。",
+          age_years: 12,
+          completion_date_source: "優室法拍 & 新竹實價登錄 (103年完工)",
+          conflict_notes: [],
+          price_history: [
+            { round: "1拍", date: "115/10/22", price_wan: 1950, result: "流標" },
+            { round: "2拍", date: "115/11/19", price_wan: 1560, result: "本次公告開標" }
+          ],
+          sources: [
+            { platform: "司法院法拍公告", url: "https://aomp109.judicial.gov.tw/judbp/wkw/WHD1A02.htm", tier: "Tier-1 官方權威", fetched_at: "2026-10-28 07:30" },
+            { platform: "優室法拍", url: "https://uhomes.com.tw/", tier: "Tier-2 輔助校驗", fetched_at: "2026-10-28 07:32" }
+          ],
+          user_note: "竹北高鐵特區 12 年大樓，同社區實價已站上 58~62 萬/坪，2 拍單價僅 41.2 萬/坪且明確點交。",
+          due_diligence: {
+            confirmed_facts: [
+              "【點交與權屬】1/1 完整所有權，含 B2 平面大車位 1 個，拍定後點交。",
+              "【價差安全邊際】較周邊實價登錄折讓約 30%。"
+            ],
+            pending_leads: [
+              "【第二拍熱門搶標預警】竹北高鐵特區點交物件通常於 2 拍即有 5~10 組投標人競標，出價策略不宜僅貼底價。"
+            ],
+            manual_verification_required: [
+              "【確認車位尺寸與充電樁規範】實地洽詢物業管理中心。"
+            ]
+          }
+        }
+      ];
+
+      var DEFAULT_SUBSCRIPTIONS = [
+        {
+          id: "sub_1",
+          name: "新北(新莊/三重) ＋ 苗栗(頭份/竹南) 跨區自住監控",
+          locations: ["新北市:新莊區", "新北市:三重區", "苗栗縣:頭份市", "苗栗縣:竹南鎮"],
+          maxPrice: 1200,
+          minPing: 20,
+          maxAge: 20,
+          handover: "SAFE_AND_PENDING",
+          active: true,
+          createdAt: "2026-10-28"
+        },
+        {
+          id: "sub_2",
+          name: "桃園全區自住核心監控 (850萬內 / 20坪+ / 20年內 / 含待查防漏)",
+          locations: ["桃園市:*"],
+          maxPrice: 850,
+          minPing: 20,
+          maxAge: 20,
+          handover: "SAFE_AND_PENDING",
+          active: true,
+          createdAt: "2026-10-20"
+        },
+        {
+          id: "sub_3",
+          name: "苗栗頭份・竹南低總價透天與園區宅 (850萬內 / 30坪+)",
+          locations: ["苗栗縣:頭份市", "苗栗縣:竹南鎮"],
+          maxPrice: 850,
+          minPing: 30,
+          maxAge: 30,
+          handover: "SAFE_AND_PENDING",
+          active: true,
+          createdAt: "2026-10-22"
+        }
+      ];
+
+      var STATUS_ALERT_LOGS = [
+        {
+          time: "2026-10-28 07:30",
+          badge: "流標降價 20%",
+          badgeClass: "bg-emerald-100 text-emerald-800 border-emerald-200",
+          caseKey: "TYD_114_58291_甲",
+          title: "桃園區正光路186號9樓 (114司執58291號)",
+          detail: "一拍 980 萬流標，今日公告進入【2拍】底價降至 784 萬（已跌破 850 萬預算線！）"
+        },
+        {
+          time: "2026-10-28 07:30",
+          badge: "應買倒數提醒",
+          badgeClass: "bg-amber-100 text-amber-800 border-amber-200",
+          caseKey: "PCD_114_42910_甲",
+          title: "新莊區中原東路118號11樓 (114司執42910號)",
+          detail: "目前處於【應買公告期】底價 1,180 萬，距離 115/11/08 應買截止僅剩 11 天，先遞狀者得標。"
+        },
+        {
+          time: "2026-10-27 17:15",
+          badge: "緊急停拍通知",
+          badgeClass: "bg-rose-100 text-rose-800 border-rose-200",
+          caseKey: "TPD_114_77102_1",
+          title: "臺北市文山區興隆路三段112巷8號5樓 (114司執77102號)",
+          detail: "司法院發布最新停拍公告：債權人聲請延緩執行，原定 115/11/05 二拍取消開標（民間網站尚未更新，系統已自動攔截）。"
+        }
+      ];
+
+      // Application State
+      // selectedLocations stores strings like "新北市:*" (whole city) or "新北市:新莊區", "苗栗縣:頭份市"
+      var state = {
+        activeTab: "search",
+        activeBucket: "CONFIRMED", // CONFIRMED | PENDING | FAVORITES
+        cases: loadLocal("fr_tw_cases_v4", INITIAL_CASES),
+        favorites: loadLocal("fr_tw_favs_v4", ["PCD_114_42910_甲", "PCD_114_51033_1", "MLD_114_11208_1"]),
+        subscriptions: loadLocal("fr_tw_subs_v4", DEFAULT_SUBSCRIPTIONS),
+        selectedLocations: [], // Empty array means ALL Taiwan (no restriction)
+        focusedCityForDistricts: "新北市",
+        selectedDdKey: "PCD_114_42910_甲"
+      };
+
+      if (!state.cases || state.cases.length < INITIAL_CASES.length) {
+        state.cases = INITIAL_CASES;
+        saveLocal("fr_tw_cases_v4", state.cases);
+      }
+
+      // Check if a case matches a multi-select locations array (e.g. ["新北市:新莊區", "新北市:三重區", "苗栗縣:*"])
+      function matchMultiLocations(c, locArray) {
+        if (!locArray || locArray.length === 0) return true; // Empty = All Taiwan
+        for (var i = 0; i < locArray.length; i++) {
+          var token = locArray[i].trim();
+          if (!token || token === "ALL") return true;
+          if (token.indexOf(":") !== -1) {
+            var parts = token.split(":");
+            var tCity = parts[0].trim();
+            var tDist = parts[1].trim();
+            if (c.city === tCity && (tDist === "*" || tDist === "" || c.district === tDist)) {
+              return true;
+            }
+          } else {
+            // Flexible fallback if user typed "新北市新莊區" or "新莊區" or "苗栗縣"
+            if (c.city === token || c.district === token || (c.city + c.district) === token) {
+              return true;
+            }
+          }
+        }
+        return false;
+      }
+
+      // Three-State Evaluation Function supporting multi-select locations & dual-mode numeric inputs
+      function evaluateCaseBucket(c, filters) {
+        // 1. Multi-Select City & District Filter
+        if (!matchMultiLocations(c, filters.locations)) {
+          return { bucket: "EXCLUDED", reasons: ["地區不符"] };
+        }
+
+        // 2. Channel filter ("ALL" includes Judicial Court, TFASC Gold, Bank Silver, and MOJ Tax Auctions)
+        if (filters.channel !== "ALL" && c.auction_type !== filters.channel) {
+          return { bucket: "EXCLUDED", reasons: ["拍賣管道不符"] };
+        }
+
+        // 3. Auction Round filter
+        if (filters.round && filters.round !== "ALL" && c.auction_round !== filters.round) {
+          return { bucket: "EXCLUDED", reasons: ["拍次不符"] };
+        }
+
+        // 4. Property Type filter
+        if (filters.propType && filters.propType !== "ALL" && c.property_type !== filters.propType) {
+          return { bucket: "EXCLUDED", reasons: ["建物類型不符"] };
+        }
+
+        // 5. Keyword filter
+        if (filters.keyword) {
+          var kw = filters.keyword.toLowerCase();
+          var hay = (c.case_id + " " + c.address + " " + c.city + " " + c.district + " " + c.court + " " + c.property_type + " " + (c.user_note || "")).toLowerCase();
+          if (hay.indexOf(kw) === -1) {
+            return { bucket: "EXCLUDED", reasons: ["關鍵字不符"] };
+          }
+        }
+
+        // 6. Reserve Price Min & Max
+        if (filters.minPrice !== null && !isNaN(filters.minPrice) && c.reserve_price_wan < filters.minPrice) {
+          return { bucket: "EXCLUDED", reasons: ["底價低於下限"] };
+        }
+        if (filters.maxPrice !== null && !isNaN(filters.maxPrice) && c.reserve_price_wan > filters.maxPrice) {
+          return { bucket: "EXCLUDED", reasons: ["底價超過上限"] };
+        }
+
+        var pendingReasons = [];
+
+        // 7. Area Ping Min & Max (handle null/unknown gracefully)
+        var hasMinPing = filters.minPing !== null && !isNaN(filters.minPing) && filters.minPing > 0;
+        var hasMaxPing = filters.maxPing !== null && !isNaN(filters.maxPing) && filters.maxPing > 0;
+        if (hasMinPing || hasMaxPing) {
+          if (c.area_total_ping === null || c.area_total_ping === undefined) {
+            pendingReasons.push("總建坪官方未載(待查)");
+          } else {
+            if (hasMinPing && c.area_total_ping < filters.minPing) {
+              return { bucket: "EXCLUDED", reasons: ["建坪低於下限"] };
+            }
+            if (hasMaxPing && c.area_total_ping > filters.maxPing) {
+              return { bucket: "EXCLUDED", reasons: ["建坪超過上限"] };
+            }
+          }
+        }
+
+        // 8. Age Years Min & Max (handle null/unknown gracefully)
+        var hasMinAge = filters.minAge !== null && !isNaN(filters.minAge) && filters.minAge >= 0;
+        var hasMaxAge = filters.maxAge !== null && !isNaN(filters.maxAge) && filters.maxAge >= 0;
+        if (hasMinAge || hasMaxAge) {
+          if (c.age_years === null || c.age_years === undefined) {
+            pendingReasons.push("屋齡官方公告未載(待調謄本核實)");
+          } else {
+            if (hasMinAge && c.age_years < filters.minAge) {
+              return { bucket: "EXCLUDED", reasons: ["屋齡小於下限"] };
+            }
+            if (hasMaxAge && c.age_years > filters.maxAge) {
+              return { bucket: "EXCLUDED", reasons: ["屋齡超過上限"] };
+            }
+          }
+        }
+
+        // 9. Handover Status Enum Logic
+        var hMode = filters.handover;
+        if (hMode === "STRICT_HANDOVER") {
+          if (c.handover_status !== "點交") {
+            return { bucket: "EXCLUDED", reasons: ["非明確點交"] };
+          }
+        } else if (hMode === "SAFE_AND_PENDING") {
+          if (c.handover_status === "不點交") {
+            return { bucket: "EXCLUDED", reasons: ["不點交排除"] };
+          }
+          if (c.handover_status === "部分點交" || c.handover_status === "點交條件不明(待查)") {
+            pendingReasons.push("點交狀態為「" + c.handover_status + "」需讀筆錄確認");
+          }
+        } else if (hMode === "PARTIAL_ONLY") {
+          if (c.handover_status !== "部分點交" && c.handover_status !== "點交條件不明(待查)") {
+            return { bucket: "EXCLUDED", reasons: ["非部分點交/待查"] };
+          }
+        } else if (hMode === "NO_HANDOVER") {
+          if (c.handover_status !== "不點交") {
+            return { bucket: "EXCLUDED", reasons: ["非不點交"] };
+          }
+        }
+
+        if (c.status === "停拍/撤回") {
+          pendingReasons.push("最新公告為「停拍/撤回」請勿貿然開票");
+        }
+
+        if (pendingReasons.length > 0) {
+          if (filters.keepUnknown) {
+            return { bucket: "PENDING", reasons: pendingReasons };
+          } else {
+            return { bucket: "EXCLUDED", reasons: pendingReasons };
+          }
+        }
+
+        return { bucket: "CONFIRMED", reasons: [] };
+      }
+
+      // ==========================================
+      // MULTI-SELECT CITY & DISTRICT UI RENDERER
+      // ==========================================
+      function isWholeCitySelected(cityName) {
+        return state.selectedLocations.indexOf(cityName + ":*") !== -1;
+      }
+
+      function isDistrictSelected(cityName, distName) {
+        if (isWholeCitySelected(cityName)) return true;
+        return state.selectedLocations.indexOf(cityName + ":" + distName) !== -1;
+      }
+
+      function toggleWholeCity(cityName, checked) {
+        // Remove all existing tokens for this city first
+        state.selectedLocations = state.selectedLocations.filter(function(tok) {
+          return tok.indexOf(cityName + ":") !== 0;
+        });
+        if (checked) {
+          state.selectedLocations.push(cityName + ":*");
+        }
+        renderLocationMultiSelector();
+        renderSearchResults();
+      }
+
+      function toggleDistrictSelection(cityName, distName, checked) {
+        var allDists = getDistrictsByCity(cityName);
+        if (isWholeCitySelected(cityName)) {
+          // Expand whole city into individual districts except the unchecked one
+          state.selectedLocations = state.selectedLocations.filter(function(tok) {
+            return tok !== (cityName + ":*");
+          });
+          allDists.forEach(function(d) {
+            if (d !== distName) {
+              state.selectedLocations.push(cityName + ":" + d);
+            }
+          });
+        } else {
+          var key = cityName + ":" + distName;
+          var idx = state.selectedLocations.indexOf(key);
+          if (checked && idx === -1) {
+            state.selectedLocations.push(key);
+          } else if (!checked && idx !== -1) {
+            state.selectedLocations.splice(idx, 1);
+          }
+          // Check if all districts of this city are now selected -> collapse to cityName:*
+          var selectedDistsOfCity = state.selectedLocations.filter(function(tok) {
+            return tok.indexOf(cityName + ":") === 0;
+          });
+          if (allDists.length > 0 && selectedDistsOfCity.length === allDists.length) {
+            state.selectedLocations = state.selectedLocations.filter(function(tok) {
+              return tok.indexOf(cityName + ":") !== 0;
+            });
+            state.selectedLocations.push(cityName + ":*");
+          }
+        }
+        renderLocationMultiSelector();
+        renderSearchResults();
+      }
+
+      function renderLocationMultiSelector() {
+        // 1. Render Active Chips & Badge
+        var badgeEl = document.getElementById("locSelectedCountBadge");
+        var chipsContainer = document.getElementById("selectedLocationChips");
+        if (state.selectedLocations.length === 0) {
+          badgeEl.textContent = "全台灣 (不限地區)";
+          chipsContainer.innerHTML =
+            '<span class="text-xs text-slate-500 bg-white px-2.5 py-1 rounded-md border border-slate-200">目前顯示：<strong>全國 22 縣市全部行政區</strong>（點擊上方黑鈕可展開勾選特定縣市與行政區，支援跨區複選）</span>';
+        } else {
+          badgeEl.textContent = "已選 " + state.selectedLocations.length + " 個地區條件";
+          chipsContainer.innerHTML = state.selectedLocations.map(function(tok) {
+            var parts = tok.split(":");
+            var label = parts[1] === "*" ? (parts[0] + " (全區)") : (parts[0] + "・" + parts[1]);
+            return '<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-indigo-100 text-indigo-900 border border-indigo-300">' +
+              '<span>📍 ' + label + '</span>' +
+              '<button type="button" data-rmloc="' + tok + '" class="btn-remove-loc hover:text-rose-600 font-bold">✕</button>' +
+            '</span>';
+          }).join("");
+
+          chipsContainer.querySelectorAll(".btn-remove-loc").forEach(function(btn) {
+            btn.addEventListener("click", function() {
+              var tok = btn.getAttribute("data-rmloc");
+              state.selectedLocations = state.selectedLocations.filter(function(x) { return x !== tok; });
+              renderLocationMultiSelector();
+              renderSearchResults();
+            });
+          });
+        }
+
+        // 2. Render Left Column: 22 Cities grouped by Region
+        var cityListEl = document.getElementById("cityListMultiContainer");
+        if (!cityListEl) return;
+        cityListEl.innerHTML = "";
+
+        TAIWAN_ADMIN_DIVISIONS.forEach(function(group) {
+          var grpDiv = document.createElement("div");
+          grpDiv.className = "space-y-1";
+          var title = document.createElement("div");
+          title.className = "text-[11px] font-bold text-slate-400 uppercase tracking-wider";
+          title.textContent = group.region;
+          grpDiv.appendChild(title);
+
+          var grid = document.createElement("div");
+          grid.className = "grid grid-cols-2 gap-1";
+
+          group.cities.forEach(function(cityObj) {
+            var cName = cityObj.name;
+            var isFocused = state.focusedCityForDistricts === cName;
+            var isWhole = isWholeCitySelected(cName);
+            var partialCount = state.selectedLocations.filter(function(tok) {
+              return tok.indexOf(cName + ":") === 0 && tok !== (cName + ":*");
+            }).length;
+
+            var row = document.createElement("div");
+            row.className = "flex items-center justify-between px-2 py-1.5 rounded cursor-pointer border transition " +
+              (isFocused
+                ? "bg-indigo-50 border-indigo-400 font-bold text-indigo-950"
+                : (isWhole || partialCount > 0 ? "bg-emerald-50/60 border-emerald-300 text-slate-900" : "bg-slate-50/70 border-slate-200 hover:bg-slate-100 text-slate-700"));
+
+            var chk = document.createElement("input");
+            chk.type = "checkbox";
+            chk.checked = isWhole;
+            chk.className = "rounded text-indigo-600 mr-1.5 cursor-pointer";
+            chk.title = "打勾代表選取整個" + cName;
+            chk.addEventListener("click", function(e) {
+              e.stopPropagation();
+              state.focusedCityForDistricts = cName;
+              toggleWholeCity(cName, chk.checked);
+            });
+
+            var lbl = document.createElement("span");
+            lbl.className = "flex-1 truncate text-xs";
+            lbl.textContent = cName + (partialCount > 0 ? " (" + partialCount + "區)" : (isWhole ? " (全)" : ""));
+
+            row.appendChild(chk);
+            row.appendChild(lbl);
+
+            row.addEventListener("click", function() {
+              state.focusedCityForDistricts = cName;
+              renderLocationMultiSelector();
+            });
+
+            grid.appendChild(row);
+          });
+
+          grpDiv.appendChild(grid);
+          cityListEl.appendChild(grpDiv);
+        });
+
+        // 3. Render Right Column: Districts for state.focusedCityForDistricts
+        var activeCity = state.focusedCityForDistricts || "新北市";
+        document.getElementById("activeCityDistrictTitle").textContent = "步驟 B：勾選【" + activeCity + "】行政區（支援跨縣市多區複選）";
+        var distContainer = document.getElementById("districtCheckboxesContainer");
+        distContainer.innerHTML = "";
+
+        var distList = getDistrictsByCity(activeCity);
+        distList.forEach(function(dName) {
+          var checked = isDistrictSelected(activeCity, dName);
+          var labelEl = document.createElement("label");
+          labelEl.className = "flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border cursor-pointer transition " +
+            (checked ? "bg-indigo-600 text-white border-indigo-600 font-semibold shadow-sm" : "bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100");
+
+          var cb = document.createElement("input");
+          cb.type = "checkbox";
+          cb.checked = checked;
+          cb.className = "rounded text-indigo-600 focus:ring-0";
+          cb.addEventListener("change", function() {
+            toggleDistrictSelection(activeCity, dName, cb.checked);
+          });
+
+          var span = document.createElement("span");
+          span.textContent = dName;
+
+          labelEl.appendChild(cb);
+          labelEl.appendChild(span);
+          distContainer.appendChild(labelEl);
+        });
+      }
+
+      function parseOptionalNum(elementId) {
+        var el = document.getElementById(elementId);
+        if (!el) return null;
+        var raw = el.value.trim();
+        if (raw === "") return null;
+        var num = parseFloat(raw);
+        return isNaN(num) ? null : num;
+      }
+
+      function getCurrentFilters() {
+        return {
+          locations: state.selectedLocations.slice(),
+          handover: document.getElementById("filterHandover").value,
+          minPrice: parseOptionalNum("filterMinPrice"),
+          maxPrice: parseOptionalNum("filterMaxPrice"),
+          minAge: parseOptionalNum("filterMinAge"),
+          maxAge: parseOptionalNum("filterMaxAge"),
+          minPing: parseOptionalNum("filterMinPing"),
+          maxPing: parseOptionalNum("filterMaxPing"),
+          channel: document.getElementById("filterChannel").value,
+          round: document.getElementById("filterRound").value,
+          propType: document.getElementById("filterPropType").value,
+          keyword: document.getElementById("filterKeyword").value.trim(),
+          keepUnknown: document.getElementById("toggleKeepUnknown").checked,
+          sortOrder: document.getElementById("sortOrder").value
+        };
+      }
+
+      function renderBucketTabStyles(confirmedCount, pendingCount, favCount) {
+        document.getElementById("countConfirmedBadge").textContent = confirmedCount;
+        document.getElementById("countPendingBadge").textContent = pendingCount;
+        document.getElementById("countFavoritesBadge").textContent = favCount;
+        document.getElementById("navCountTotal").textContent = confirmedCount + pendingCount;
+        document.getElementById("navCountFav").textContent = favCount;
+
+        var tabs = [
+          { id: "subTabConfirmed", bucket: "CONFIRMED", activeCls: "bg-white text-emerald-900 shadow-sm border border-emerald-300" },
+          { id: "subTabPending", bucket: "PENDING", activeCls: "bg-white text-amber-900 shadow-sm border border-amber-300" },
+          { id: "subTabFavorites", bucket: "FAVORITES", activeCls: "bg-white text-indigo-900 shadow-sm border border-indigo-300" }
+        ];
+        tabs.forEach(function(t) {
+          var el = document.getElementById(t.id);
+          if (!el) return;
+          if (state.activeBucket === t.bucket) {
+            el.className = "bucket-tab-btn px-4 py-2 rounded-lg text-xs sm:text-sm font-bold flex items-center gap-2 " + t.activeCls;
+          } else {
+            el.className = "bucket-tab-btn px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold text-slate-600 hover:bg-white/60 flex items-center gap-2";
+          }
+        });
+      }
+
+      function getHandoverBadgeHtml(status) {
+        if (status === "點交") {
+          return '<span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">✅ 點交</span>';
+        }
+        if (status === "部分點交") {
+          return '<span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-900 border border-amber-300">⚠️ 部分點交 (主建物點交)</span>';
+        }
+        if (status === "點交條件不明(待查)") {
+          return '<span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-900 border border-amber-300">❓ 點交待查 (待履勘補充)</span>';
+        }
+        return '<span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-rose-100 text-rose-800 border border-rose-300">⛔ 不點交</span>';
+      }
+
+      // Render Case Cards
+      function renderSearchResults() {
+        var filters = getCurrentFilters();
+
+        var confirmedList = [];
+        var pendingList = [];
+        var favList = [];
+
+        state.cases.forEach(function(c) {
+          var res = evaluateCaseBucket(c, filters);
+          var copy = Object.assign({}, c, { _evalBucket: res.bucket, _evalReasons: res.reasons });
+          if (res.bucket === "CONFIRMED") confirmedList.push(copy);
+          if (res.bucket === "PENDING") pendingList.push(copy);
+          if (state.favorites.indexOf(c.dedup_key) !== -1) favList.push(copy);
+        });
+
+        function sortCases(arr) {
+          arr.sort(function(a, b) {
+            if (filters.sortOrder === "price_asc") return a.reserve_price_wan - b.reserve_price_wan;
+            if (filters.sortOrder === "price_desc") return b.reserve_price_wan - a.reserve_price_wan;
+            if (filters.sortOrder === "unit_asc") return (a.unit_price_wan || 999) - (b.unit_price_wan || 999);
+            if (filters.sortOrder === "age_asc") return (a.age_years === null ? 999 : a.age_years) - (b.age_years === null ? 999 : b.age_years);
+            return (a.auction_date_ad || "").localeCompare(b.auction_date_ad || "");
+          });
+        }
+        sortCases(confirmedList);
+        sortCases(pendingList);
+        sortCases(favList);
+
+        renderBucketTabStyles(confirmedList.length, pendingList.length, favList.length);
+
+        var targetList = state.activeBucket === "CONFIRMED"
+          ? confirmedList
+          : (state.activeBucket === "PENDING" ? pendingList : favList);
+
+        var container = document.getElementById("casesListContainer");
+        container.innerHTML = "";
+
+        if (targetList.length === 0) {
+          var emptyMsg = state.activeBucket === "PENDING"
+            ? "目前篩選條件下沒有「資訊不足待確認」的案件。您可以切換至左側「✅ 已確認符合條件」分頁檢視結果。"
+            : "目前篩選條件下無符合案件。您可以放寬上方的價格、屋齡或地區複選條件，或切換至「⚠️ 資訊不足・待人工確認」查看是否有因缺欄位而待查的案件。";
+          container.innerHTML = '<div class="col-span-full bg-white rounded-xl border border-slate-200 p-8 text-center text-slate-500 text-sm">' + emptyMsg + '</div>';
+          return;
+        }
+
+        targetList.forEach(function(c) {
+          var isFav = state.favorites.indexOf(c.dedup_key) !== -1;
+          var card = document.createElement("div");
+          card.className = "bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-all p-5 flex flex-col justify-between space-y-4";
+
+          var alertHtml = "";
+          if (c._evalReasons && c._evalReasons.length > 0) {
+            alertHtml += '<div class="p-2.5 rounded-lg bg-amber-50 border border-amber-200 text-amber-900 text-xs flex items-start gap-2">' +
+              '<span class="font-bold shrink-0">⚠️ 待人工確認原因：</span>' +
+              '<span>' + c._evalReasons.join("；") + '</span></div>';
+          }
+          if (c.conflict_notes && c.conflict_notes.length > 0) {
+            alertHtml += '<div class="p-2.5 rounded-lg bg-indigo-50/80 border border-indigo-200 text-indigo-900 text-xs">' +
+              '<strong>🔍 跨平台交叉核驗提示：</strong>' + c.conflict_notes.join(" ") + '</div>';
+          }
+
+          var historyHtml = (c.price_history || []).map(function(h) {
+            var isCurrent = h.round === c.auction_round;
+            return '<div class="px-2.5 py-1 rounded text-[11px] border ' +
+              (isCurrent ? 'bg-slate-900 text-white border-slate-900 font-bold' : 'bg-slate-50 text-slate-500 border-slate-200') + '">' +
+              h.round + '：' + h.price_wan + '萬 (' + h.date + ' ' + h.result + ')</div>';
+          }).join("");
+
+          var sourcesHtml = (c.sources || []).map(function(s) {
+            var badgeCls = s.tier.indexOf("Tier-1") !== -1
+              ? "bg-emerald-50 text-emerald-800 border-emerald-200 hover:bg-emerald-100"
+              : "bg-slate-100 text-slate-700 border-slate-200 hover:bg-slate-200";
+            return '<a href="' + s.url + '" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-medium border transition ' + badgeCls + '">' +
+              '<span>🔗 ' + s.platform + ' (' + s.tier + ')</span></a>';
+          }).join(" ");
+
+          var ageText = (c.age_years !== null && c.age_years !== undefined)
+            ? (c.age_years + " 年")
+            : '<span class="text-amber-700 font-bold">未知 (待調謄本)</span>';
+
+          var statusBadge = c.status === "停拍/撤回"
+            ? '<span class="px-2 py-0.5 rounded text-xs font-bold bg-rose-600 text-white">⛔ 已公告停拍</span>'
+            : (c.status === "應買公告中"
+              ? '<span class="px-2 py-0.5 rounded text-xs font-bold bg-indigo-600 text-white">⏳ 應買公告 (先遞狀得標)</span>'
+              : '<span class="px-2 py-0.5 rounded text-xs font-semibold bg-slate-100 text-slate-800 border border-slate-300">' + c.auction_round + '・' + c.auction_type + '</span>');
+
+          card.innerHTML =
+            '<div class="space-y-3">' +
+              '<div class="flex items-start justify-between gap-2">' +
+                '<div class="flex flex-wrap items-center gap-1.5">' +
+                  '<span class="px-2 py-0.5 rounded text-xs font-bold bg-indigo-50 text-indigo-800 border border-indigo-200">' + c.city + '・' + c.district + '</span>' +
+                  statusBadge +
+                  getHandoverBadgeHtml(c.handover_status) +
+                  '<span class="text-xs text-slate-500 font-mono bg-slate-100 px-2 py-0.5 rounded">' + c.property_type + '</span>' +
+                '</div>' +
+                '<button type="button" data-favkey="' + c.dedup_key + '" class="btn-toggle-fav px-2.5 py-1 rounded-lg text-xs font-semibold border transition ' +
+                  (isFav ? 'bg-amber-100 text-amber-900 border-amber-300' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50') + '">' +
+                  (isFav ? '★ 已收藏追蹤' : '☆ 收藏追蹤') +
+                '</button>' +
+              '</div>' +
+
+              '<div>' +
+                '<h3 class="text-base font-bold text-slate-900 leading-snug">' + c.address + '</h3>' +
+                '<p class="text-xs text-slate-500 mt-0.5">' +
+                  '執行機關：<strong>' + c.court + ' (' + c.division + ' / ' + c.section + ')</strong> ｜ 案號：<span class="font-mono text-slate-700">' + c.case_id + '</span>' +
+                '</p>' +
+              '</div>' +
+
+              alertHtml +
+
+              '<!-- Key Metrics Grid -->' +
+              '<div class="grid grid-cols-2 sm:grid-cols-4 gap-2 bg-slate-50 p-3 rounded-xl border border-slate-200/80 text-xs">' +
+                '<div>' +
+                  '<span class="text-slate-500 block">拍賣總底價</span>' +
+                  '<strong class="text-base font-bold text-rose-600">' + c.reserve_price_wan.toLocaleString() + ' 萬</strong>' +
+                  '<span class="block text-[11px] text-slate-500">保證金 ' + c.deposit_wan + ' 萬</span>' +
+                '</div>' +
+                '<div>' +
+                  '<span class="text-slate-500 block">權狀總建坪 / 單價</span>' +
+                  '<strong class="text-sm font-bold text-slate-900">' + (c.area_total_ping ? c.area_total_ping + ' 坪' : '未載') + '</strong>' +
+                  '<span class="block text-[11px] text-emerald-700 font-semibold">約 ' + c.unit_price_wan + ' 萬/坪</span>' +
+                '</div>' +
+                '<div>' +
+                  '<span class="text-slate-500 block">主建物 / 土地持分</span>' +
+                  '<strong class="text-sm font-bold text-slate-900">室內 ' + (c.area_main_ping || '--') + ' 坪</strong>' +
+                  '<span class="block text-[11px] text-slate-500">土地 ' + (c.area_land_ping || '--') + ' 坪</span>' +
+                '</div>' +
+                '<div>' +
+                  '<span class="text-slate-500 block">推算屋齡 / 開標日</span>' +
+                  '<strong class="text-sm font-bold text-slate-900">' + ageText + '</strong>' +
+                  '<span class="block text-[11px] text-indigo-700 font-semibold">' + c.auction_date_roc + ' (' + c.auction_date_ad + ')</span>' +
+                '</div>' +
+              '</div>' +
+
+              '<!-- Handover Original Court Note & Age Basis -->' +
+              '<div class="text-xs space-y-1 text-slate-600 bg-slate-50/60 p-2.5 rounded-lg border border-slate-100">' +
+                '<div><strong class="text-slate-800">📜 筆錄點交原文：</strong>' + c.handover_raw_note + '</div>' +
+                '<div><strong class="text-slate-800">🏗️ 屋齡推算依據：</strong>' + c.completion_date_source + '</div>' +
+              '</div>' +
+
+              '<!-- Auction Price Timeline -->' +
+              '<div class="space-y-1">' +
+                '<span class="text-[11px] font-semibold text-slate-500">歷次拍賣底價時間軸：</span>' +
+                '<div class="flex flex-wrap gap-1.5">' + historyHtml + '</div>' +
+              '</div>' +
+            '</div>' +
+
+            '<div class="pt-3 border-t border-slate-100 space-y-2.5">' +
+              '<div class="flex flex-wrap items-center justify-between gap-2">' +
+                '<div class="flex flex-wrap gap-1.5">' + sourcesHtml + '</div>' +
+                '<button type="button" data-ddkey="' + c.dedup_key + '" class="btn-open-dd px-3.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold transition shadow-sm">' +
+                  '🕵️ 深度調查 & 匯出 AI 分析 →' +
+                '</button>' +
+              '</div>' +
+            '</div>';
+
+          container.appendChild(card);
+        });
+
+        container.querySelectorAll(".btn-toggle-fav").forEach(function(btn) {
+          btn.addEventListener("click", function() {
+            var key = btn.getAttribute("data-favkey");
+            var idx = state.favorites.indexOf(key);
+            if (idx === -1) {
+              state.favorites.push(key);
+              showToast("已加入收藏追蹤！無論篩選條件如何變更，皆會持續監控此案降價與停拍異動。");
+            } else {
+              state.favorites.splice(idx, 1);
+              showToast("已從收藏追蹤移除。");
+            }
+            saveLocal("fr_tw_favs_v4", state.favorites);
+            renderSearchResults();
+          });
+        });
+
+        container.querySelectorAll(".btn-open-dd").forEach(function(btn) {
+          btn.addEventListener("click", function() {
+            var key = btn.getAttribute("data-ddkey");
+            state.selectedDdKey = key;
+            switchMainTab("duediligence");
+            renderDueDiligenceView();
+          });
+        });
+      }
+
+      // ==========================================
+      // DUE DILIGENCE & AI EXPORT WORKBENCH
+      // ==========================================
+      function populateDdSelector() {
+        var sel = document.getElementById("ddCaseSelector");
+        if (!sel) return;
+        sel.innerHTML = "";
+        state.cases.forEach(function(c) {
+          var opt = document.createElement("option");
+          opt.value = c.dedup_key;
+          opt.textContent = "[" + c.city + c.district + "・" + c.auction_round + " " + c.reserve_price_wan + "萬] " + c.address + " (" + c.case_id + ")";
+          if (c.dedup_key === state.selectedDdKey) opt.selected = true;
+          sel.appendChild(opt);
+        });
+      }
+
+      function getSelectedDdCase() {
+        for (var i = 0; i < state.cases.length; i++) {
+          if (state.cases[i].dedup_key === state.selectedDdKey) return state.cases[i];
+        }
+        return state.cases[0];
+      }
+
+      function updateAcquisitionCalc(c) {
+        var bidInput = document.getElementById("calcBidPriceInput");
+        var evictInput = document.getElementById("calcEvictInput");
+        var renovInput = document.getElementById("calcRenovInput");
+
+        var bidWan = parseFloat(bidInput.value) || c.reserve_price_wan;
+        var depositWan = c.deposit_wan || Math.round(c.reserve_price_wan * 0.2);
+        var balanceWan = Math.max(0, bidWan - depositWan);
+        var taxWan = +(bidWan * 0.012).toFixed(1);
+        var evictWan = parseFloat(evictInput.value) || 0;
+        var renovWan = parseFloat(renovInput.value) || 0;
+        var totalCost = +(bidWan + taxWan + evictWan + renovWan).toFixed(1);
+        var ping = c.area_total_ping || 30;
+        var realUnit = +(totalCost / ping).toFixed(1);
+
+        document.getElementById("calcDepositVal").textContent = depositWan.toLocaleString() + " 萬 (投標當日銀行本票)";
+        document.getElementById("calcBalanceVal").textContent = balanceWan.toLocaleString() + " 萬 (拍定7日內繳清)";
+        document.getElementById("calcTaxVal").textContent = taxWan + " 萬";
+        document.getElementById("calcTotalCostVal").textContent = totalCost.toLocaleString() + " 萬";
+        document.getElementById("calcRealUnitVal").textContent = realUnit + " 萬/坪";
+      }
+
+      function buildStructuredExportPayload(c) {
+        var bidWan = parseFloat(document.getElementById("calcBidPriceInput").value) || c.reserve_price_wan;
+        var evictWan = parseFloat(document.getElementById("calcEvictInput").value) || 0;
+        var renovWan = parseFloat(document.getElementById("calcRenovInput").value) || 0;
+        var totalLandingWan = +(bidWan * 1.012 + evictWan + renovWan).toFixed(1);
+
+        return {
+          export_metadata: {
+            system: "ForeclosureRadar TW",
+            exported_at_taipei: "2026-10-28T10:15:00+08:00",
+            legal_disclaimer: "本結構化資料僅供法拍風險評估與 AI 輔助推理參考，不構成法律或徵信結論；同名同姓裁判書與網路事故傳聞須嚴格區分，投標前務必以法院拍賣公告正本與最新地政謄本為準。"
+          },
+          case_core: {
+            dedup_key: c.dedup_key,
+            case_id: c.case_id,
+            court: c.court,
+            division: c.division,
+            section: c.section,
+            auction_type: c.auction_type,
+            status: c.status,
+            city: c.city,
+            district: c.district,
+            address: c.address,
+            property_type: c.property_type,
+            auction_round: c.auction_round,
+            auction_date_roc: c.auction_date_roc,
+            auction_date_ad: c.auction_date_ad,
+            reserve_price_wan: c.reserve_price_wan,
+            deposit_wan: c.deposit_wan,
+            area_total_ping: c.area_total_ping,
+            area_main_ping: c.area_main_ping,
+            area_land_ping: c.area_land_ping,
+            unit_price_wan: c.unit_price_wan,
+            handover_status: c.handover_status,
+            handover_raw_note: c.handover_raw_note,
+            age_years: c.age_years,
+            completion_date_source: c.completion_date_source
+          },
+          price_history: c.price_history,
+          sources: c.sources,
+          three_tier_due_diligence: c.due_diligence,
+          financial_simulation: {
+            planned_bid_price_wan: bidWan,
+            deposit_required_wan: c.deposit_wan,
+            seven_day_balance_wan: Math.max(0, bidWan - c.deposit_wan),
+            estimated_eviction_and_renovation_wan: evictWan + renovWan,
+            estimated_total_landing_cost_wan: totalLandingWan
+          },
+          field_inspection_user_note: c.user_note || ""
+        };
+      }
+
+      function buildAiPromptWrapper(c) {
+        var payload = buildStructuredExportPayload(c);
+        var jsonStr = JSON.stringify(payload, null, 2);
+        return "你現在是一位專精台灣強制執行法、不動產登記實務、法拍屋點交訴訟與銀行代墊款估價的資深法拍顧問與律師。\n" +
+          "以下是我從「ForeclosureRadar TW 跨平台法拍系統」匯出的單案件結構化調查資料（已區分【第1級：官方已確認事實】、【第2級：待查證關聯線索】與【第3級：無法自動取得須人工核實事項】）。\n\n" +
+          "請根據這份 JSON 證據清單，為我進行以下 5 項深度研判（請嚴守證據邊界，切勿將未確認線索或同名同姓當成既定事實）：\n" +
+          "1. 【點交與占有法律風險剖析】：解析筆錄原文中的點交範圍、是否有未保存登記增建、共有物優先承買權、或除去租賃權抗告風險。\n" +
+          "2. 【價格安全邊際與出價策略建議】：對照歷次拍賣底價、社區實價登錄與預估總落地成本，評估本拍次是否值得進場、建議加價區間與最高出價紅線。\n" +
+          "3. 【7日尾款與代墊款融資可行性】：針對本案性質（法拍/金拍/銀拍/稅拍、點交與否、屋齡），說明銀行代墊款成數、利率與現金流準備重點。\n" +
+          "4. 【投標前必做人工查核清單 (Action Checklist)】：列出我去現場看屋、詢問管委會、調閱地政二類謄本與電詢法院書記官時，具體要問哪幾個問題。\n" +
+          "5. 【綜合投資/自住決策評級】：給出明確的風險等級與操作建議。\n\n" +
+          "=== 案件結構化調查資料 (JSON) ===\n" + jsonStr;
+      }
+
+      function renderDueDiligenceView() {
+        populateDdSelector();
+        var c = getSelectedDdCase();
+        if (!c) return;
+
+        var sumBox = document.getElementById("ddCaseSummaryBox");
+        sumBox.innerHTML =
+          '<div class="p-4 rounded-xl bg-slate-50 border border-slate-200 flex flex-wrap items-center justify-between gap-4">' +
+            '<div class="space-y-1">' +
+              '<div class="flex items-center gap-2">' +
+                '<span class="px-2.5 py-0.5 rounded bg-slate-900 text-white text-xs font-bold">' + c.auction_round + ' (' + c.auction_date_roc + ')</span>' +
+                getHandoverBadgeHtml(c.handover_status) +
+                '<span class="text-xs font-mono text-slate-500">' + c.case_id + '</span>' +
+              '</div>' +
+              '<h3 class="text-base font-bold text-slate-900">' + c.address + '</h3>' +
+              '<p class="text-xs text-slate-600">執行機關：' + c.court + ' (' + c.division + ' / ' + c.section + ') ｜ 屋齡：' + (c.age_years !== null ? c.age_years + '年' : '未知(待查)') + ' ｜ 建坪：' + (c.area_total_ping || '未載') + ' 坪 (室內 ' + (c.area_main_ping || '--') + ' 坪)</p>' +
+            '</div>' +
+            '<div class="text-right">' +
+              '<span class="text-xs text-slate-500 block">本拍次總底價</span>' +
+              '<strong class="text-2xl font-bold text-rose-600">' + c.reserve_price_wan.toLocaleString() + ' 萬元</strong>' +
+              '<span class="text-xs text-emerald-700 font-semibold block">折算單價約 ' + c.unit_price_wan + ' 萬/坪</span>' +
+            '</div>' +
+          '</div>';
+
+        var dd = c.due_diligence || { confirmed_facts: [], pending_leads: [], manual_verification_required: [] };
+        var evContainer = document.getElementById("ddEvidenceContainer");
+
+        var tier1Html = (dd.confirmed_facts || []).map(function(item) {
+          return '<li class="flex items-start gap-2 text-xs text-slate-800 leading-relaxed"><span class="text-emerald-600 font-bold shrink-0">✔</span><span>' + item + '</span></li>';
+        }).join("");
+
+        var tier2Html = (dd.pending_leads || []).map(function(item) {
+          return '<li class="flex items-start gap-2 text-xs text-slate-800 leading-relaxed"><span class="text-amber-600 font-bold shrink-0">▲</span><span>' + item + '</span></li>';
+        }).join("");
+
+        var tier3Html = (dd.manual_verification_required || []).map(function(item) {
+          return '<li class="flex items-start gap-2 text-xs text-slate-800 leading-relaxed"><span class="text-rose-600 font-bold shrink-0">❗</span><span>' + item + '</span></li>';
+        }).join("");
+
+        evContainer.innerHTML =
+          '<!-- Tier 1: Confirmed Facts -->' +
+          '<div class="bg-white rounded-xl border-l-4 border-l-emerald-600 border border-slate-200 p-5 shadow-sm space-y-2.5">' +
+            '<div class="flex items-center justify-between">' +
+              '<h3 class="text-sm font-bold text-emerald-900">🟢 第一級：已確認事實 (具官方拍賣筆錄或實價登錄依據)</h3>' +
+              '<span class="text-[11px] font-semibold px-2 py-0.5 rounded bg-emerald-50 text-emerald-700">高可信度證據</span>' +
+            '</div>' +
+            '<ul class="space-y-2">' + tier1Html + '</ul>' +
+          '</div>' +
+
+          '<!-- Tier 2: Pending Leads -->' +
+          '<div class="bg-white rounded-xl border-l-4 border-l-amber-500 border border-slate-200 p-5 shadow-sm space-y-2.5">' +
+            '<div class="flex items-center justify-between">' +
+              '<h3 class="text-sm font-bold text-amber-900">🟡 第二級：待查證關聯線索 (裁判書字號/未保存增建/管理費線索)</h3>' +
+              '<span class="text-[11px] font-semibold px-2 py-0.5 rounded bg-amber-50 text-amber-800">嚴防同名同姓誤判</span>' +
+            '</div>' +
+            '<ul class="space-y-2">' + tier2Html + '</ul>' +
+          '</div>' +
+
+          '<!-- Tier 3: Manual Verification Required -->' +
+          '<div class="bg-white rounded-xl border-l-4 border-l-rose-600 border border-slate-200 p-5 shadow-sm space-y-2.5">' +
+            '<div class="flex items-center justify-between">' +
+              '<h3 class="text-sm font-bold text-rose-900">🔴 第三級：無法自動取得・投標前須人工核實 (凶宅限制/二類謄本/現場履勘)</h3>' +
+              '<span class="text-[11px] font-semibold px-2 py-0.5 rounded bg-rose-50 text-rose-700">查無紀錄 ≠ 零風險</span>' +
+            '</div>' +
+            '<ul class="space-y-2">' + tier3Html + '</ul>' +
+          '</div>' +
+
+          '<!-- 6 Legal & Public Investigation Source Direct Launchers -->' +
+          '<div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm space-y-3">' +
+            '<h3 class="text-sm font-bold text-slate-900">🔗 6 大公開權威資料庫深度挖掘一鍵跳轉 (自動預帶本案關鍵字)</h3>' +
+            '<div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">' +
+              '<a href="https://judgment.judicial.gov.tw/FJUD/default.aspx" target="_blank" rel="noopener noreferrer" class="p-3 rounded-lg border border-slate-200 hover:border-indigo-400 hover:bg-indigo-50/40 transition flex flex-col justify-between">' +
+                '<strong class="text-slate-900">1. 司法院裁判書查詢系統 ↗</strong>' +
+                '<span class="text-slate-500 mt-1">檢索關鍵字：<code class="bg-slate-100 px-1 rounded text-indigo-700">' + c.case_id + '</code>（查塗銷抵押、除租抗告、共有物分割訴訟）</span>' +
+              '</a>' +
+              '<a href="https://lvr.land.moi.gov.tw/" target="_blank" rel="noopener noreferrer" class="p-3 rounded-lg border border-slate-200 hover:border-indigo-400 hover:bg-indigo-50/40 transition flex flex-col justify-between">' +
+                '<strong class="text-slate-900">2. 內政部不動產交易實價查詢 ↗</strong>' +
+                '<span class="text-slate-500 mt-1">檢索：<code class="bg-slate-100 px-1 rounded text-indigo-700">' + c.city + c.district + '</code> 查同社區歷年成交單價與建築完成年月</span>' +
+              '</a>' +
+              '<a href="https://findbiz.nat.gov.tw/fts/query/QueryBar/queryInit.do" target="_blank" rel="noopener noreferrer" class="p-3 rounded-lg border border-slate-200 hover:border-indigo-400 hover:bg-indigo-50/40 transition flex flex-col justify-between">' +
+                '<strong class="text-slate-900">3. 經濟部商工登記公示資料 ↗</strong>' +
+                '<span class="text-slate-500 mt-1">查該門牌是否設籍公司行號、債務人是否涉及公司破產清算</span>' +
+              '</a>' +
+              '<a href="https://luz.tcd.gov.tw/" target="_blank" rel="noopener noreferrer" class="p-3 rounded-lg border border-slate-200 hover:border-indigo-400 hover:bg-indigo-50/40 transition flex flex-col justify-between">' +
+                '<strong class="text-slate-900">4. 全國土地使用分區查詢 ↗</strong>' +
+                '<span class="text-slate-500 mt-1">核驗基地是否屬住宅區、工業住宅、農業區或法定空地</span>' +
+              '</a>' +
+              '<a href="https://www.google.com/search?q=' + encodeURIComponent(c.city + c.district + ' ' + c.address.split('（')[0] + ' 命案 OR 墜樓 OR 火警 OR 海砂 OR 凶宅') + '" target="_blank" rel="noopener noreferrer" class="p-3 rounded-lg border border-slate-200 hover:border-indigo-400 hover:bg-indigo-50/40 transition flex flex-col justify-between">' +
+                '<strong class="text-slate-900">5. 社區事故 / 凶宅 / 社會新聞檢索 ↗</strong>' +
+                '<span class="text-slate-500 mt-1">自動組合門牌與社區名稱搜尋歷年社會新聞</span>' +
+              '</a>' +
+              '<a href="https://aomp109.judicial.gov.tw/judbp/wkw/WHD1A02.htm" target="_blank" rel="noopener noreferrer" class="p-3 rounded-lg border border-slate-200 hover:border-indigo-400 hover:bg-indigo-50/40 transition flex flex-col justify-between">' +
+                '<strong class="text-slate-900">6. 司法院拍賣公告正本與停拍核對 ↗</strong>' +
+                '<span class="text-slate-500 mt-1">開標前一日必查是否有最新變更公告或延緩執行停拍</span>' +
+              '</a>' +
+            '</div>' +
+          '</div>';
+
+        document.getElementById("calcBidPriceInput").value = Math.round(c.reserve_price_wan * 1.03);
+        document.getElementById("ddUserCustomNote").value = c.user_note || "";
+        updateAcquisitionCalc(c);
+        document.getElementById("ddExportPreview").value = buildAiPromptWrapper(c);
+      }
+
+      // ==========================================
+      // SUBSCRIPTIONS & DAILY EMAIL DIGEST VIEW
+      // ==========================================
+      function formatLocationsDisplay(locs) {
+        if (!locs || locs.length === 0) return "全台灣 (不限縣市)";
+        return locs.map(function(tok) {
+          var p = tok.split(":");
+          if (p.length === 2) return p[1] === "*" ? (p[0] + "(全區)") : (p[0] + p[1]);
+          return tok;
+        }).join("、");
+      }
+
+      function renderSubscriptionsAndDigest() {
+        var listEl = document.getElementById("subscriptionRulesList");
+        if (!listEl) return;
+        listEl.innerHTML = "";
+
+        state.subscriptions.forEach(function(sub) {
+          var subLocs = sub.locations || (sub.city && sub.city !== "ALL" ? [sub.city + ":*"] : []);
+          var ruleFilters = {
+            locations: subLocs,
+            handover: sub.handover || "SAFE_AND_PENDING",
+            minPrice: null,
+            maxPrice: sub.maxPrice ? parseFloat(sub.maxPrice) : null,
+            minAge: null,
+            maxAge: sub.maxAge ? parseFloat(sub.maxAge) : null,
+            minPing: sub.minPing ? parseFloat(sub.minPing) : null,
+            maxPing: null,
+            channel: "ALL",
+            round: "ALL",
+            propType: "ALL",
+            keyword: "",
+            keepUnknown: true
+          };
+          var confCount = 0;
+          var pendCount = 0;
+          state.cases.forEach(function(c) {
+            var r = evaluateCaseBucket(c, ruleFilters);
+            if (r.bucket === "CONFIRMED") confCount++;
+            if (r.bucket === "PENDING") pendCount++;
+          });
+
+          var row = document.createElement("div");
+          row.className = "p-4 rounded-xl border border-slate-200 bg-slate-50/70 flex flex-wrap items-center justify-between gap-3";
+          row.innerHTML =
+            '<div class="space-y-1">' +
+              '<div class="flex items-center gap-2">' +
+                '<span class="w-2 h-2 rounded-full ' + (sub.active ? 'bg-emerald-500' : 'bg-slate-400') + '"></span>' +
+                '<strong class="text-xs sm:text-sm font-bold text-slate-900">' + sub.name + '</strong>' +
+                '<span class="text-[11px] px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-semibold">確認符合 ' + confCount + ' 筆</span>' +
+                '<span class="text-[11px] px-2 py-0.5 rounded bg-amber-100 text-amber-900 font-semibold">待查防漏 ' + pendCount + ' 筆</span>' +
+              '</div>' +
+              '<p class="text-xs text-slate-500">' +
+                '複選地區：<strong>' + formatLocationsDisplay(subLocs) + '</strong> ｜ 預算上限：' + (sub.maxPrice || '不限') + '萬 ｜ 最小建坪：' + (sub.minPing || '不限') + '坪 ｜ 屋齡上限：' + (sub.maxAge || '不限') + '年' +
+              '</p>' +
+            '</div>' +
+            '<div class="flex items-center gap-2">' +
+              '<button type="button" data-applysub="' + sub.id + '" class="btn-apply-sub px-2.5 py-1.5 rounded bg-white border border-slate-300 hover:bg-slate-100 text-xs font-semibold text-slate-700">套用至搜尋頁</button>' +
+              '<button type="button" data-delsub="' + sub.id + '" class="btn-del-sub px-2.5 py-1.5 rounded bg-white border border-rose-200 hover:bg-rose-50 text-xs font-semibold text-rose-600">刪除</button>' +
+            '</div>';
+          listEl.appendChild(row);
+        });
+
+        listEl.querySelectorAll(".btn-apply-sub").forEach(function(btn) {
+          btn.addEventListener("click", function() {
+            var id = btn.getAttribute("data-applysub");
+            var sub = state.subscriptions.find(function(s) { return s.id === id; });
+            if (!sub) return;
+            state.selectedLocations = (sub.locations || []).slice();
+            document.getElementById("filterHandover").value = sub.handover || "SAFE_AND_PENDING";
+            document.getElementById("filterMinPrice").value = "";
+            document.getElementById("filterMaxPrice").value = sub.maxPrice ? String(sub.maxPrice) : "";
+            document.getElementById("quickPriceSelect").value = sub.maxPrice ? "CUSTOM" : "ALL";
+            document.getElementById("filterMinAge").value = "";
+            document.getElementById("filterMaxAge").value = sub.maxAge ? String(sub.maxAge) : "";
+            document.getElementById("quickAgeSelect").value = sub.maxAge ? "CUSTOM" : "ALL";
+            document.getElementById("filterMinPing").value = sub.minPing ? String(sub.minPing) : "";
+            document.getElementById("filterMaxPing").value = "";
+            document.getElementById("quickPingSelect").value = sub.minPing ? "CUSTOM" : "ALL";
+            switchMainTab("search");
+            renderLocationMultiSelector();
+            renderSearchResults();
+            showToast("已將訂閱條件「" + sub.name + "」帶入搜尋篩選器！");
+          });
+        });
+
+        listEl.querySelectorAll(".btn-del-sub").forEach(function(btn) {
+          btn.addEventListener("click", function() {
+            var id = btn.getAttribute("data-delsub");
+            state.subscriptions = state.subscriptions.filter(function(s) { return s.id !== id; });
+            saveLocal("fr_tw_subs_v4", state.subscriptions);
+            renderSubscriptionsAndDigest();
+            showToast("已刪除該組訂閱規則。");
+          });
+        });
+
+        var logContainer = document.getElementById("statusChangeLogContainer");
+        logContainer.innerHTML = STATUS_ALERT_LOGS.map(function(log) {
+          return '<div class="p-3 rounded-lg border border-slate-200 bg-white flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">' +
+            '<div class="space-y-0.5">' +
+              '<div class="flex items-center gap-2">' +
+                '<span class="px-2 py-0.5 rounded font-bold border ' + log.badgeClass + '">' + log.badge + '</span>' +
+                '<strong class="text-slate-900">' + log.title + '</strong>' +
+                '<span class="text-slate-400 font-mono">' + log.time + '</span>' +
+              '</div>' +
+              '<p class="text-slate-600">' + log.detail + '</p>' +
+            '</div>' +
+          '</div>';
+        }).join("");
+
+        renderEmailDigestPreview();
+      }
+
+      function renderEmailDigestPreview() {
+        var box = document.getElementById("emailDigestPreviewBox");
+        if (!box) return;
+        var emailAddr = document.getElementById("subRecipientEmail").value || "buyer.research@example.com";
+
+        box.innerHTML =
+          '<div class="border border-slate-200 rounded-lg overflow-hidden">' +
+            '<div class="bg-slate-900 text-white p-3">' +
+              '<div class="font-bold text-sm">【法拍雷達日報】今日命中 新莊/三重/竹南/頭份 等 5 筆符合案件 + 2 筆待查防漏</div>' +
+              '<div class="text-[11px] text-slate-300 mt-0.5">收件人：' + emailAddr + ' ｜ 排程時間：2026-10-28 07:30 (Asia/Taipei)</div>' +
+            '</div>' +
+            '<div class="p-3.5 space-y-3 bg-white">' +
+              '<div>' +
+                '<div class="font-bold text-emerald-800 border-b border-emerald-100 pb-1 mb-2">✅ 一、已確認符合訂閱條件 (節錄代表案件)</div>' +
+                '<div class="p-2.5 rounded bg-emerald-50/70 border-l-4 border-emerald-500 space-y-0.5">' +
+                  '<div class="font-bold text-slate-900">[新北市・新莊區] 中平路270巷15號8樓 (3拍・845萬・點交)</div>' +
+                  '<div class="text-slate-600">建坪 24.2 坪 ｜ 屋齡 17 年 ｜ 開標：115/11/13</div>' +
+                '</div>' +
+                '<div class="p-2.5 rounded bg-emerald-50/70 border-l-4 border-emerald-500 space-y-0.5 mt-2">' +
+                  '<div class="font-bold text-slate-900">[新北市・三重區] 集賢路152號7樓 (2拍・1,120萬・點交)</div>' +
+                  '<div class="text-slate-600">建坪 28.4 坪 ｜ 屋齡 15 年 ｜ 開標：115/11/17</div>' +
+                '</div>' +
+                '<div class="p-2.5 rounded bg-emerald-50/70 border-l-4 border-emerald-500 space-y-0.5 mt-2">' +
+                  '<div class="font-bold text-slate-900">[苗栗縣・頭份市] 中央路256巷18號透天 (3拍・768萬・點交)</div>' +
+                  '<div class="text-slate-600">建坪 52.3 坪 (土地 26.5 坪) ｜ 屋齡 14 年 ｜ 開標：115/11/20</div>' +
+                '</div>' +
+              '</div>' +
+              '<div>' +
+                '<div class="font-bold text-amber-800 border-b border-amber-100 pb-1 mb-2">⚠️ 二、資訊不足待確認防漏清單 (缺屋齡或部分點交)</div>' +
+                '<div class="p-2.5 rounded bg-amber-50/80 border-l-4 border-amber-500 space-y-0.5">' +
+                  '<div class="font-bold text-slate-900">[缺屋齡保護] 桃園市中壢區環北路395巷12號7樓 (3拍・692萬・除租點交)</div>' +
+                  '<div class="text-slate-600">室內 22.8 坪，因司法院公告未載屋齡，保留於此提醒調閱謄本核實。</div>' +
+                '</div>' +
+              '</div>' +
+            '</div>' +
+          '</div>';
+      }
+
+      // ==========================================
+      // 8 SOURCES HEALTH TABLE
+      // ==========================================
+      function renderSourcesTable() {
+        var tbody = document.getElementById("sourcesHealthTableBody");
+        if (!tbody) return;
+        tbody.innerHTML = SOURCE_HEALTH_DATA.map(function(s) {
+          var badgeMap = {
+            emerald: "bg-emerald-100 text-emerald-800 border-emerald-200",
+            indigo: "bg-indigo-100 text-indigo-800 border-indigo-200",
+            amber: "bg-amber-100 text-amber-900 border-amber-200",
+            slate: "bg-slate-100 text-slate-700 border-slate-300"
+          };
+          var cls = badgeMap[s.statusColor] || badgeMap.slate;
+          return '<tr class="hover:bg-slate-50">' +
+            '<td class="py-3 px-3"><strong class="text-slate-900 block">' + s.name + '</strong><span class="text-[11px] text-slate-500">' + s.tier + '</span></td>' +
+            '<td class="py-3 px-3 text-slate-700">' + s.tech + '</td>' +
+            '<td class="py-3 px-3 text-slate-600 max-w-xs">' + s.strategy + '</td>' +
+            '<td class="py-3 px-3 text-slate-700">' + s.fields + '</td>' +
+            '<td class="py-3 px-3"><span class="px-2 py-0.5 rounded-full text-[11px] font-bold border ' + cls + '">' + s.status + '</span></td>' +
+            '<td class="py-3 px-3"><a href="' + s.url + '" target="_blank" rel="noopener noreferrer" class="text-indigo-600 hover:underline font-semibold">開啟官方頁 ↗</a></td>' +
+          '</tr>';
+        }).join("");
+      }
+
+      // ==========================================
+      // TAB SWITCHING & GLOBAL LISTENERS
+      // ==========================================
+      function switchMainTab(tabName) {
+        state.activeTab = tabName;
+        var views = ["search", "duediligence", "subscription", "sources"];
+        views.forEach(function(v) {
+          var el = document.getElementById("view-" + v);
+          if (el) {
+            if (v === tabName) el.classList.remove("hidden");
+            else el.classList.add("hidden");
+          }
+        });
+
+        document.querySelectorAll(".nav-tab-btn").forEach(function(btn) {
+          var t = btn.getAttribute("data-tab");
+          if (t === tabName) {
+            btn.className = "nav-tab-btn px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all bg-slate-900 text-white shadow-sm flex items-center gap-1.5";
+          } else {
+            btn.className = "nav-tab-btn px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all text-slate-600 hover:bg-slate-100 flex items-center gap-1.5";
+          }
+        });
+      }
+
+      function copyTextCrossBrowser(text) {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(function() {
+            showToast("已複製完整結構化 JSON 與 AI 分析 Prompt！可直接貼給 AI。");
+          }).catch(function() {
+            fallbackCopy(text);
+          });
+        } else {
+          fallbackCopy(text);
+        }
+      }
+
+      function fallbackCopy(text) {
+        var ta = document.getElementById("ddExportPreview");
+        if (ta) {
+          ta.value = text;
+          ta.select();
+          try { document.execCommand("copy"); } catch (e) {}
+          showToast("已複製完整結構化 JSON 與 AI 分析 Prompt！");
+        }
+      }
+
+      function downloadFileBlob(filename, content, mime) {
+        var blob = new Blob([content], { type: mime + ";charset=utf-8;" });
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement("a");
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }
+
+      // Initialize all listeners on DOMContentLoaded
+      window.addEventListener("DOMContentLoaded", function() {
+        // Main Navigation Tabs
+        document.querySelectorAll(".nav-tab-btn").forEach(function(btn) {
+          btn.addEventListener("click", function() {
+            var tab = btn.getAttribute("data-tab");
+            switchMainTab(tab);
+            if (tab === "duediligence") renderDueDiligenceView();
+            if (tab === "subscription") renderSubscriptionsAndDigest();
+            if (tab === "sources") renderSourcesTable();
+          });
+        });
+
+        // Bucket Sub-tabs
+        document.querySelectorAll(".bucket-tab-btn").forEach(function(btn) {
+          btn.addEventListener("click", function() {
+            state.activeBucket = btn.getAttribute("data-bucket");
+            renderSearchResults();
+          });
+        });
+
+        // Multi-Select Location Panel Controls
+        document.getElementById("btnToggleLocPanel").addEventListener("click", function() {
+          document.getElementById("locMultiSelectPanel").classList.toggle("hidden");
+        });
+        document.getElementById("btnCloseLocPanel").addEventListener("click", function() {
+          document.getElementById("locMultiSelectPanel").classList.add("hidden");
+        });
+        document.getElementById("btnClearLocations").addEventListener("click", function() {
+          state.selectedLocations = [];
+          renderLocationMultiSelector();
+          renderSearchResults();
+          showToast("已清空地區限制，目前顯示全台灣所有縣市案件。");
+        });
+        document.getElementById("btnSelectAllDistrictsCity").addEventListener("click", function() {
+          toggleWholeCity(state.focusedCityForDistricts, true);
+          showToast("已全選【" + state.focusedCityForDistricts + "】所有行政區！");
+        });
+        document.getElementById("btnClearDistrictsCity").addEventListener("click", function() {
+          toggleWholeCity(state.focusedCityForDistricts, false);
+          showToast("已取消選取【" + state.focusedCityForDistricts + "】。");
+        });
+
+        // Dual-Mode Quick Dropdowns -> Auto-fill Min/Max Number Inputs
+        document.getElementById("quickPriceSelect").addEventListener("change", function(e) {
+          var v = e.target.value;
+          if (v === "ALL") {
+            document.getElementById("filterMinPrice").value = "";
+            document.getElementById("filterMaxPrice").value = "";
+          } else if (v !== "CUSTOM") {
+            var parts = v.split("-");
+            document.getElementById("filterMinPrice").value = parts[0] === "0" ? "" : parts[0];
+            document.getElementById("filterMaxPrice").value = parts[1] || "";
+          } else {
+            document.getElementById("filterMaxPrice").focus();
+          }
+          renderSearchResults();
+        });
+
+        document.getElementById("quickAgeSelect").addEventListener("change", function(e) {
+          var v = e.target.value;
+          if (v === "ALL") {
+            document.getElementById("filterMinAge").value = "";
+            document.getElementById("filterMaxAge").value = "";
+          } else if (v !== "CUSTOM") {
+            var parts = v.split("-");
+            document.getElementById("filterMinAge").value = parts[0] === "0" ? "" : parts[0];
+            document.getElementById("filterMaxAge").value = parts[1] || "";
+          } else {
+            document.getElementById("filterMaxAge").focus();
+          }
+          renderSearchResults();
+        });
+
+        document.getElementById("quickPingSelect").addEventListener("change", function(e) {
+          var v = e.target.value;
+          if (v === "ALL") {
+            document.getElementById("filterMinPing").value = "";
+            document.getElementById("filterMaxPing").value = "";
+          } else if (v !== "CUSTOM") {
+            var parts = v.split("-");
+            document.getElementById("filterMinPing").value = parts[0] || "";
+            document.getElementById("filterMaxPing").value = parts[1] || "";
+          } else {
+            document.getElementById("filterMinPing").focus();
+          }
+          renderSearchResults();
+        });
+
+        // Sync Quick Dropdown to "CUSTOM" when user types directly in Min/Max inputs
+        ["filterMinPrice", "filterMaxPrice"].forEach(function(id) {
+          document.getElementById(id).addEventListener("input", function() {
+            var minV = document.getElementById("filterMinPrice").value.trim();
+            var maxV = document.getElementById("filterMaxPrice").value.trim();
+            document.getElementById("quickPriceSelect").value = (!minV && !maxV) ? "ALL" : "CUSTOM";
+            renderSearchResults();
+          });
+        });
+
+        ["filterMinAge", "filterMaxAge"].forEach(function(id) {
+          document.getElementById(id).addEventListener("input", function() {
+            var minV = document.getElementById("filterMinAge").value.trim();
+            var maxV = document.getElementById("filterMaxAge").value.trim();
+            document.getElementById("quickAgeSelect").value = (!minV && !maxV) ? "ALL" : "CUSTOM";
+            renderSearchResults();
+          });
+        });
+
+        ["filterMinPing", "filterMaxPing"].forEach(function(id) {
+          document.getElementById(id).addEventListener("input", function() {
+            var minV = document.getElementById("filterMinPing").value.trim();
+            var maxV = document.getElementById("filterMaxPing").value.trim();
+            document.getElementById("quickPingSelect").value = (!minV && !maxV) ? "ALL" : "CUSTOM";
+            renderSearchResults();
+          });
+        });
+
+        // Other Select & Keyword Filter Listeners
+        ["filterHandover", "filterChannel", "filterRound", "filterPropType", "sortOrder", "toggleKeepUnknown"].forEach(function(id) {
+          var el = document.getElementById(id);
+          if (el) {
+            el.addEventListener("change", function() {
+              renderSearchResults();
+            });
+          }
+        });
+
+        document.getElementById("filterKeyword").addEventListener("input", function() {
+          renderSearchResults();
+        });
+
+        // Reset Filters Button
+        document.getElementById("btnResetFilters").addEventListener("click", function() {
+          state.selectedLocations = [];
+          document.getElementById("filterHandover").value = "ALL";
+          document.getElementById("quickPriceSelect").value = "ALL";
+          document.getElementById("filterMinPrice").value = "";
+          document.getElementById("filterMaxPrice").value = "";
+          document.getElementById("quickAgeSelect").value = "ALL";
+          document.getElementById("filterMinAge").value = "";
+          document.getElementById("filterMaxAge").value = "";
+          document.getElementById("quickPingSelect").value = "ALL";
+          document.getElementById("filterMinPing").value = "";
+          document.getElementById("filterMaxPing").value = "";
+          document.getElementById("filterChannel").value = "ALL";
+          document.getElementById("filterRound").value = "ALL";
+          document.getElementById("filterPropType").value = "ALL";
+          document.getElementById("filterKeyword").value = "";
+          document.getElementById("toggleKeepUnknown").checked = true;
+          renderLocationMultiSelector();
+          renderSearchResults();
+          showToast("已清空重置全部篩選條件。");
+        });
+
+        // Save current filter (including multi-selected districts) as subscription rule
+        document.getElementById("btnSaveCurrentAsSub").addEventListener("click", function() {
+          var f = getCurrentFilters();
+          var locLabel = formatLocationsDisplay(f.locations);
+          var priceLabel = f.maxPrice ? (f.maxPrice + "萬內") : "不限預算";
+          var pingLabel = f.minPing ? (f.minPing + "坪+") : "不限坪數";
+          var ageLabel = f.maxAge ? (f.maxAge + "年內") : "不限屋齡";
+
+          var newSub = {
+            id: "sub_" + Date.now(),
+            name: locLabel + " (" + priceLabel + " / " + pingLabel + " / " + ageLabel + ")",
+            locations: f.locations,
+            maxPrice: f.maxPrice,
+            minPing: f.minPing,
+            maxAge: f.maxAge,
+            handover: f.handover,
+            active: true,
+            createdAt: "2026-10-28"
+          };
+          state.subscriptions.unshift(newSub);
+          saveLocal("fr_tw_subs_v4", state.subscriptions);
+          showToast("已將目前複選地區與篩選條件存為每日 Email 訂閱規則！");
+        });
+
+        // Due Diligence Case Selector & Calculator
+        document.getElementById("ddCaseSelector").addEventListener("change", function(e) {
+          state.selectedDdKey = e.target.value;
+          renderDueDiligenceView();
+        });
+
+        ["calcBidPriceInput", "calcEvictInput", "calcRenovInput"].forEach(function(id) {
+          document.getElementById(id).addEventListener("input", function() {
+            var c = getSelectedDdCase();
+            if (c) {
+              updateAcquisitionCalc(c);
+              document.getElementById("ddExportPreview").value = buildAiPromptWrapper(c);
+            }
+          });
+        });
+
+        document.getElementById("btnSaveCustomNote").addEventListener("click", function() {
+          var c = getSelectedDdCase();
+          if (!c) return;
+          c.user_note = document.getElementById("ddUserCustomNote").value;
+          saveLocal("fr_tw_cases_v4", state.cases);
+          document.getElementById("ddExportPreview").value = buildAiPromptWrapper(c);
+          showToast("已儲存此案實地勘查筆記，並同步更新至 AI 匯出資料！");
+        });
+
+        document.getElementById("btnCopyAiPrompt").addEventListener("click", function() {
+          var c = getSelectedDdCase();
+          if (!c) return;
+          copyTextCrossBrowser(buildAiPromptWrapper(c));
+        });
+
+        document.getElementById("btnDownloadJson").addEventListener("click", function() {
+          var c = getSelectedDdCase();
+          if (!c) return;
+          var jsonStr = JSON.stringify(buildStructuredExportPayload(c), null, 2);
+          downloadFileBlob(c.dedup_key + "_due_diligence.json", jsonStr, "application/json");
+          showToast("已下載結構化 JSON 檔案！");
+        });
+
+        document.getElementById("btnDownloadMd").addEventListener("click", function() {
+          var c = getSelectedDdCase();
+          if (!c) return;
+          var md = "# 法拍案件深度調查報告：" + c.address + "\n\n" + buildAiPromptWrapper(c);
+          downloadFileBlob(c.dedup_key + "_report.md", md, "text/markdown");
+          showToast("已下載 Markdown 調查報告！");
+        });
+
+        // Subscription Modal & Preview Controls
+        document.getElementById("btnOpenNewRuleModal").addEventListener("click", function() {
+          document.getElementById("newRuleFormPanel").classList.toggle("hidden");
+        });
+        document.getElementById("btnCancelNewRule").addEventListener("click", function() {
+          document.getElementById("newRuleFormPanel").classList.add("hidden");
+        });
+        document.getElementById("btnConfirmNewRule").addEventListener("click", function() {
+          var name = document.getElementById("newRuleName").value.trim() || "自訂跨區監控規則";
+          var locRaw = document.getElementById("newRuleLocations").value.trim();
+          var locs = locRaw ? locRaw.split(/[,，、]+/).map(function(s) { return s.trim(); }).filter(Boolean) : [];
+          var maxPriceVal = document.getElementById("newRuleMaxPrice").value.trim();
+          var minPingVal = document.getElementById("newRuleMinPing").value.trim();
+          var maxAgeVal = document.getElementById("newRuleMaxAge").value.trim();
+          var handover = document.getElementById("newRuleHandover").value;
+
+          state.subscriptions.unshift({
+            id: "sub_" + Date.now(),
+            name: name,
+            locations: locs,
+            maxPrice: maxPriceVal ? parseFloat(maxPriceVal) : null,
+            minPing: minPingVal ? parseFloat(minPingVal) : null,
+            maxAge: maxAgeVal ? parseFloat(maxAgeVal) : null,
+            handover: handover,
+            active: true,
+            createdAt: "2026-10-28"
+          });
+          saveLocal("fr_tw_subs_v4", state.subscriptions);
+          document.getElementById("newRuleFormPanel").classList.add("hidden");
+          renderSubscriptionsAndDigest();
+          showToast("已新增跨區訂閱條件組：「" + name + "」");
+        });
+
+        document.getElementById("btnPreviewEmailNow").addEventListener("click", function() {
+          renderEmailDigestPreview();
+          showToast("已依據最新收件人與訂閱規則更新今日 Email 日報預覽！");
+        });
+
+        // Health Check & Manual Case Import
+        document.getElementById("btnSimulateHealthCheck").addEventListener("click", function() {
+          document.getElementById("lastSyncTimeDisplay").textContent = "2026-10-28 10:15 (剛剛完成全平台核驗)";
+          renderSourcesTable();
+          showToast("已完成 8 大官方與民間資料源健康度自檢！");
+        });
+
+        document.getElementById("btnImportManualCase").addEventListener("click", function() {
+          var cid = document.getElementById("impCaseId").value.trim() || ("115年度執字第" + Math.floor(1000 + Math.random() * 9000) + "號");
+          var city = document.getElementById("impCity").value;
+          var dist = document.getElementById("impDistrict").value.trim() || "新莊區";
+          var addr = document.getElementById("impAddress").value.trim() || (city + dist + "示範路88號5樓");
+          var price = parseFloat(document.getElementById("impPrice").value) || 650;
+          var pingVal = document.getElementById("impPing").value.trim();
+          var ping = pingVal ? parseFloat(pingVal) : null;
+          var handover = document.getElementById("impHandover").value;
+
+          var newKey = "MANUAL_" + Date.now().toString().slice(-5);
+          var newCase = {
+            dedup_key: newKey,
+            case_id: cid,
+            court: "法務部行政執行署 / 銀行標售 (手動匯入)",
+            division: "專案股",
+            section: "第1標",
+            auction_type: "稅務行政執行拍賣",
+            status: "公告中",
+            city: city,
+            district: dist,
+            address: addr,
+            property_type: "電梯大樓/華廈",
+            auction_round: "2拍",
+            auction_date_roc: "115/11/28",
+            auction_date_ad: "2026-11-28",
+            reserve_price_wan: price,
+            deposit_wan: Math.round(price * 0.2),
+            unit_price_wan: ping ? +(price / ping).toFixed(1) : 22.0,
+            area_total_ping: ping,
+            area_main_ping: ping ? +(ping * 0.68).toFixed(1) : null,
+            area_land_ping: 4.0,
+            handover_status: handover,
+            handover_raw_note: "由使用者自法務部行政執行署或銀行公告手動匯入，待調閱完整拍賣筆錄核實。",
+            age_years: null,
+            completion_date_source: "未知 (手動匯入尚未比對使用執照，自動納入待確認防漏清單)",
+            conflict_notes: [],
+            price_history: [
+              { round: "2拍", date: "115/11/28", price_wan: price, result: "手動匯入追蹤中" }
+            ],
+            sources: [
+              { platform: "法務部行政執行署/手動匯入", url: "https://www.tpkonsale.moj.gov.tw/", tier: "Tier-1 官方權威", fetched_at: "2026-10-28 10:15" }
+            ],
+            user_note: "使用者手動自外部官方公告匯入之追蹤標的。",
+            due_diligence: {
+              confirmed_facts: ["【手動建檔】案號 " + cid + "，底價 " + price + " 萬。"],
+              pending_leads: ["【屋齡與建坪待補】請使用下方內政部實價登錄連結反查同門牌建築完成日。"],
+              manual_verification_required: ["【調閱二類謄本與現場查訪】投標前須確認有無優先承買權與管理費積欠。"]
+            }
+          };
+
+          state.cases.unshift(newCase);
+          saveLocal("fr_tw_cases_v4", state.cases);
+          state.selectedDdKey = newKey;
+          switchMainTab("search");
+          renderSearchResults();
+          showToast("已成功匯入案件「" + addr + "」並建立深度調查卡！");
+        });
+
+        // Initial Render
+        renderLocationMultiSelector();
+        renderSearchResults();
+        renderSourcesTable();
+      });
+    })();
+  </script>
+</body>
+</html>

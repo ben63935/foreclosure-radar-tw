@@ -1,0 +1,209 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "TaiwanForeclosureCaseUnifiedSchema",
+  "description": "統一法拍、金拍、銀拍與民間平台交叉比對之標準案件資料結構 (支援三態未知值與多源去重)",
+  "type": "object",
+  "required": [
+    "dedup_key",
+    "case_id",
+    "court",
+    "division",
+    "section",
+    "city",
+    "district",
+    "address",
+    "auction_round",
+    "auction_date_ad",
+    "reserve_price_wan",
+    "handover_status",
+    "sources",
+    "last_verified_at"
+  ],
+  "properties": {
+    "dedup_key": {
+      "type": "string",
+      "description": "標準化去重主鍵: {court_code}_{year}_{word}_{number}_{section}"
+    },
+    "case_id": {
+      "type": "string",
+      "description": "案號 (如: 114年度司執字第58291號)"
+    },
+    "court": {
+      "type": "string",
+      "description": "執行法院或拍賣主辦機關"
+    },
+    "division": {
+      "type": "string",
+      "description": "股別 (如: 順股、仁股)"
+    },
+    "section": {
+      "type": "string",
+      "description": "標別 (如: 甲標、第1標)"
+    },
+    "auction_type": {
+      "type": "string",
+      "enum": [
+        "法院法拍",
+        "金拍屋(TFASC)",
+        "銀拍屋/行有標售",
+        "稅務行政執行拍賣"
+      ]
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "公告中",
+        "應買公告中",
+        "流標待降價",
+        "停拍/撤回",
+        "已拍定"
+      ]
+    },
+    "city": {
+      "type": "string"
+    },
+    "district": {
+      "type": "string"
+    },
+    "address": {
+      "type": "string",
+      "description": "門牌地址或地段地號"
+    },
+    "property_type": {
+      "type": "string",
+      "enum": [
+        "電梯大樓/華廈",
+        "公寓",
+        "透天厝",
+        "套房",
+        "土地/廠房"
+      ]
+    },
+    "auction_round": {
+      "type": "string",
+      "enum": [
+        "1拍",
+        "2拍",
+        "3拍",
+        "4拍(特拍)",
+        "應買公告",
+        "銀拍公開標售"
+      ]
+    },
+    "auction_date_roc": {
+      "type": "string",
+      "description": "民國開標日期 (如: 115/11/12)"
+    },
+    "auction_date_ad": {
+      "type": "string",
+      "format": "date",
+      "description": "西元開標日期 ISO-8601 (Asia/Taipei)"
+    },
+    "reserve_price_wan": {
+      "type": "number",
+      "description": "總底價(萬元)"
+    },
+    "deposit_wan": {
+      "type": "number",
+      "description": "保證金(萬元)"
+    },
+    "unit_price_wan": {
+      "type": "number",
+      "description": "折算建坪單價(萬元/坪)"
+    },
+    "area_total_ping": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "description": "權狀總建坪 (null代表未載/待查)"
+    },
+    "area_main_ping": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "description": "主建物室內坪數"
+    },
+    "area_land_ping": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "description": "土地持分坪數"
+    },
+    "handover_status": {
+      "type": "string",
+      "enum": [
+        "點交",
+        "不點交",
+        "部分點交",
+        "點交條件不明(待查)"
+      ],
+      "description": "標準化點交枚舉，嚴禁將部分點交或未記載直接視為點交或排除"
+    },
+    "handover_raw_note": {
+      "type": "string",
+      "description": "法院筆錄原文摘要"
+    },
+    "age_years": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "description": "推算屋齡(年)，無資料時為 null (未知)"
+    },
+    "completion_date_source": {
+      "type": "string",
+      "description": "屋齡推算依據 (使用執照/實價登錄/104法拍/優室/未知)"
+    },
+    "price_history": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "round": {
+            "type": "string"
+          },
+          "date": {
+            "type": "string"
+          },
+          "price_wan": {
+            "type": "number"
+          },
+          "result": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "sources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "platform": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "tier": {
+            "type": "string",
+            "enum": [
+              "Tier-1 官方權威",
+              "Tier-2 輔助校驗"
+            ]
+          },
+          "fetched_at": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "due_diligence": {
+      "type": "object",
+      "description": "三級證據力深度調查清單"
+    }
+  }
+}
