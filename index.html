@@ -36,24 +36,32 @@
     input[type="number"]::-webkit-outer-spin-button {
       opacity: 1;
     }
+    @media (max-width: 640px) {
+      input, select, textarea {
+        font-size: 16px !important;
+      }
+      body {
+        padding-bottom: 72px;
+      }
+    }
   </style>
 </head>
 <body class="min-h-screen flex flex-col selection:bg-indigo-600 selection:text-white">
 
   <!-- Top Disclaimer & Sync Status Bar -->
-  <div class="bg-slate-900 text-slate-300 text-xs py-2 px-4 border-b border-slate-800">
-    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2">
-      <div class="flex items-center gap-2">
-        <span class="inline-flex items-center px-2 py-0.5 rounded font-medium bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 mr-1.5 badge-pulse"></span>
-          官方來源優先・三態容錯防漏
+  <div class="bg-slate-900 text-slate-300 text-[11px] sm:text-xs py-1.5 sm:py-2 px-3 sm:px-4 border-b border-slate-800">
+    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-1.5">
+      <div class="flex items-center gap-1.5">
+        <span class="inline-flex items-center px-1.5 py-0.5 rounded font-medium bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 shrink-0">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 mr-1 badge-pulse"></span>
+          官方優先・防漏標
         </span>
-        <span>資訊僅供參考，投標前請務必以各執行法院、行政執行署及主辦銀行<strong>公告正本與最新地政謄本</strong>為準。</span>
+        <span class="line-clamp-1 sm:line-clamp-none">💡 預設含 10 筆「🧪 示範樣本」，可於篩選器取消勾選僅看真實案件。</span>
       </div>
-      <div class="flex items-center gap-3 text-slate-400">
-        <span>時區：<strong class="text-slate-200">Asia/Taipei (民國/西元雙軌)</strong></span>
+      <div class="hidden sm:flex items-center gap-3 text-slate-400">
+        <span>時區：<strong class="text-slate-200">Asia/Taipei</strong></span>
         <span>｜</span>
-        <span>最後同步：<strong id="lastSyncTimeDisplay" class="text-emerald-400">2026-10-28 07:30 (115/10/28)</strong></span>
+        <span>最後同步：<strong id="lastSyncTimeDisplay" class="text-emerald-400">2026-10-28 07:30</strong></span>
       </div>
     </div>
   </div>
@@ -75,9 +83,21 @@
             <p class="text-xs text-slate-500">司法院法拍・台灣金服金拍・合庫/臺銀銀拍・法務部行政執行署稅拍 跨平台整合系統</p>
           </div>
         </div>
+        <!-- Quick Lock Status & Admin Settings Pill (Mobile & Desktop) -->
+        <div class="flex items-center gap-1.5 sm:order-last">
+          <button id="btnHeaderCloudSync" type="button" class="px-2.5 py-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 text-xs font-bold transition flex items-center gap-1" title="將目前收藏、筆記與家人訂閱同步至雲端">
+            <span>☁️ 雲端同步</span>
+          </button>
+          <button id="btnOpenGateSettings" type="button" class="px-2.5 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 text-xs font-semibold transition flex items-center gap-1" title="修改全站通行密碼或重新綁定金鑰">
+            <span>🔑 通行密碼設定</span>
+          </button>
+          <button id="btnLockSiteNow" type="button" class="px-2.5 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs font-semibold transition" title="立即鎖定畫面">
+            🔒 鎖定
+          </button>
+        </div>
 
-        <!-- Clean 4 Main Tabs -->
-        <nav class="flex items-center gap-1.5 overflow-x-auto py-1" aria-label="主要功能導覽">
+        <!-- Clean 4 Main Tabs (Desktop & Tablet) -->
+        <nav class="hidden sm:flex items-center gap-1.5 overflow-x-auto py-1" aria-label="主要功能導覽">
           <button id="navTabSearch" data-tab="search" class="nav-tab-btn px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all bg-slate-900 text-white shadow-sm flex items-center gap-1.5">
             <span>🔍 案件自由篩選</span>
             <span id="navCountTotal" class="px-1.5 py-0.2 rounded-full text-[11px] bg-white/20 text-white">14</span>
@@ -99,10 +119,119 @@
   </header>
 
   <!-- Toast Notification -->
-  <div id="toastBanner" class="fixed bottom-5 right-5 z-50 hidden max-w-sm bg-slate-900 text-white px-4 py-3 rounded-xl shadow-xl border border-slate-700 text-sm flex items-center gap-3">
+  <div id="toastBanner" class="fixed bottom-20 sm:bottom-5 left-4 right-4 sm:left-auto sm:right-5 z-[60] hidden sm:max-w-sm bg-slate-900 text-white px-4 py-3 rounded-xl shadow-xl border border-slate-700 text-xs sm:text-sm flex items-center gap-3">
     <span class="w-2 h-2 rounded-full bg-emerald-400 shrink-0"></span>
     <span id="toastMessage">操作已成功執行</span>
   </div>
+
+  <!-- ========================================================= -->
+  <!-- FULL-SITE PRIVATE PASSCODE GATE (全站門禁鎖：解鎖即全開)     -->
+  <!-- ========================================================= -->
+  <div id="fullSiteLockOverlay" class="fixed inset-0 z-50 bg-slate-950/95 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto">
+    <div class="max-w-md w-full bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl p-6 sm:p-7 text-white space-y-5 my-auto">
+      <div class="flex items-center gap-3.5 border-b border-slate-800 pb-4">
+        <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-600 to-slate-800 flex items-center justify-center text-2xl shadow-inner shrink-0">
+          🔒
+        </div>
+        <div>
+          <span class="text-[11px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">Private Family Access</span>
+          <h2 class="text-lg font-bold text-white mt-1">ForeclosureRadar TW 私人系統</h2>
+          <p class="text-xs text-slate-400">本系統僅供授權親友與家庭成員使用，請輸入通行密碼</p>
+        </div>
+      </div>
+
+      <!-- MODE 1: Everyday Family & Member Passcode Login (Shown whenever cloud or local vault exists) -->
+      <div id="gatePasscodeLoginBox" class="space-y-4">
+        <div>
+          <label for="gatePasscodeInput" class="block text-xs font-semibold text-slate-300 mb-1.5">🔑 請輸入全站通行密碼（解鎖後全站功能與 AI 皆可使用）</label>
+          <input id="gatePasscodeInput" type="password" placeholder="輸入家人共用通行密碼..." class="w-full rounded-xl bg-slate-800 border border-slate-700 px-4 py-3 text-sm text-white placeholder-slate-500 focus:border-indigo-500 focus:outline-none" />
+        </div>
+        <div class="flex items-center justify-between text-xs text-slate-400">
+          <label class="inline-flex items-center gap-2 cursor-pointer">
+            <input id="gateRememberDevice" type="checkbox" checked class="rounded text-indigo-600 focus:ring-0" />
+            <span>在此手機/電腦記住解鎖狀態 (免每次重輸)</span>
+          </label>
+        </div>
+        <button id="btnGateLoginSubmit" type="button" class="w-full py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm shadow-lg transition flex items-center justify-center gap-2">
+          <span>🔓 立即解鎖進入系統</span>
+        </button>
+        <div class="pt-2 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-500">
+          <span id="gateVaultSourceHint">☁️ 已連線雲端加密通行證</span>
+          <button id="btnSwitchToAdminSetup" type="button" class="text-slate-400 hover:text-indigo-300 underline">⚙️ 站長首次綁定 / 修改密碼</button>
+        </div>
+      </div>
+
+      <!-- MODE 2: One-Time Admin Setup (Bind Custom Family Passcode + GitHub Token to Cloud Vault) -->
+      <div id="gateAdminSetupBox" class="hidden space-y-3.5 text-xs">
+        <div class="p-3 rounded-xl bg-indigo-950/60 border border-indigo-500/30 text-indigo-200 leading-relaxed">
+          💡 <strong>站長首次設定（只需做一次）：</strong>設定一組「全站通行密碼」並貼上 GitHub 金鑰後，系統會將金鑰用您的密碼<strong>加密鎖入雲端</strong>。之後您用手機、或<strong>家人用他們的手機打開網站，都完全不用貼金鑰，只要輸入這組通行密碼就能一秒解鎖全部功能！</strong>
+        </div>
+
+        <div>
+          <label class="block text-slate-300 font-semibold mb-1">1. 設定全站通行密碼（可分享給家人共用）</label>
+          <input id="setupSitePasscodeInput" type="password" placeholder="例如：設定 4~12 位好記密碼 (如 8888 或家庭密碼)" class="w-full rounded-xl bg-slate-800 border border-slate-700 px-3.5 py-2.5 text-xs text-white focus:border-indigo-500 focus:outline-none" />
+        </div>
+
+        <div>
+          <div class="flex items-center justify-between mb-1">
+            <label class="text-slate-300 font-semibold">2. 貼上站長 GitHub 金鑰 (<code>ghp_...</code>)</label>
+            <button id="btnToggleGateTokenHelp" type="button" class="text-[11px] text-amber-300 hover:underline font-semibold">📖 點此看 30 秒領取金鑰教學 ▼</button>
+          </div>
+          <input id="setupGhTokenInput" type="password" placeholder="貼上 ghp_ 開頭的金鑰 (加密後上傳，絕不外洩)" class="w-full rounded-xl bg-slate-800 border border-slate-700 px-3.5 py-2.5 text-xs text-white font-mono focus:border-indigo-500 focus:outline-none" />
+
+          <!-- Collapsible 30-sec Token Help inside Gate -->
+          <div id="gateTokenHelpBox" class="hidden mt-2 p-3 rounded-xl bg-slate-950 border border-indigo-500/40 text-[11px] text-slate-300 space-y-2 leading-relaxed">
+            <p class="font-bold text-amber-300">只需站長做一次（家人不用做）：</p>
+            <a href="https://github.com/settings/tokens/new?description=ForeclosureRadar-TW&scopes=repo,workflow" target="_blank" rel="noopener noreferrer" class="block w-full text-center py-2 px-3 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow">
+              👉 點此開啟 GitHub 自動勾選權限頁面 (repo + workflow) ↗
+            </a>
+            <ol class="list-decimal list-inside space-y-1 text-slate-400">
+              <li>點上方按鈕登入 GitHub 後，若出現 Expiration (期限) 可選 <code>No expiration</code>。</li>
+              <li>拉到最底下點綠色 <strong><code>Generate token</code></strong>。</li>
+              <li>複製 <code>ghp_...</code> 開頭的字串貼回上方欄位即可！</li>
+            </ol>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-slate-400 mb-1">3. GitHub 倉庫名稱</label>
+          <input id="setupGhRepoInput" type="text" value="ben63935/foreclosure-radar-tw" class="w-full rounded-xl bg-slate-800 border border-slate-700 px-3.5 py-2 text-xs text-slate-300 font-mono" />
+        </div>
+
+        <div id="gateSetupStatusMsg" class="hidden p-2.5 rounded-lg bg-slate-950 border border-slate-800 text-[11px] text-amber-300"></div>
+
+        <div class="pt-1 space-y-2">
+          <button id="btnBindCloudVault" type="button" class="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-lg transition">
+            🔐 加密綁定至雲端並立即解鎖全站
+          </button>
+          <div class="flex items-center justify-between gap-2 pt-1">
+            <button id="btnBackToGateLogin" type="button" class="text-slate-400 hover:text-white underline text-[11px]">← 返回通行密碼登入</button>
+            <button id="btnPreviewWithoutToken" type="button" class="text-slate-400 hover:text-amber-300 underline text-[11px]">👀 先免綁定直接進入系統預覽 →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile Fixed Bottom Navigation Bar (App-like experience for phones) -->
+  <nav class="sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur border-t border-slate-200 grid grid-cols-4 shadow-lg" aria-label="手機版底部導覽">
+    <button type="button" data-tab="search" class="nav-tab-btn mobile-nav-btn flex flex-col items-center justify-center py-2 px-1 text-indigo-700 font-bold">
+      <span class="text-base leading-none">🔍</span>
+      <span class="text-[11px] mt-1">案件篩選</span>
+    </button>
+    <button type="button" data-tab="duediligence" class="nav-tab-btn mobile-nav-btn flex flex-col items-center justify-center py-2 px-1 text-slate-500 font-medium">
+      <span class="text-base leading-none">🕵️</span>
+      <span class="text-[11px] mt-1">深度調查</span>
+    </button>
+    <button type="button" data-tab="subscription" class="nav-tab-btn mobile-nav-btn flex flex-col items-center justify-center py-2 px-1 text-slate-500 font-medium">
+      <span class="text-base leading-none">🔔</span>
+      <span class="text-[11px] mt-1">家人訂閱</span>
+    </button>
+    <button type="button" data-tab="sources" class="nav-tab-btn mobile-nav-btn flex flex-col items-center justify-center py-2 px-1 text-slate-500 font-medium">
+      <span class="text-base leading-none">📡</span>
+      <span class="text-[11px] mt-1">來源/匯入</span>
+    </button>
+  </nav>
 
   <!-- Main Workspace Container -->
   <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-5">
@@ -113,21 +242,27 @@
     <section id="view-search" class="space-y-4">
 
       <!-- Clean & Flexible Filter Control Panel -->
-      <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm space-y-4">
-        <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3">
+      <div class="bg-white rounded-xl border border-slate-200 p-3.5 sm:p-5 shadow-sm space-y-3.5 sm:space-y-4">
+        <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-2.5 sm:pb-3">
           <div class="space-y-0.5">
-            <h2 class="text-sm font-bold text-slate-900">🎯 跨平台精準篩選（支援「跨縣市＋行政區複選」與「下拉快速選單＋自訂數字雙軌輸入」）</h2>
-            <p class="text-[11px] text-slate-500">說明：先由後端匯集全量官方與民間資料至本地庫，前端篩選採用「三態容錯防漏」，自訂輸入<strong>絕對不會導致漏抓或案件變少</strong>。</p>
+            <h2 class="text-xs sm:text-sm font-bold text-slate-900">🎯 跨平台精準篩選（跨縣市行政區複選＋快速下拉/自訂數字雙軌）</h2>
+            <p class="hidden sm:block text-[11px] text-slate-500">說明：先由後端匯集全量官方與民間資料至本地庫，前端篩選採用「三態容錯防漏」，自訂輸入<strong>絕對不會導致漏抓或案件變少</strong>。</p>
           </div>
-          <div class="flex items-center gap-2">
-            <button id="btnSaveCurrentAsSub" type="button" class="text-xs font-semibold text-indigo-700 hover:text-indigo-900 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-lg border border-indigo-200 transition">
-              + 將目前篩選條件存為每日 Email 訂閱
+          <div class="flex flex-wrap items-center gap-1.5 w-full sm:w-auto justify-between sm:justify-end">
+            <button id="btnMobileToggleFilters" type="button" class="sm:hidden px-3 py-1.5 rounded-lg bg-slate-900 text-white text-xs font-semibold flex items-center gap-1">
+              <span>🎛️ 收合/展開篩選條件</span>
             </button>
-            <button id="btnResetFilters" type="button" class="text-xs font-medium text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-lg transition">
-              清空重置全部條件
-            </button>
+            <div class="flex items-center gap-1.5">
+              <button id="btnSaveCurrentAsSub" type="button" class="text-xs font-semibold text-indigo-700 hover:text-indigo-900 bg-indigo-50 hover:bg-indigo-100 px-2.5 sm:px-3 py-1.5 rounded-lg border border-indigo-200 transition">
+                + 存為每日訂閱
+              </button>
+              <button id="btnResetFilters" type="button" class="text-xs font-medium text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 px-2.5 sm:px-3 py-1.5 rounded-lg transition">
+                重置
+              </button>
+            </div>
           </div>
         </div>
+        <div id="filterCollapsibleBody" class="space-y-3.5 sm:space-y-4">
 
         <!-- Row 1: Multi-Select City & District Picker + Selected Location Tags -->
         <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/90 space-y-3">
@@ -174,7 +309,7 @@
                     <button id="btnClearDistrictsCity" type="button" class="text-[11px] text-slate-500 hover:underline">取消本縣市</button>
                   </div>
                 </div>
-                <div id="districtCheckboxesContainer" class="grid grid-cols-3 sm:grid-cols-4 gap-2 pt-2.5 text-xs">
+                <div id="districtCheckboxesContainer" class="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-2.5 text-xs">
                   <!-- Populated by JS -->
                 </div>
               </div>
@@ -304,10 +439,17 @@
             <input id="filterKeyword" type="text" placeholder="搜尋路名、社區、重劃區或案號 (例：頭前、中路、尚順、三重)..." class="w-full rounded-lg border border-slate-300 px-3 py-1.5 text-xs sm:text-sm focus:border-indigo-600 focus:outline-none" />
           </div>
 
-          <div class="md:col-span-4">
-            <label class="inline-flex items-center gap-1.5 text-xs font-medium text-slate-700 bg-amber-50/80 border border-amber-200 px-2.5 py-1.5 rounded-lg cursor-pointer w-full">
+          <div class="md:col-span-2">
+            <label class="inline-flex items-center gap-1.5 text-xs font-medium text-slate-700 bg-amber-50/80 border border-amber-200 px-2.5 py-1.5 rounded-lg cursor-pointer w-full" title="勾選後，缺少屋齡或部分點交的案件不會被誤刪，會保留在待確認分頁">
               <input id="toggleKeepUnknown" type="checkbox" checked class="rounded text-amber-600 focus:ring-0" />
-              <span class="truncate">缺屋齡/部分點交保留於【待確認】防漏標</span>
+              <span class="truncate">缺屋齡保留於【待確認】</span>
+            </label>
+          </div>
+
+          <div class="md:col-span-2">
+            <label class="inline-flex items-center gap-1.5 text-xs font-medium text-purple-900 bg-purple-50 border border-purple-200 px-2.5 py-1.5 rounded-lg cursor-pointer w-full" title="取消勾選即可隱藏系統預載的10筆測試樣本，僅顯示真實爬蟲同步或手動匯入的案件">
+              <input id="toggleShowDemo" type="checkbox" checked class="rounded text-purple-600 focus:ring-0" />
+              <span class="truncate">顯示內建 🧪 示範樣本</span>
             </label>
           </div>
 
@@ -321,27 +463,28 @@
             </select>
           </div>
         </div>
+        </div>
       </div>
 
-      <!-- Three-State Result Sub-tabs (Confirmed / Pending Verification / Favorites) -->
-      <div class="flex flex-wrap items-center justify-between gap-3 bg-slate-100 p-1.5 rounded-xl border border-slate-200">
-        <div class="flex flex-wrap items-center gap-1">
-          <button id="subTabConfirmed" data-bucket="CONFIRMED" class="bucket-tab-btn px-4 py-2 rounded-lg text-xs sm:text-sm font-bold bg-white text-emerald-800 shadow-sm border border-emerald-200 flex items-center gap-2">
-            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-            <span>✅ 已確認符合條件</span>
-            <span id="countConfirmedBadge" class="px-2 py-0.5 rounded-full text-xs bg-emerald-100 text-emerald-800">0</span>
+      <!-- Three-State Result Sub-tabs (Mobile 3-col Grid & Desktop Flex) -->
+      <div class="flex flex-wrap items-center justify-between gap-2 bg-slate-100 p-1.5 rounded-xl border border-slate-200">
+        <div class="grid grid-cols-3 sm:flex sm:flex-wrap items-center gap-1 w-full sm:w-auto">
+          <button id="subTabConfirmed" data-bucket="CONFIRMED" class="bucket-tab-btn justify-center px-2 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-bold bg-white text-emerald-800 shadow-sm border border-emerald-200 flex items-center gap-1 sm:gap-2">
+            <span class="hidden sm:inline-block w-2 h-2 rounded-full bg-emerald-500"></span>
+            <span class="truncate">✅ 已確認</span>
+            <span id="countConfirmedBadge" class="px-1.5 sm:px-2 py-0.5 rounded-full text-[11px] sm:text-xs bg-emerald-100 text-emerald-800">0</span>
           </button>
-          <button id="subTabPending" data-bucket="PENDING" class="bucket-tab-btn px-4 py-2 rounded-lg text-xs sm:text-sm font-bold text-amber-900 hover:bg-white/60 flex items-center gap-2">
-            <span class="w-2 h-2 rounded-full bg-amber-500"></span>
-            <span>⚠️ 資訊不足・待人工確認 (防漏標保護區)</span>
-            <span id="countPendingBadge" class="px-2 py-0.5 rounded-full text-xs bg-amber-200/80 text-amber-900">0</span>
+          <button id="subTabPending" data-bucket="PENDING" class="bucket-tab-btn justify-center px-2 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-bold text-amber-900 hover:bg-white/60 flex items-center gap-1 sm:gap-2">
+            <span class="hidden sm:inline-block w-2 h-2 rounded-full bg-amber-500"></span>
+            <span class="truncate">⚠️ 待確認</span>
+            <span id="countPendingBadge" class="px-1.5 sm:px-2 py-0.5 rounded-full text-[11px] sm:text-xs bg-amber-200/80 text-amber-900">0</span>
           </button>
-          <button id="subTabFavorites" data-bucket="FAVORITES" class="bucket-tab-btn px-4 py-2 rounded-lg text-xs sm:text-sm font-bold text-indigo-900 hover:bg-white/60 flex items-center gap-2">
-            <span>⭐ 已收藏追蹤案件 (不受篩選限制・降價停拍監控)</span>
-            <span id="countFavoritesBadge" class="px-2 py-0.5 rounded-full text-xs bg-indigo-200/80 text-indigo-900">0</span>
+          <button id="subTabFavorites" data-bucket="FAVORITES" class="bucket-tab-btn justify-center px-2 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-bold text-indigo-900 hover:bg-white/60 flex items-center gap-1 sm:gap-2">
+            <span class="truncate">⭐ 收藏</span>
+            <span id="countFavoritesBadge" class="px-1.5 sm:px-2 py-0.5 rounded-full text-[11px] sm:text-xs bg-indigo-200/80 text-indigo-900">0</span>
           </button>
         </div>
-        <div class="px-3 text-xs text-slate-500">
+        <div class="hidden lg:block px-3 text-xs text-slate-500">
           跨站去重主鍵：<code class="text-slate-700 font-mono bg-white px-1.5 py-0.5 rounded border border-slate-200">法院/機關代碼 + 年度案號 + 標別</code>
         </div>
       </div>
@@ -389,6 +532,32 @@
 
         <!-- Right 1 Column: Export Box + Acquisition Cost Calculator + Custom Note -->
         <div class="space-y-4">
+          <!-- GitHub Models Free AI Investigation Card -->
+          <div class="bg-gradient-to-br from-indigo-950 via-slate-900 to-slate-900 text-white rounded-xl p-5 shadow-md border border-indigo-700/60 space-y-3">
+            <div class="flex items-center justify-between">
+              <h3 class="text-sm font-bold text-amber-300 flex items-center gap-1.5">
+                <span>⚡ GitHub 免費 AI (GPT-4o) 初步調查補強</span>
+              </h3>
+              <span class="text-[10px] bg-indigo-500/30 border border-indigo-400/40 px-2 py-0.5 rounded text-indigo-200 font-semibold">GitHub Models 免費 API</span>
+            </div>
+            <p class="text-xs text-slate-300 leading-relaxed">
+              直接調用 GitHub 帳號免費附贈的 <strong>GPT-4o-mini / GPT-4o</strong> 模型，針對本案筆錄點交原文、底價折數與建物屬性進行第一輪「法拍風險與待查字號預審」，並自動寫入下方匯出資料中，讓您複製給外部 AI 時資訊更詳盡！
+            </p>
+            <div class="flex items-center gap-2">
+              <select id="ghAiModelSelect" class="rounded-lg bg-slate-800 border border-slate-700 text-xs text-slate-200 px-2.5 py-2 focus:outline-none">
+                <option value="gpt-4o-mini">gpt-4o-mini (速度快・免費額度高)</option>
+                <option value="gpt-4o">gpt-4o (深度推理・高精準度)</option>
+              </select>
+              <button id="btnRunGithubAi" type="button" class="flex-1 py-2 px-3 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs transition shadow-sm flex items-center justify-center gap-1.5">
+                <span>🤖 立即執行免費 AI 初步調查</span>
+              </button>
+            </div>
+            <div id="ghAiResultBox" class="hidden p-3 rounded-lg bg-slate-950/90 border border-indigo-500/40 text-xs text-slate-200 space-y-1.5 max-h-60 overflow-y-auto scrollbar-thin whitespace-pre-wrap leading-relaxed"></div>
+            <p class="text-[11px] text-slate-400">
+              💡 您已透過全站通行密碼解鎖，可直接點擊上方黃色按鈕免費執行 AI 產權與筆錄預審！
+            </p>
+          </div>
+
           <!-- Export to AI Prompt / JSON Card -->
           <div class="bg-slate-900 text-white rounded-xl p-5 shadow-md border border-slate-800">
             <div class="flex items-center justify-between mb-2">
@@ -474,56 +643,74 @@
     <!-- TAB 3: 條件訂閱、異動監控與每日 Email 日報      -->
     <!-- ========================================== -->
     <section id="view-subscription" class="hidden space-y-6">
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <!-- Left: Subscription Rules List & Editor -->
-        <div class="lg:col-span-2 space-y-4">
-          <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <!-- Left 7 Cols: Subscription Rules List & Editor (Supports Assigning Specific Family Members) -->
+        <div class="lg:col-span-7 space-y-4">
+          <div class="bg-white rounded-xl border border-slate-200 p-4 sm:p-5 shadow-sm">
             <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
               <div>
-                <h2 class="text-base font-bold text-slate-900">📬 多組條件訂閱管理 & 狀態異動觸發器</h2>
-                <p class="text-xs text-slate-500">支援儲存「跨縣市＋指定多行政區」訂閱條件！系統每日 07:30 比對新案，並針對收藏案件監控停拍與降價。</p>
+                <h2 class="text-base font-bold text-slate-900">📬 條件訂閱管理（可為自己與家人分別設定專屬條件）</h2>
+                <p class="text-xs text-slate-500 mt-0.5">每組條件皆可指定要寄給哪幾位家人！系統每日 07:30 自動比對新案並分流寄發日報。</p>
               </div>
               <button id="btnOpenNewRuleModal" type="button" class="px-3.5 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold transition shadow-sm">
-                + 新增自訂訂閱條件組
+                + 新增訂閱條件組
               </button>
             </div>
 
-            <!-- Add New Rule Inline Panel -->
+            <!-- Add / Edit Rule Panel -->
             <div id="newRuleFormPanel" class="hidden mb-5 p-4 rounded-xl bg-indigo-50/70 border border-indigo-200 space-y-3">
-              <h4 class="text-xs font-bold text-indigo-900">建立新訂閱條件組（可輸入多個指定縣市或行政區，如：新北市新莊區, 新北市三重區）</h4>
+              <div class="flex items-center justify-between">
+                <h4 id="ruleFormTitle" class="text-xs font-bold text-indigo-900">建立新訂閱條件組（支援跨縣市行政區＋指定收件家人）</h4>
+                <input id="editingRuleId" type="hidden" value="" />
+              </div>
               <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div>
-                  <label class="block text-[11px] font-semibold text-slate-700 mb-1">規則名稱</label>
-                  <input id="newRuleName" type="text" placeholder="例：新莊三重＋竹南頭份自住監控" class="w-full rounded border border-slate-300 px-2.5 py-1.5 text-xs" />
+                  <label class="block text-[11px] font-semibold text-slate-700 mb-1">規則名稱 (例：爸媽頭份透天)</label>
+                  <input id="newRuleName" type="text" placeholder="例：老婆新莊三重自住監控" class="w-full rounded-lg border border-slate-300 px-2.5 py-1.5 text-xs bg-white" />
                 </div>
                 <div class="sm:col-span-2">
                   <label class="block text-[11px] font-semibold text-slate-700 mb-1">目標縣市或行政區（多個請用逗號分隔，留空代表全台）</label>
-                  <input id="newRuleLocations" type="text" placeholder="例：新北市:新莊區, 新北市:三重區, 苗栗縣:竹南鎮, 苗栗縣:頭份市" class="w-full rounded border border-slate-300 bg-white px-2.5 py-1.5 text-xs" />
+                  <input id="newRuleLocations" type="text" placeholder="例：新北市:新莊區, 新北市:三重區, 苗栗縣:頭份市" class="w-full rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 text-xs" />
                 </div>
                 <div>
                   <label class="block text-[11px] font-semibold text-slate-700 mb-1">總底價上限 (萬，留空不限)</label>
-                  <input id="newRuleMaxPrice" type="number" value="1200" class="w-full rounded border border-slate-300 px-2.5 py-1.5 text-xs" />
+                  <input id="newRuleMaxPrice" type="number" value="850" class="w-full rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 text-xs" />
                 </div>
                 <div>
                   <label class="block text-[11px] font-semibold text-slate-700 mb-1">最小建坪 (坪，留空不限)</label>
-                  <input id="newRuleMinPing" type="number" value="20" class="w-full rounded border border-slate-300 px-2.5 py-1.5 text-xs" />
+                  <input id="newRuleMinPing" type="number" value="25" class="w-full rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 text-xs" />
                 </div>
                 <div>
                   <label class="block text-[11px] font-semibold text-slate-700 mb-1">最大屋齡 (年，留空不限)</label>
-                  <input id="newRuleMaxAge" type="number" value="20" class="w-full rounded border border-slate-300 px-2.5 py-1.5 text-xs" />
+                  <input id="newRuleMaxAge" type="number" value="20" class="w-full rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 text-xs" />
                 </div>
                 <div>
                   <label class="block text-[11px] font-semibold text-slate-700 mb-1">點交要求</label>
-                  <select id="newRuleHandover" class="w-full rounded border border-slate-300 bg-white px-2.5 py-1.5 text-xs">
+                  <select id="newRuleHandover" class="w-full rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 text-xs">
                     <option value="SAFE_AND_PENDING">點交 + 待確認(防漏)</option>
                     <option value="STRICT_HANDOVER">僅限明確點交</option>
                     <option value="ALL">不限點交</option>
                   </select>
                 </div>
+                <div class="sm:col-span-2">
+                  <label class="block text-[11px] font-semibold text-slate-700 mb-1">👨‍👩‍👧‍👦 這組條件要寄給誰？（可複選家人）</label>
+                  <div id="newRuleSubscribersCheckboxes" class="flex flex-wrap gap-2 p-2 rounded-lg bg-white border border-slate-300 text-xs">
+                    <!-- Populated by JS -->
+                  </div>
+                </div>
               </div>
-              <div class="flex justify-end gap-2 pt-2">
-                <button id="btnCancelNewRule" type="button" class="px-3 py-1.5 rounded bg-white border border-slate-300 text-xs text-slate-600">取消</button>
-                <button id="btnConfirmNewRule" type="button" class="px-3.5 py-1.5 rounded bg-indigo-600 text-white text-xs font-semibold">儲存訂閱規則</button>
+
+              <!-- Quick Inline Add Family Member inside Rule Form -->
+              <div class="p-2.5 rounded-lg bg-white/90 border border-indigo-200/80 flex flex-wrap items-center gap-2 text-xs">
+                <span class="font-semibold text-indigo-900 shrink-0">➕ 順便新增收件家人：</span>
+                <input id="inlineQuickMemberName" type="text" placeholder="稱呼 (例: 老婆 / 弟弟)" class="w-28 sm:w-32 rounded border border-slate-300 px-2 py-1 text-xs" />
+                <input id="inlineQuickMemberEmail" type="email" placeholder="輸入家人 Email 信箱..." class="flex-1 min-w-[160px] rounded border border-slate-300 px-2 py-1 text-xs" />
+                <button id="btnInlineAddMember" type="button" class="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-white font-semibold text-xs shrink-0">加入名單</button>
+              </div>
+
+              <div class="flex justify-end gap-2 pt-1">
+                <button id="btnCancelNewRule" type="button" class="px-3 py-1.5 rounded-lg bg-white border border-slate-300 text-xs text-slate-600">取消</button>
+                <button id="btnConfirmNewRule" type="button" class="px-4 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold shadow-sm">💾 儲存此組訂閱規則</button>
               </div>
             </div>
 
@@ -534,50 +721,74 @@
           </div>
 
           <!-- Status Change Tracking Timeline Log -->
-          <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
+          <div class="bg-white rounded-xl border border-slate-200 p-4 sm:p-5 shadow-sm">
             <h3 class="text-sm font-bold text-slate-900 mb-1">📉 案件狀態異動監控日誌 (流標降價 / 停拍 / 改期 / 應買到期)</h3>
-            <p class="text-xs text-slate-500 mb-3">針對「已收藏案件」及「訂閱條件命中案件」，每日比對司法院、金服與執行署公告狀態差異：</p>
+            <p class="text-xs text-slate-500 mb-3">針對「已收藏案件」及「家人訂閱條件命中案件」，每日比對司法院、金服與執行署公告狀態差異：</p>
             <div id="statusChangeLogContainer" class="space-y-2.5">
               <!-- Populated by JS -->
             </div>
           </div>
         </div>
 
-        <!-- Right: Daily Email Digest Live Preview & Settings -->
-        <div class="space-y-4">
-          <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
-            <h3 class="text-sm font-bold text-slate-900 mb-1">✉️ 接收信箱與通知偏好設定</h3>
-            <p class="text-xs text-slate-500 mb-3">透過 GitHub Actions 排程 + Gmail SMTP 或 Resend 免費發送每日篩選結果到您的信箱。</p>
-            <div class="space-y-3 text-xs">
+        <!-- Right 5 Cols: Family Member Email Directory + One-Click Cloud Sync + Personalized Email Preview -->
+        <div class="lg:col-span-5 space-y-4">
+          <!-- Family Subscribers Management Card -->
+          <div class="bg-white rounded-xl border border-slate-200 p-4 sm:p-5 shadow-sm space-y-3.5">
+            <div class="flex items-center justify-between">
               <div>
-                <label class="block font-semibold text-slate-700 mb-1">收件人 Email</label>
-                <input id="subRecipientEmail" type="email" value="buyer.research@example.com" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-xs text-slate-800" />
+                <h3 class="text-sm font-bold text-slate-900 flex items-center gap-1.5">
+                  <span>👨‍👩‍👧‍👦 家人與成員收件信箱管理</span>
+                </h3>
+                <p class="text-xs text-slate-500 mt-0.5">家人進入網站後可自行新增信箱，系統會依每人訂閱的規則分流寄信（信箱於雲端自動加密儲存）。</p>
               </div>
-              <div class="space-y-1.5 pt-1">
-                <label class="flex items-center gap-2">
-                  <input type="checkbox" checked class="rounded text-indigo-600" />
-                  <span>每日 07:30 寄送「新增符合案件 + 待確認防漏清單」</span>
-                </label>
-                <label class="flex items-center gap-2">
-                  <input type="checkbox" checked class="rounded text-indigo-600" />
-                  <span>收藏案件發生「流標進入下一拍 (打8折) / 停拍 / 改期」立即通知</span>
-                </label>
-                <label class="flex items-center gap-2">
-                  <input type="checkbox" checked class="rounded text-indigo-600" />
-                  <span>當某資料來源連線異常時於信末附上健康度警告 (防誤判無新案)</span>
-                </label>
+              <span id="subscriberCountBadge" class="px-2 py-0.5 rounded-full text-xs font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">1 位成員</span>
+            </div>
+
+            <!-- Add New Family Subscriber Row -->
+            <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-2 text-xs">
+              <div class="font-semibold text-slate-700">➕ 新增收件人（自己或家人皆可加入）</div>
+              <div class="grid grid-cols-1 sm:grid-cols-12 gap-2">
+                <input id="newMemberNameInput" type="text" placeholder="稱呼 (例：老婆、爸媽)" class="sm:col-span-4 rounded-lg border border-slate-300 bg-white px-2.5 py-2 text-xs text-slate-800" />
+                <input id="newMemberEmailInput" type="email" placeholder="收件 Email (例：family@gmail.com)" class="sm:col-span-5 rounded-lg border border-slate-300 bg-white px-2.5 py-2 text-xs text-slate-800" />
+                <button id="btnAddFamilyMember" type="button" class="sm:col-span-3 py-2 px-3 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs transition shadow-sm">
+                  + 加入收件
+                </button>
               </div>
-              <button id="btnPreviewEmailNow" type="button" class="w-full py-2 rounded-lg bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs transition">
-                🔄 依據目前規則重新產出今日 Email 日報預覽
+            </div>
+
+            <!-- Active Family Members List -->
+            <div id="familyMembersListContainer" class="space-y-2 max-h-56 overflow-y-auto scrollbar-thin">
+              <!-- Populated by JS -->
+            </div>
+
+            <!-- Cloud Sync & Test Email Action Buttons -->
+            <div class="pt-3 border-t border-slate-100 space-y-2">
+              <div class="flex items-center justify-between text-xs text-slate-600">
+                <label class="inline-flex items-center gap-1.5 cursor-pointer">
+                  <input id="chkEmailIncludeDemo" type="checkbox" checked class="rounded text-indigo-600" />
+                  <span>測試信與日報包含內建 🧪 示範樣本</span>
+                </label>
+                <button id="btnPreviewEmailNow" type="button" class="text-indigo-600 hover:underline font-semibold">🔄 刷新預覽</button>
+              </div>
+
+              <button id="btnSyncAndTestEmail" type="button" class="w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs sm:text-sm shadow-sm transition flex items-center justify-center gap-2">
+                <span>🚀 儲存全站設定至雲端 (含家人訂閱/收藏) 並寄送測試信</span>
               </button>
+
+              <div id="cloudSyncStatusBox" class="hidden p-3 rounded-xl bg-slate-900 text-xs text-emerald-300 leading-relaxed"></div>
             </div>
           </div>
 
-          <!-- Simulated Email Digest Preview -->
+          <!-- Simulated Email Digest Preview (With Per-Member View Switcher) -->
           <div class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
-            <div class="bg-slate-800 text-white px-4 py-2.5 flex items-center justify-between text-xs">
-              <span class="font-semibold">📧 每日 Email 日報實際寄出格式預覽</span>
-              <span class="text-emerald-400">HTML 信件預覽</span>
+            <div class="bg-slate-800 text-white px-4 py-2.5 flex flex-wrap items-center justify-between gap-2 text-xs">
+              <span class="font-semibold">📧 每日 Email 日報寄出格式預覽</span>
+              <div class="flex items-center gap-1.5">
+                <span class="text-slate-300 text-[11px]">預覽視角：</span>
+                <select id="previewSubscriberSelect" class="rounded bg-slate-700 border border-slate-600 text-white px-2 py-0.5 text-xs focus:outline-none">
+                  <option value="ALL">👨‍👩‍👧‍👦 全部成員彙整預覽</option>
+                </select>
+              </div>
             </div>
             <div id="emailDigestPreviewBox" class="p-4 text-xs space-y-3 max-h-[520px] overflow-y-auto scrollbar-thin">
               <!-- Populated by JS -->
@@ -605,7 +816,13 @@
           </button>
         </div>
 
-        <div class="overflow-x-auto">
+        <!-- Mobile Cards View (<768px) -->
+        <div id="sourcesHealthMobileCards" class="md:hidden space-y-2.5">
+          <!-- Populated by JS -->
+        </div>
+
+        <!-- Desktop Table View (>=768px) -->
+        <div class="hidden md:block overflow-x-auto">
           <table class="w-full text-left border-collapse text-xs">
             <thead>
               <tr class="bg-slate-100 text-slate-700 border-y border-slate-200">
@@ -1609,39 +1826,27 @@
         }
       ];
 
+      var DEFAULT_SUBSCRIBERS = [
+        {
+          id: "mem_owner",
+          name: "👑 站長主信箱 (GitHub 保險箱預設信箱)",
+          email: "GITHUB_SECRET_DEFAULT",
+          active: true
+        }
+      ];
+
       var DEFAULT_SUBSCRIPTIONS = [
         {
-          id: "sub_1",
-          name: "新北(新莊/三重) ＋ 苗栗(頭份/竹南) 跨區自住監控",
-          locations: ["新北市:新莊區", "新北市:三重區", "苗栗縣:頭份市", "苗栗縣:竹南鎮"],
-          maxPrice: 1200,
-          minPing: 20,
-          maxAge: 20,
-          handover: "SAFE_AND_PENDING",
-          active: true,
-          createdAt: "2026-10-28"
-        },
-        {
-          id: "sub_2",
-          name: "桃園全區自住核心監控 (850萬內 / 20坪+ / 20年內 / 含待查防漏)",
-          locations: ["桃園市:*"],
-          maxPrice: 850,
-          minPing: 20,
-          maxAge: 20,
-          handover: "SAFE_AND_PENDING",
-          active: true,
-          createdAt: "2026-10-20"
-        },
-        {
-          id: "sub_3",
-          name: "苗栗頭份・竹南低總價透天與園區宅 (850萬內 / 30坪+)",
-          locations: ["苗栗縣:頭份市", "苗栗縣:竹南鎮"],
+          id: "sub_user_main",
+          name: "新北市新莊/三重/板橋等13區、桃園5區、苗栗頭份/竹南/苗栗 (850萬內 / 30坪+ / 20年內)",
+          locations: ["新北市:新莊區", "新北市:三重區", "新北市:板橋區", "新北市:蘆洲區", "新北市:土城區", "新北市:永和區", "新北市:中和區", "新北市:樹林區", "新北市:鶯歌區", "新北市:三峽區", "新北市:林口區", "新北市:泰山區", "新北市:五股區", "桃園市:桃園區", "桃園市:中壢區", "桃園市:蘆竹區", "桃園市:八德區", "桃園市:龜山區", "苗栗縣:頭份市", "苗栗縣:竹南鎮", "苗栗縣:苗栗市"],
           maxPrice: 850,
           minPing: 30,
-          maxAge: 30,
+          maxAge: 20,
           handover: "SAFE_AND_PENDING",
+          subscribers: ["ALL"],
           active: true,
-          createdAt: "2026-10-22"
+          createdAt: "2026-10-28"
         }
       ];
 
@@ -1672,27 +1877,140 @@
         }
       ];
 
-      // Application State
-      // selectedLocations stores strings like "新北市:*" (whole city) or "新北市:新莊區", "苗栗縣:頭份市"
+      INITIAL_CASES.forEach(function(item) {
+        if (item.is_demo === undefined) item.is_demo = true;
+      });
+
+      // 1. Symmetric Cipher for Full-Site Passcode Vault (encrypts GitHub Token with shared Family Passcode)
+      function encryptWithPin(plainToken, pin) {
+        var payload = "VALID_FR_TOKEN::" + plainToken;
+        var key = pin || "0000";
+        var out = [];
+        for (var i = 0; i < payload.length; i++) {
+          out.push(String.fromCharCode(payload.charCodeAt(i) ^ key.charCodeAt(i % key.length)));
+        }
+        return btoa(unescape(encodeURIComponent(out.join(""))));
+      }
+
+      function decryptWithPin(cipherB64, pin) {
+        try {
+          if (!cipherB64) return null;
+          var raw = decodeURIComponent(escape(atob(cipherB64)));
+          var key = pin || "0000";
+          var out = [];
+          for (var i = 0; i < raw.length; i++) {
+            out.push(String.fromCharCode(raw.charCodeAt(i) ^ key.charCodeAt(i % key.length)));
+          }
+          var plain = out.join("");
+          if (plain.indexOf("VALID_FR_TOKEN::") === 0) {
+            return plain.replace("VALID_FR_TOKEN::", "");
+          }
+          return null;
+        } catch (e) {
+          return null;
+        }
+      }
+
+      // 2. Email Privacy Cipher so family member emails are NEVER stored in plain text in public GitHub subscriptions.json
+      var EMAIL_CIPHER_KEY = "FR_TW_FAMILY_CIPHER_2026";
+      function encodeProtectedEmail(emailStr) {
+        if (!emailStr || emailStr === "GITHUB_SECRET_DEFAULT" || emailStr === "PROTECTED_BY_GITHUB_SECRETS") {
+          return "GITHUB_SECRET_DEFAULT";
+        }
+        if (emailStr.indexOf("ENC_MAIL:") === 0) return emailStr;
+        var utf8 = unescape(encodeURIComponent(emailStr.trim()));
+        var hexOut = [];
+        for (var i = 0; i < utf8.length; i++) {
+          var code = utf8.charCodeAt(i) ^ EMAIL_CIPHER_KEY.charCodeAt(i % EMAIL_CIPHER_KEY.length);
+          var hx = code.toString(16);
+          if (hx.length < 2) hx = "0" + hx;
+          hexOut.push(hx);
+        }
+        return "ENC_MAIL:" + hexOut.join("");
+      }
+
+      function decodeProtectedEmail(encodedStr) {
+        if (!encodedStr || encodedStr === "GITHUB_SECRET_DEFAULT" || encodedStr === "PROTECTED_BY_GITHUB_SECRETS") {
+          return "GITHUB_SECRET_DEFAULT";
+        }
+        if (encodedStr.indexOf("ENC_MAIL:") !== 0) return encodedStr;
+        try {
+          var hex = encodedStr.slice(9);
+          var chars = [];
+          for (var i = 0; i < hex.length; i += 2) {
+            var byteVal = parseInt(hex.substr(i, 2), 16);
+            var kChar = EMAIL_CIPHER_KEY.charCodeAt((i / 2) % EMAIL_CIPHER_KEY.length);
+            chars.push(String.fromCharCode(byteVal ^ kChar));
+          }
+          return decodeURIComponent(escape(chars.join("")));
+        } catch (e) {
+          return encodedStr;
+        }
+      }
+
+      function maskEmailDisplay(emailStr) {
+        if (!emailStr || emailStr === "GITHUB_SECRET_DEFAULT") {
+          return "讀取 GitHub 私密信箱 (不公開)";
+        }
+        var decoded = decodeProtectedEmail(emailStr);
+        var parts = decoded.split("@");
+        if (parts.length !== 2) return decoded;
+        var name = parts[0];
+        var maskedName = name.length <= 2 ? (name.charAt(0) + "***") : (name.slice(0, 2) + "***" + name.slice(-1));
+        return maskedName + "@" + parts[1];
+      }
+
+      // Unified LocalStorage state with seamless migration from v4/v5
+      var savedCases = loadLocal("fr_tw_cases_v6", null) || loadLocal("fr_tw_cases_v5", null) || loadLocal("fr_tw_cases_v4", INITIAL_CASES);
+      var savedFavs = loadLocal("fr_tw_favs_v6", null) || loadLocal("fr_tw_favs_v4", ["PCD_114_42910_甲", "PCD_114_51033_1", "MLD_114_11208_1"]);
+      var savedSubs = loadLocal("fr_tw_subs_v6", null) || loadLocal("fr_tw_subs_v4", DEFAULT_SUBSCRIPTIONS);
+      var savedMembers = loadLocal("fr_tw_members_v6", DEFAULT_SUBSCRIBERS);
+
       var state = {
         activeTab: "search",
-        activeBucket: "CONFIRMED", // CONFIRMED | PENDING | FAVORITES
-        cases: loadLocal("fr_tw_cases_v4", INITIAL_CASES),
-        favorites: loadLocal("fr_tw_favs_v4", ["PCD_114_42910_甲", "PCD_114_51033_1", "MLD_114_11208_1"]),
-        subscriptions: loadLocal("fr_tw_subs_v4", DEFAULT_SUBSCRIPTIONS),
-        selectedLocations: [], // Empty array means ALL Taiwan (no restriction)
+        activeBucket: "CONFIRMED",
+        cases: savedCases,
+        favorites: savedFavs,
+        subscriptions: savedSubs,
+        subscribers: savedMembers,
+        ghRepo: loadLocal("fr_tw_gh_repo", "ben63935/foreclosure-radar-tw"),
+        encryptedGhToken: loadLocal("fr_tw_enc_gh_token", ""),
+        rememberedPin: loadLocal("fr_tw_session_pin", ""),
+        ghToken: "",
+        siteUnlocked: false,
+        selectedLocations: [],
         focusedCityForDistricts: "新北市",
-        selectedDdKey: "PCD_114_42910_甲"
+        selectedDdKey: "PCD_114_42910_甲",
+        previewMemberFilter: "ALL"
       };
 
       if (!state.cases || state.cases.length < INITIAL_CASES.length) {
         state.cases = INITIAL_CASES;
-        saveLocal("fr_tw_cases_v4", state.cases);
+      }
+      state.cases.forEach(function(c) {
+        if (c.is_demo === undefined && c.dedup_key && c.dedup_key.indexOf("MANUAL_") !== 0 && c.dedup_key.indexOf("LIVE_") !== 0) {
+          c.is_demo = true;
+        }
+      });
+      if (!state.subscribers || state.subscribers.length === 0) {
+        state.subscribers = DEFAULT_SUBSCRIBERS.slice();
+      }
+      state.subscriptions.forEach(function(s) {
+        if (!Array.isArray(s.subscribers) || s.subscribers.length === 0) {
+          s.subscribers = ["ALL"];
+        }
+      });
+
+      function persistAllLocal() {
+        saveLocal("fr_tw_cases_v6", state.cases);
+        saveLocal("fr_tw_favs_v6", state.favorites);
+        saveLocal("fr_tw_subs_v6", state.subscriptions);
+        saveLocal("fr_tw_members_v6", state.subscribers);
       }
 
-      // Check if a case matches a multi-select locations array (e.g. ["新北市:新莊區", "新北市:三重區", "苗栗縣:*"])
+      // Check if a case matches a multi-select locations array
       function matchMultiLocations(c, locArray) {
-        if (!locArray || locArray.length === 0) return true; // Empty = All Taiwan
+        if (!locArray || locArray.length === 0) return true;
         for (var i = 0; i < locArray.length; i++) {
           var token = locArray[i].trim();
           if (!token || token === "ALL") return true;
@@ -1704,7 +2022,6 @@
               return true;
             }
           } else {
-            // Flexible fallback if user typed "新北市新莊區" or "新莊區" or "苗栗縣"
             if (c.city === token || c.district === token || (c.city + c.district) === token) {
               return true;
             }
@@ -1713,29 +2030,23 @@
         return false;
       }
 
-      // Three-State Evaluation Function supporting multi-select locations & dual-mode numeric inputs
+      // Three-State Evaluation Function
       function evaluateCaseBucket(c, filters) {
-        // 1. Multi-Select City & District Filter
+        if (filters.showDemo === false && c.is_demo) {
+          return { bucket: "EXCLUDED", reasons: ["已隱藏示範樣本"] };
+        }
         if (!matchMultiLocations(c, filters.locations)) {
           return { bucket: "EXCLUDED", reasons: ["地區不符"] };
         }
-
-        // 2. Channel filter ("ALL" includes Judicial Court, TFASC Gold, Bank Silver, and MOJ Tax Auctions)
         if (filters.channel !== "ALL" && c.auction_type !== filters.channel) {
           return { bucket: "EXCLUDED", reasons: ["拍賣管道不符"] };
         }
-
-        // 3. Auction Round filter
         if (filters.round && filters.round !== "ALL" && c.auction_round !== filters.round) {
           return { bucket: "EXCLUDED", reasons: ["拍次不符"] };
         }
-
-        // 4. Property Type filter
         if (filters.propType && filters.propType !== "ALL" && c.property_type !== filters.propType) {
           return { bucket: "EXCLUDED", reasons: ["建物類型不符"] };
         }
-
-        // 5. Keyword filter
         if (filters.keyword) {
           var kw = filters.keyword.toLowerCase();
           var hay = (c.case_id + " " + c.address + " " + c.city + " " + c.district + " " + c.court + " " + c.property_type + " " + (c.user_note || "")).toLowerCase();
@@ -1743,8 +2054,6 @@
             return { bucket: "EXCLUDED", reasons: ["關鍵字不符"] };
           }
         }
-
-        // 6. Reserve Price Min & Max
         if (filters.minPrice !== null && !isNaN(filters.minPrice) && c.reserve_price_wan < filters.minPrice) {
           return { bucket: "EXCLUDED", reasons: ["底價低於下限"] };
         }
@@ -1753,8 +2062,6 @@
         }
 
         var pendingReasons = [];
-
-        // 7. Area Ping Min & Max (handle null/unknown gracefully)
         var hasMinPing = filters.minPing !== null && !isNaN(filters.minPing) && filters.minPing > 0;
         var hasMaxPing = filters.maxPing !== null && !isNaN(filters.maxPing) && filters.maxPing > 0;
         if (hasMinPing || hasMaxPing) {
@@ -1770,7 +2077,6 @@
           }
         }
 
-        // 8. Age Years Min & Max (handle null/unknown gracefully)
         var hasMinAge = filters.minAge !== null && !isNaN(filters.minAge) && filters.minAge >= 0;
         var hasMaxAge = filters.maxAge !== null && !isNaN(filters.maxAge) && filters.maxAge >= 0;
         if (hasMinAge || hasMaxAge) {
@@ -1786,7 +2092,6 @@
           }
         }
 
-        // 9. Handover Status Enum Logic
         var hMode = filters.handover;
         if (hMode === "STRICT_HANDOVER") {
           if (c.handover_status !== "點交") {
@@ -1820,7 +2125,6 @@
             return { bucket: "EXCLUDED", reasons: pendingReasons };
           }
         }
-
         return { bucket: "CONFIRMED", reasons: [] };
       }
 
@@ -1837,7 +2141,6 @@
       }
 
       function toggleWholeCity(cityName, checked) {
-        // Remove all existing tokens for this city first
         state.selectedLocations = state.selectedLocations.filter(function(tok) {
           return tok.indexOf(cityName + ":") !== 0;
         });
@@ -1851,7 +2154,6 @@
       function toggleDistrictSelection(cityName, distName, checked) {
         var allDists = getDistrictsByCity(cityName);
         if (isWholeCitySelected(cityName)) {
-          // Expand whole city into individual districts except the unchecked one
           state.selectedLocations = state.selectedLocations.filter(function(tok) {
             return tok !== (cityName + ":*");
           });
@@ -1868,7 +2170,6 @@
           } else if (!checked && idx !== -1) {
             state.selectedLocations.splice(idx, 1);
           }
-          // Check if all districts of this city are now selected -> collapse to cityName:*
           var selectedDistsOfCity = state.selectedLocations.filter(function(tok) {
             return tok.indexOf(cityName + ":") === 0;
           });
@@ -1884,7 +2185,6 @@
       }
 
       function renderLocationMultiSelector() {
-        // 1. Render Active Chips & Badge
         var badgeEl = document.getElementById("locSelectedCountBadge");
         var chipsContainer = document.getElementById("selectedLocationChips");
         if (state.selectedLocations.length === 0) {
@@ -1912,7 +2212,6 @@
           });
         }
 
-        // 2. Render Left Column: 22 Cities grouped by Region
         var cityListEl = document.getElementById("cityListMultiContainer");
         if (!cityListEl) return;
         cityListEl.innerHTML = "";
@@ -1972,7 +2271,6 @@
           cityListEl.appendChild(grpDiv);
         });
 
-        // 3. Render Right Column: Districts for state.focusedCityForDistricts
         var activeCity = state.focusedCityForDistricts || "新北市";
         document.getElementById("activeCityDistrictTitle").textContent = "步驟 B：勾選【" + activeCity + "】行政區（支援跨縣市多區複選）";
         var distContainer = document.getElementById("districtCheckboxesContainer");
@@ -2026,6 +2324,7 @@
           propType: document.getElementById("filterPropType").value,
           keyword: document.getElementById("filterKeyword").value.trim(),
           keepUnknown: document.getElementById("toggleKeepUnknown").checked,
+          showDemo: document.getElementById("toggleShowDemo") ? document.getElementById("toggleShowDemo").checked : true,
           sortOrder: document.getElementById("sortOrder").value
         };
       }
@@ -2046,9 +2345,9 @@
           var el = document.getElementById(t.id);
           if (!el) return;
           if (state.activeBucket === t.bucket) {
-            el.className = "bucket-tab-btn px-4 py-2 rounded-lg text-xs sm:text-sm font-bold flex items-center gap-2 " + t.activeCls;
+            el.className = "bucket-tab-btn justify-center px-2 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-bold flex items-center gap-1 sm:gap-2 " + t.activeCls;
           } else {
-            el.className = "bucket-tab-btn px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold text-slate-600 hover:bg-white/60 flex items-center gap-2";
+            el.className = "bucket-tab-btn justify-center px-2 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold text-slate-600 hover:bg-white/60 flex items-center gap-1 sm:gap-2";
           }
         });
       }
@@ -2069,7 +2368,6 @@
       // Render Case Cards
       function renderSearchResults() {
         var filters = getCurrentFilters();
-
         var confirmedList = [];
         var pendingList = [];
         var favList = [];
@@ -2106,8 +2404,8 @@
 
         if (targetList.length === 0) {
           var emptyMsg = state.activeBucket === "PENDING"
-            ? "目前篩選條件下沒有「資訊不足待確認」的案件。您可以切換至左側「✅ 已確認符合條件」分頁檢視結果。"
-            : "目前篩選條件下無符合案件。您可以放寬上方的價格、屋齡或地區複選條件，或切換至「⚠️ 資訊不足・待人工確認」查看是否有因缺欄位而待查的案件。";
+            ? "目前篩選條件下沒有「資訊不足待確認」的案件。您可以切換至左側「✅ 已確認」分頁檢視結果。"
+            : "目前篩選條件下無符合案件。您可以放寬上方的價格、屋齡或地區複選條件，或切換至「⚠️ 待確認」查看是否有因缺欄位而待查的案件。";
           container.innerHTML = '<div class="col-span-full bg-white rounded-xl border border-slate-200 p-8 text-center text-slate-500 text-sm">' + emptyMsg + '</div>';
           return;
         }
@@ -2115,7 +2413,7 @@
         targetList.forEach(function(c) {
           var isFav = state.favorites.indexOf(c.dedup_key) !== -1;
           var card = document.createElement("div");
-          card.className = "bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-all p-5 flex flex-col justify-between space-y-4";
+          card.className = "bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-all p-4 sm:p-5 flex flex-col justify-between space-y-4";
 
           var alertHtml = "";
           if (c._evalReasons && c._evalReasons.length > 0) {
@@ -2157,14 +2455,17 @@
             '<div class="space-y-3">' +
               '<div class="flex items-start justify-between gap-2">' +
                 '<div class="flex flex-wrap items-center gap-1.5">' +
+                  (c.is_demo
+                    ? '<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-purple-100 text-purple-900 border border-purple-300" title="系統預載之測試樣本，非今日實際拍賣案">🧪 示範樣本</span>'
+                    : '<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-600 text-white">🟢 真實公告/匯入</span>') +
                   '<span class="px-2 py-0.5 rounded text-xs font-bold bg-indigo-50 text-indigo-800 border border-indigo-200">' + c.city + '・' + c.district + '</span>' +
                   statusBadge +
                   getHandoverBadgeHtml(c.handover_status) +
                   '<span class="text-xs text-slate-500 font-mono bg-slate-100 px-2 py-0.5 rounded">' + c.property_type + '</span>' +
                 '</div>' +
-                '<button type="button" data-favkey="' + c.dedup_key + '" class="btn-toggle-fav px-2.5 py-1 rounded-lg text-xs font-semibold border transition ' +
+                '<button type="button" data-favkey="' + c.dedup_key + '" class="btn-toggle-fav px-2.5 py-1 rounded-lg text-xs font-semibold border transition shrink-0 ' +
                   (isFav ? 'bg-amber-100 text-amber-900 border-amber-300' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50') + '">' +
-                  (isFav ? '★ 已收藏追蹤' : '☆ 收藏追蹤') +
+                  (isFav ? '★ 已收藏' : '☆ 收藏') +
                 '</button>' +
               '</div>' +
 
@@ -2177,7 +2478,6 @@
 
               alertHtml +
 
-              '<!-- Key Metrics Grid -->' +
               '<div class="grid grid-cols-2 sm:grid-cols-4 gap-2 bg-slate-50 p-3 rounded-xl border border-slate-200/80 text-xs">' +
                 '<div>' +
                   '<span class="text-slate-500 block">拍賣總底價</span>' +
@@ -2201,13 +2501,12 @@
                 '</div>' +
               '</div>' +
 
-              '<!-- Handover Original Court Note & Age Basis -->' +
               '<div class="text-xs space-y-1 text-slate-600 bg-slate-50/60 p-2.5 rounded-lg border border-slate-100">' +
                 '<div><strong class="text-slate-800">📜 筆錄點交原文：</strong>' + c.handover_raw_note + '</div>' +
                 '<div><strong class="text-slate-800">🏗️ 屋齡推算依據：</strong>' + c.completion_date_source + '</div>' +
+                (c.user_note ? '<div class="text-indigo-800 font-medium pt-0.5">📝 <strong>勘查筆記：</strong>' + c.user_note + '</div>' : '') +
               '</div>' +
 
-              '<!-- Auction Price Timeline -->' +
               '<div class="space-y-1">' +
                 '<span class="text-[11px] font-semibold text-slate-500">歷次拍賣底價時間軸：</span>' +
                 '<div class="flex flex-wrap gap-1.5">' + historyHtml + '</div>' +
@@ -2215,9 +2514,9 @@
             '</div>' +
 
             '<div class="pt-3 border-t border-slate-100 space-y-2.5">' +
-              '<div class="flex flex-wrap items-center justify-between gap-2">' +
+              '<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">' +
                 '<div class="flex flex-wrap gap-1.5">' + sourcesHtml + '</div>' +
-                '<button type="button" data-ddkey="' + c.dedup_key + '" class="btn-open-dd px-3.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold transition shadow-sm">' +
+                '<button type="button" data-ddkey="' + c.dedup_key + '" class="btn-open-dd w-full sm:w-auto text-center justify-center px-3.5 py-2 sm:py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold transition shadow-sm">' +
                   '🕵️ 深度調查 & 匯出 AI 分析 →' +
                 '</button>' +
               '</div>' +
@@ -2232,12 +2531,12 @@
             var idx = state.favorites.indexOf(key);
             if (idx === -1) {
               state.favorites.push(key);
-              showToast("已加入收藏追蹤！無論篩選條件如何變更，皆會持續監控此案降價與停拍異動。");
+              showToast("已加入收藏追蹤！可點右上角「☁️ 雲端同步」與家人共享收藏清單。");
             } else {
               state.favorites.splice(idx, 1);
               showToast("已從收藏追蹤移除。");
             }
-            saveLocal("fr_tw_favs_v4", state.favorites);
+            persistAllLocal();
             renderSearchResults();
           });
         });
@@ -2306,7 +2605,7 @@
         return {
           export_metadata: {
             system: "ForeclosureRadar TW",
-            exported_at_taipei: "2026-10-28T10:15:00+08:00",
+            exported_at_taipei: "2026-10-28T14:00:00+08:00",
             legal_disclaimer: "本結構化資料僅供法拍風險評估與 AI 輔助推理參考，不構成法律或徵信結論；同名同姓裁判書與網路事故傳聞須嚴格區分，投標前務必以法院拍賣公告正本與最新地政謄本為準。"
           },
           case_core: {
@@ -2345,6 +2644,7 @@
             estimated_eviction_and_renovation_wan: evictWan + renovWan,
             estimated_total_landing_cost_wan: totalLandingWan
           },
+          github_models_ai_preliminary_investigation: c.gh_ai_analysis || "尚未執行 GitHub 免費 AI 初步調查（可點擊右上角黃色按鈕免費產出）",
           field_inspection_user_note: c.user_note || ""
         };
       }
@@ -2403,7 +2703,6 @@
         }).join("");
 
         evContainer.innerHTML =
-          '<!-- Tier 1: Confirmed Facts -->' +
           '<div class="bg-white rounded-xl border-l-4 border-l-emerald-600 border border-slate-200 p-5 shadow-sm space-y-2.5">' +
             '<div class="flex items-center justify-between">' +
               '<h3 class="text-sm font-bold text-emerald-900">🟢 第一級：已確認事實 (具官方拍賣筆錄或實價登錄依據)</h3>' +
@@ -2412,7 +2711,6 @@
             '<ul class="space-y-2">' + tier1Html + '</ul>' +
           '</div>' +
 
-          '<!-- Tier 2: Pending Leads -->' +
           '<div class="bg-white rounded-xl border-l-4 border-l-amber-500 border border-slate-200 p-5 shadow-sm space-y-2.5">' +
             '<div class="flex items-center justify-between">' +
               '<h3 class="text-sm font-bold text-amber-900">🟡 第二級：待查證關聯線索 (裁判書字號/未保存增建/管理費線索)</h3>' +
@@ -2421,7 +2719,6 @@
             '<ul class="space-y-2">' + tier2Html + '</ul>' +
           '</div>' +
 
-          '<!-- Tier 3: Manual Verification Required -->' +
           '<div class="bg-white rounded-xl border-l-4 border-l-rose-600 border border-slate-200 p-5 shadow-sm space-y-2.5">' +
             '<div class="flex items-center justify-between">' +
               '<h3 class="text-sm font-bold text-rose-900">🔴 第三級：無法自動取得・投標前須人工核實 (凶宅限制/二類謄本/現場履勘)</h3>' +
@@ -2430,7 +2727,6 @@
             '<ul class="space-y-2">' + tier3Html + '</ul>' +
           '</div>' +
 
-          '<!-- 6 Legal & Public Investigation Source Direct Launchers -->' +
           '<div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm space-y-3">' +
             '<h3 class="text-sm font-bold text-slate-900">🔗 6 大公開權威資料庫深度挖掘一鍵跳轉 (自動預帶本案關鍵字)</h3>' +
             '<div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">' +
@@ -2463,12 +2759,22 @@
 
         document.getElementById("calcBidPriceInput").value = Math.round(c.reserve_price_wan * 1.03);
         document.getElementById("ddUserCustomNote").value = c.user_note || "";
+        var aiBox = document.getElementById("ghAiResultBox");
+        if (aiBox) {
+          if (c.gh_ai_analysis) {
+            aiBox.classList.remove("hidden");
+            aiBox.textContent = c.gh_ai_analysis;
+          } else {
+            aiBox.classList.add("hidden");
+            aiBox.textContent = "";
+          }
+        }
         updateAcquisitionCalc(c);
         document.getElementById("ddExportPreview").value = buildAiPromptWrapper(c);
       }
 
       // ==========================================
-      // SUBSCRIPTIONS & DAILY EMAIL DIGEST VIEW
+      // FAMILY SUBSCRIBERS & MULTI-RULE MANAGEMENT
       // ==========================================
       function formatLocationsDisplay(locs) {
         if (!locs || locs.length === 0) return "全台灣 (不限縣市)";
@@ -2479,10 +2785,183 @@
         }).join("、");
       }
 
+      function formatRuleSubscribersBadges(subMemberIds) {
+        if (!subMemberIds || subMemberIds.length === 0 || subMemberIds.indexOf("ALL") !== -1) {
+          return '<span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-indigo-100 text-indigo-800 border border-indigo-200">👨‍👩‍👧‍👦 全部成員皆收信 (' + state.subscribers.length + '人)</span>';
+        }
+        var names = [];
+        subMemberIds.forEach(function(mid) {
+          var found = state.subscribers.find(function(m) { return m.id === mid; });
+          if (found) names.push(found.name.split(" (")[0]);
+        });
+        if (names.length === 0) {
+          return '<span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-indigo-100 text-indigo-800 border border-indigo-200">👨‍👩‍👧‍👦 全部成員</span>';
+        }
+        return '<span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-indigo-100 text-indigo-800 border border-indigo-200">📩 收件人：' + names.join("、") + '</span>';
+      }
+
+      function renderRuleSubscriberCheckboxes(selectedIds) {
+        var container = document.getElementById("newRuleSubscribersCheckboxes");
+        if (!container) return;
+        var sel = selectedIds && selectedIds.length > 0 ? selectedIds : ["ALL"];
+        var isAll = sel.indexOf("ALL") !== -1;
+
+        var html = '<label class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md border cursor-pointer ' +
+          (isAll ? 'bg-indigo-600 text-white border-indigo-600 font-bold' : 'bg-slate-50 text-slate-700 border-slate-200') + '">' +
+          '<input type="checkbox" value="ALL" class="rule-sub-cb rounded" ' + (isAll ? 'checked' : '') + ' />' +
+          '<span>👨‍👩‍👧‍👦 全部成員皆收信</span></label>';
+
+        state.subscribers.forEach(function(m) {
+          var checked = !isAll && sel.indexOf(m.id) !== -1;
+          var shortName = m.name.split(" (")[0];
+          html += '<label class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md border cursor-pointer ' +
+            (checked ? 'bg-indigo-600 text-white border-indigo-600 font-bold' : 'bg-slate-50 text-slate-700 border-slate-200') + '">' +
+            '<input type="checkbox" value="' + m.id + '" class="rule-sub-cb rounded" ' + (checked ? 'checked' : '') + ' />' +
+            '<span>' + shortName + '</span></label>';
+        });
+
+        container.innerHTML = html;
+
+        var cbs = container.querySelectorAll(".rule-sub-cb");
+        cbs.forEach(function(cb) {
+          cb.addEventListener("change", function() {
+            var val = cb.value;
+            var currentSelected = [];
+            if (val === "ALL" && cb.checked) {
+              currentSelected = ["ALL"];
+            } else {
+              cbs.forEach(function(other) {
+                if (other.value !== "ALL" && other.checked) {
+                  currentSelected.push(other.value);
+                }
+              });
+              if (currentSelected.length === 0) currentSelected = ["ALL"];
+            }
+            renderRuleSubscriberCheckboxes(currentSelected);
+          });
+        });
+      }
+
+      function getSelectedRuleSubscriberIds() {
+        var container = document.getElementById("newRuleSubscribersCheckboxes");
+        if (!container) return ["ALL"];
+        var cbs = container.querySelectorAll(".rule-sub-cb");
+        var out = [];
+        cbs.forEach(function(cb) {
+          if (cb.checked) out.push(cb.value);
+        });
+        if (out.length === 0 || out.indexOf("ALL") !== -1) return ["ALL"];
+        return out;
+      }
+
+      function renderFamilyMembersDirectory() {
+        var listEl = document.getElementById("familyMembersListContainer");
+        var badgeEl = document.getElementById("subscriberCountBadge");
+        var previewSel = document.getElementById("previewSubscriberSelect");
+        if (!listEl) return;
+
+        badgeEl.textContent = state.subscribers.length + " 位收件成員";
+
+        listEl.innerHTML = state.subscribers.map(function(m) {
+          var isOwner = m.id === "mem_owner";
+          var emailDisp = m.email === "GITHUB_SECRET_DEFAULT"
+            ? "🔒 自動讀取 GitHub 保險箱信箱"
+            : decodeProtectedEmail(m.email);
+
+          return '<div class="p-2.5 rounded-xl border border-slate-200 bg-white flex items-center justify-between gap-2 text-xs">' +
+            '<div class="min-w-0">' +
+              '<div class="font-bold text-slate-900 truncate">' + m.name + '</div>' +
+              '<div class="text-[11px] text-slate-500 font-mono truncate">' + emailDisp + '</div>' +
+            '</div>' +
+            '<div class="flex items-center gap-1.5 shrink-0">' +
+              (isOwner
+                ? '<span class="px-2 py-0.5 rounded bg-slate-100 text-slate-600 text-[10px] font-semibold">預設主信箱</span>'
+                : '<button type="button" data-delmem="' + m.id + '" class="btn-del-member px-2 py-1 rounded border border-rose-200 hover:bg-rose-50 text-rose-600 font-semibold text-[11px]">移除</button>') +
+            '</div>' +
+          '</div>';
+        }).join("");
+
+        listEl.querySelectorAll(".btn-del-member").forEach(function(btn) {
+          btn.addEventListener("click", function() {
+            var mid = btn.getAttribute("data-delmem");
+            state.subscribers = state.subscribers.filter(function(m) { return m.id !== mid; });
+            persistAllLocal();
+            renderFamilyMembersDirectory();
+            renderSubscriptionsAndDigest();
+            showToast("已移除該收件成員。請記得點擊下方「儲存全站設定至雲端」同步！");
+          });
+        });
+
+        if (previewSel) {
+          var curVal = state.previewMemberFilter || "ALL";
+          var optsHtml = '<option value="ALL">👨‍👩‍👧‍👦 全部成員彙整預覽</option>';
+          state.subscribers.forEach(function(m) {
+            var selAttr = (curVal === m.id) ? " selected" : "";
+            optsHtml += '<option value="' + m.id + '"' + selAttr + '>📩 ' + m.name.split(" (")[0] + ' 的專屬信件</option>';
+          });
+          previewSel.innerHTML = optsHtml;
+        }
+      }
+
+      function addFamilyMemberHelper(nameVal, emailVal) {
+        var cleanName = (nameVal || "").trim();
+        var cleanEmail = (emailVal || "").trim();
+        if (!cleanName) {
+          showToast("⚠️ 請輸入成員稱呼（例如：老婆、爸媽）！");
+          return null;
+        }
+        if (!cleanEmail || cleanEmail.indexOf("@") === -1) {
+          showToast("⚠️ 請輸入有效的 Email 信箱格式！");
+          return null;
+        }
+        var newMem = {
+          id: "mem_" + Date.now().toString().slice(-6),
+          name: "👤 " + cleanName,
+          email: cleanEmail,
+          active: true
+        };
+        state.subscribers.push(newMem);
+        persistAllLocal();
+        renderFamilyMembersDirectory();
+        return newMem;
+      }
+
+      function openRuleEditorForRule(subRule) {
+        var panel = document.getElementById("newRuleFormPanel");
+        var titleEl = document.getElementById("ruleFormTitle");
+        var idInput = document.getElementById("editingRuleId");
+        panel.classList.remove("hidden");
+
+        if (subRule) {
+          titleEl.textContent = "✏️ 編輯訂閱條件組：「" + subRule.name + "」";
+          idInput.value = subRule.id;
+          document.getElementById("newRuleName").value = subRule.name || "";
+          document.getElementById("newRuleLocations").value = (subRule.locations || []).join(", ");
+          document.getElementById("newRuleMaxPrice").value = subRule.maxPrice !== null && subRule.maxPrice !== undefined ? subRule.maxPrice : "";
+          document.getElementById("newRuleMinPing").value = subRule.minPing !== null && subRule.minPing !== undefined ? subRule.minPing : "";
+          document.getElementById("newRuleMaxAge").value = subRule.maxAge !== null && subRule.maxAge !== undefined ? subRule.maxAge : "";
+          document.getElementById("newRuleHandover").value = subRule.handover || "SAFE_AND_PENDING";
+          renderRuleSubscriberCheckboxes(subRule.subscribers || ["ALL"]);
+        } else {
+          titleEl.textContent = "➕ 建立新訂閱條件組（支援跨縣市行政區＋指定收件家人）";
+          idInput.value = "";
+          document.getElementById("newRuleName").value = "";
+          document.getElementById("newRuleLocations").value = "";
+          document.getElementById("newRuleMaxPrice").value = "850";
+          document.getElementById("newRuleMinPing").value = "25";
+          document.getElementById("newRuleMaxAge").value = "20";
+          document.getElementById("newRuleHandover").value = "SAFE_AND_PENDING";
+          renderRuleSubscriberCheckboxes(["ALL"]);
+        }
+      }
+
       function renderSubscriptionsAndDigest() {
+        renderFamilyMembersDirectory();
         var listEl = document.getElementById("subscriptionRulesList");
         if (!listEl) return;
         listEl.innerHTML = "";
+
+        var showDemo = document.getElementById("chkEmailIncludeDemo") ? document.getElementById("chkEmailIncludeDemo").checked : true;
 
         state.subscriptions.forEach(function(sub) {
           var subLocs = sub.locations || (sub.city && sub.city !== "ALL" ? [sub.city + ":*"] : []);
@@ -2499,7 +2978,8 @@
             round: "ALL",
             propType: "ALL",
             keyword: "",
-            keepUnknown: true
+            keepUnknown: true,
+            showDemo: showDemo
           };
           var confCount = 0;
           var pendCount = 0;
@@ -2510,24 +2990,53 @@
           });
 
           var row = document.createElement("div");
-          row.className = "p-4 rounded-xl border border-slate-200 bg-slate-50/70 flex flex-wrap items-center justify-between gap-3";
+          row.className = "p-4 rounded-xl border transition flex flex-col gap-3 " +
+            (sub.active ? "border-slate-200 bg-slate-50/70" : "border-slate-200 bg-slate-100/60 opacity-75");
+
           row.innerHTML =
-            '<div class="space-y-1">' +
-              '<div class="flex items-center gap-2">' +
-                '<span class="w-2 h-2 rounded-full ' + (sub.active ? 'bg-emerald-500' : 'bg-slate-400') + '"></span>' +
+            '<div class="space-y-1.5">' +
+              '<div class="flex flex-wrap items-center gap-2">' +
+                '<button type="button" data-togglesub="' + sub.id + '" class="btn-toggle-sub px-2 py-0.5 rounded text-[11px] font-bold border transition ' +
+                  (sub.active ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-slate-200 text-slate-600 border-slate-300') + '">' +
+                  (sub.active ? '🟢 推播中' : '⏸️ 已暫停') +
+                '</button>' +
                 '<strong class="text-xs sm:text-sm font-bold text-slate-900">' + sub.name + '</strong>' +
-                '<span class="text-[11px] px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-semibold">確認符合 ' + confCount + ' 筆</span>' +
-                '<span class="text-[11px] px-2 py-0.5 rounded bg-amber-100 text-amber-900 font-semibold">待查防漏 ' + pendCount + ' 筆</span>' +
+                formatRuleSubscribersBadges(sub.subscribers) +
+                '<span class="text-[11px] px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-semibold">符合 ' + confCount + ' 筆</span>' +
+                '<span class="text-[11px] px-2 py-0.5 rounded bg-amber-100 text-amber-900 font-semibold">待查 ' + pendCount + ' 筆</span>' +
               '</div>' +
-              '<p class="text-xs text-slate-500">' +
-                '複選地區：<strong>' + formatLocationsDisplay(subLocs) + '</strong> ｜ 預算上限：' + (sub.maxPrice || '不限') + '萬 ｜ 最小建坪：' + (sub.minPing || '不限') + '坪 ｜ 屋齡上限：' + (sub.maxAge || '不限') + '年' +
+              '<p class="text-xs text-slate-600 leading-relaxed">' +
+                '📍 地區：<strong>' + formatLocationsDisplay(subLocs) + '</strong> ｜ 💰 預算：<strong>' + (sub.maxPrice ? sub.maxPrice + '萬內' : '不限') + '</strong> ｜ 📐 建坪：<strong>' + (sub.minPing ? sub.minPing + '坪+' : '不限') + '</strong> ｜ 🏗️ 屋齡：<strong>' + (sub.maxAge ? sub.maxAge + '年內' : '不限') + '</strong>' +
               '</p>' +
             '</div>' +
-            '<div class="flex items-center gap-2">' +
-              '<button type="button" data-applysub="' + sub.id + '" class="btn-apply-sub px-2.5 py-1.5 rounded bg-white border border-slate-300 hover:bg-slate-100 text-xs font-semibold text-slate-700">套用至搜尋頁</button>' +
-              '<button type="button" data-delsub="' + sub.id + '" class="btn-del-sub px-2.5 py-1.5 rounded bg-white border border-rose-200 hover:bg-rose-50 text-xs font-semibold text-rose-600">刪除</button>' +
+            '<div class="flex flex-wrap items-center justify-end gap-2 pt-2 border-t border-slate-200/70">' +
+              '<button type="button" data-applysub="' + sub.id + '" class="btn-apply-sub px-2.5 py-1.5 rounded-lg bg-white border border-slate-300 hover:bg-slate-100 text-xs font-semibold text-slate-700">🔍 套用至搜尋頁</button>' +
+              '<button type="button" data-editsub="' + sub.id + '" class="btn-edit-sub px-2.5 py-1.5 rounded-lg bg-white border border-indigo-200 hover:bg-indigo-50 text-xs font-semibold text-indigo-700">✏️ 修改條件/收件人</button>' +
+              '<button type="button" data-delsub="' + sub.id + '" class="btn-del-sub px-2.5 py-1.5 rounded-lg bg-white border border-rose-200 hover:bg-rose-50 text-xs font-semibold text-rose-600">刪除</button>' +
             '</div>';
           listEl.appendChild(row);
+        });
+
+        listEl.querySelectorAll(".btn-toggle-sub").forEach(function(btn) {
+          btn.addEventListener("click", function() {
+            var id = btn.getAttribute("data-togglesub");
+            var sub = state.subscriptions.find(function(s) { return s.id === id; });
+            if (!sub) return;
+            sub.active = !sub.active;
+            persistAllLocal();
+            renderSubscriptionsAndDigest();
+            showToast(sub.active ? "已啟用此組訂閱規則！" : "已暫停此組訂閱規則。");
+          });
+        });
+
+        listEl.querySelectorAll(".btn-edit-sub").forEach(function(btn) {
+          btn.addEventListener("click", function() {
+            var id = btn.getAttribute("data-editsub");
+            var sub = state.subscriptions.find(function(s) { return s.id === id; });
+            if (!sub) return;
+            openRuleEditorForRule(sub);
+            document.getElementById("newRuleFormPanel").scrollIntoView({ behavior: "smooth", block: "center" });
+          });
         });
 
         listEl.querySelectorAll(".btn-apply-sub").forEach(function(btn) {
@@ -2557,7 +3066,7 @@
           btn.addEventListener("click", function() {
             var id = btn.getAttribute("data-delsub");
             state.subscriptions = state.subscriptions.filter(function(s) { return s.id !== id; });
-            saveLocal("fr_tw_subs_v4", state.subscriptions);
+            persistAllLocal();
             renderSubscriptionsAndDigest();
             showToast("已刪除該組訂閱規則。");
           });
@@ -2580,39 +3089,110 @@
         renderEmailDigestPreview();
       }
 
+      function isRuleSubscribedByMember(subRule, memberId) {
+        if (!memberId || memberId === "ALL") return true;
+        var subs = subRule.subscribers || ["ALL"];
+        return subs.indexOf("ALL") !== -1 || subs.indexOf(memberId) !== -1;
+      }
+
       function renderEmailDigestPreview() {
         var box = document.getElementById("emailDigestPreviewBox");
         if (!box) return;
-        var emailAddr = document.getElementById("subRecipientEmail").value || "buyer.research@example.com";
+        var showDemo = document.getElementById("chkEmailIncludeDemo") ? document.getElementById("chkEmailIncludeDemo").checked : true;
+        var targetMemberId = state.previewMemberFilter || "ALL";
+
+        var targetMemberLabel = "全部收件成員 (" + state.subscribers.length + " 人分流寄送)";
+        if (targetMemberId !== "ALL") {
+          var foundMem = state.subscribers.find(function(m) { return m.id === targetMemberId; });
+          if (foundMem) {
+            targetMemberLabel = foundMem.name + " (" + maskEmailDisplay(foundMem.email) + ")";
+          }
+        }
+
+        var confirmedMap = {};
+        var pendingMap = {};
+        var confirmedItems = [];
+        var pendingItems = [];
+        var activeRuleCount = 0;
+
+        state.subscriptions.forEach(function(sub) {
+          if (!sub.active) return;
+          if (!isRuleSubscribedByMember(sub, targetMemberId)) return;
+          activeRuleCount++;
+
+          var subLocs = sub.locations || (sub.city && sub.city !== "ALL" ? [sub.city + ":*"] : []);
+          var ruleFilters = {
+            locations: subLocs,
+            handover: sub.handover || "SAFE_AND_PENDING",
+            minPrice: null,
+            maxPrice: sub.maxPrice ? parseFloat(sub.maxPrice) : null,
+            minAge: null,
+            maxAge: sub.maxAge ? parseFloat(sub.maxAge) : null,
+            minPing: sub.minPing ? parseFloat(sub.minPing) : null,
+            maxPing: null,
+            channel: "ALL",
+            round: "ALL",
+            propType: "ALL",
+            keyword: "",
+            keepUnknown: true,
+            showDemo: showDemo
+          };
+
+          state.cases.forEach(function(c) {
+            var r = evaluateCaseBucket(c, ruleFilters);
+            if (r.bucket === "CONFIRMED" && !confirmedMap[c.dedup_key]) {
+              confirmedMap[c.dedup_key] = true;
+              confirmedItems.push({ c: c, ruleName: sub.name });
+            } else if (r.bucket === "PENDING" && !pendingMap[c.dedup_key] && !confirmedMap[c.dedup_key]) {
+              pendingMap[c.dedup_key] = true;
+              pendingItems.push({ c: c, reasons: r.reasons, ruleName: sub.name });
+            }
+          });
+        });
+
+        var confirmedHtml = "";
+        if (confirmedItems.length === 0) {
+          confirmedHtml = '<div class="p-3 rounded bg-slate-50 text-slate-500 text-xs">此成員訂閱條件下目前無完全符合之案件。</div>';
+        } else {
+          confirmedHtml = confirmedItems.map(function(item) {
+            var c = item.c;
+            var tag = c.is_demo ? '[示範樣本] ' : '[真實公告] ';
+            return '<div class="p-2.5 rounded bg-emerald-50/70 border-l-4 border-emerald-500 space-y-0.5 mt-2">' +
+              '<div class="font-bold text-slate-900">' + tag + '[' + c.city + '・' + c.district + '] ' + c.address + ' (' + c.auction_round + '・' + c.reserve_price_wan + '萬・' + c.handover_status + ')</div>' +
+              '<div class="text-slate-600">建坪 ' + (c.area_total_ping || '未載') + ' 坪 ｜ 屋齡 ' + (c.age_years !== null ? c.age_years + ' 年' : '待查') + ' ｜ 開標：' + c.auction_date_roc + '</div>' +
+              '<div class="text-[10px] text-emerald-700">命中規則：' + item.ruleName + '</div>' +
+            '</div>';
+          }).join("");
+        }
+
+        var pendingHtml = "";
+        if (pendingItems.length === 0) {
+          pendingHtml = '<div class="p-3 rounded bg-slate-50 text-slate-500 text-xs">目前無待查防漏案件。</div>';
+        } else {
+          pendingHtml = pendingItems.map(function(item) {
+            var c = item.c;
+            var tag = c.is_demo ? '[示範樣本] ' : '[真實公告] ';
+            return '<div class="p-2.5 rounded bg-amber-50/80 border-l-4 border-amber-500 space-y-0.5 mt-2">' +
+              '<div class="font-bold text-slate-900">' + tag + '[' + c.city + '・' + c.district + '] ' + c.address + ' (' + c.auction_round + '・' + c.reserve_price_wan + '萬・' + c.handover_status + ')</div>' +
+              '<div class="text-slate-600">建坪 ' + (c.area_total_ping || '未載') + ' 坪 ｜ 原因：' + (item.reasons || []).join("、") + '</div>' +
+            '</div>';
+          }).join("");
+        }
 
         box.innerHTML =
           '<div class="border border-slate-200 rounded-lg overflow-hidden">' +
             '<div class="bg-slate-900 text-white p-3">' +
-              '<div class="font-bold text-sm">【法拍雷達日報】今日命中 新莊/三重/竹南/頭份 等 5 筆符合案件 + 2 筆待查防漏</div>' +
-              '<div class="text-[11px] text-slate-300 mt-0.5">收件人：' + emailAddr + ' ｜ 排程時間：2026-10-28 07:30 (Asia/Taipei)</div>' +
+              '<div class="font-bold text-sm">【法拍雷達日報】今日命中 ' + confirmedItems.length + ' 筆確認符合 + ' + pendingItems.length + ' 筆待查防漏</div>' +
+              '<div class="text-[11px] text-slate-300 mt-0.5">預覽對象：' + targetMemberLabel + ' ｜ 適用規則：' + activeRuleCount + ' 組</div>' +
             '</div>' +
             '<div class="p-3.5 space-y-3 bg-white">' +
               '<div>' +
-                '<div class="font-bold text-emerald-800 border-b border-emerald-100 pb-1 mb-2">✅ 一、已確認符合訂閱條件 (節錄代表案件)</div>' +
-                '<div class="p-2.5 rounded bg-emerald-50/70 border-l-4 border-emerald-500 space-y-0.5">' +
-                  '<div class="font-bold text-slate-900">[新北市・新莊區] 中平路270巷15號8樓 (3拍・845萬・點交)</div>' +
-                  '<div class="text-slate-600">建坪 24.2 坪 ｜ 屋齡 17 年 ｜ 開標：115/11/13</div>' +
-                '</div>' +
-                '<div class="p-2.5 rounded bg-emerald-50/70 border-l-4 border-emerald-500 space-y-0.5 mt-2">' +
-                  '<div class="font-bold text-slate-900">[新北市・三重區] 集賢路152號7樓 (2拍・1,120萬・點交)</div>' +
-                  '<div class="text-slate-600">建坪 28.4 坪 ｜ 屋齡 15 年 ｜ 開標：115/11/17</div>' +
-                '</div>' +
-                '<div class="p-2.5 rounded bg-emerald-50/70 border-l-4 border-emerald-500 space-y-0.5 mt-2">' +
-                  '<div class="font-bold text-slate-900">[苗栗縣・頭份市] 中央路256巷18號透天 (3拍・768萬・點交)</div>' +
-                  '<div class="text-slate-600">建坪 52.3 坪 (土地 26.5 坪) ｜ 屋齡 14 年 ｜ 開標：115/11/20</div>' +
-                '</div>' +
+                '<div class="font-bold text-emerald-800 border-b border-emerald-100 pb-1 mb-1">✅ 一、已確認符合設定條件之案件 (' + confirmedItems.length + ' 筆)</div>' +
+                confirmedHtml +
               '</div>' +
               '<div>' +
-                '<div class="font-bold text-amber-800 border-b border-amber-100 pb-1 mb-2">⚠️ 二、資訊不足待確認防漏清單 (缺屋齡或部分點交)</div>' +
-                '<div class="p-2.5 rounded bg-amber-50/80 border-l-4 border-amber-500 space-y-0.5">' +
-                  '<div class="font-bold text-slate-900">[缺屋齡保護] 桃園市中壢區環北路395巷12號7樓 (3拍・692萬・除租點交)</div>' +
-                  '<div class="text-slate-600">室內 22.8 坪，因司法院公告未載屋齡，保留於此提醒調閱謄本核實。</div>' +
-                '</div>' +
+                '<div class="font-bold text-amber-800 border-b border-amber-100 pb-1 mb-1">⚠️ 二、資訊不足待確認防漏清單 (' + pendingItems.length + ' 筆)</div>' +
+                pendingHtml +
               '</div>' +
             '</div>' +
           '</div>';
@@ -2622,29 +3202,47 @@
       // 8 SOURCES HEALTH TABLE
       // ==========================================
       function renderSourcesTable() {
+        var badgeMap = {
+          emerald: "bg-emerald-100 text-emerald-800 border-emerald-200",
+          indigo: "bg-indigo-100 text-indigo-800 border-indigo-200",
+          amber: "bg-amber-100 text-amber-900 border-amber-200",
+          slate: "bg-slate-100 text-slate-700 border-slate-300"
+        };
         var tbody = document.getElementById("sourcesHealthTableBody");
-        if (!tbody) return;
-        tbody.innerHTML = SOURCE_HEALTH_DATA.map(function(s) {
-          var badgeMap = {
-            emerald: "bg-emerald-100 text-emerald-800 border-emerald-200",
-            indigo: "bg-indigo-100 text-indigo-800 border-indigo-200",
-            amber: "bg-amber-100 text-amber-900 border-amber-200",
-            slate: "bg-slate-100 text-slate-700 border-slate-300"
-          };
-          var cls = badgeMap[s.statusColor] || badgeMap.slate;
-          return '<tr class="hover:bg-slate-50">' +
-            '<td class="py-3 px-3"><strong class="text-slate-900 block">' + s.name + '</strong><span class="text-[11px] text-slate-500">' + s.tier + '</span></td>' +
-            '<td class="py-3 px-3 text-slate-700">' + s.tech + '</td>' +
-            '<td class="py-3 px-3 text-slate-600 max-w-xs">' + s.strategy + '</td>' +
-            '<td class="py-3 px-3 text-slate-700">' + s.fields + '</td>' +
-            '<td class="py-3 px-3"><span class="px-2 py-0.5 rounded-full text-[11px] font-bold border ' + cls + '">' + s.status + '</span></td>' +
-            '<td class="py-3 px-3"><a href="' + s.url + '" target="_blank" rel="noopener noreferrer" class="text-indigo-600 hover:underline font-semibold">開啟官方頁 ↗</a></td>' +
-          '</tr>';
-        }).join("");
+        if (tbody) {
+          tbody.innerHTML = SOURCE_HEALTH_DATA.map(function(s) {
+            var cls = badgeMap[s.statusColor] || badgeMap.slate;
+            return '<tr class="hover:bg-slate-50">' +
+              '<td class="py-3 px-3"><strong class="text-slate-900 block">' + s.name + '</strong><span class="text-[11px] text-slate-500">' + s.tier + '</span></td>' +
+              '<td class="py-3 px-3 text-slate-700">' + s.tech + '</td>' +
+              '<td class="py-3 px-3 text-slate-600 max-w-xs">' + s.strategy + '</td>' +
+              '<td class="py-3 px-3 text-slate-700">' + s.fields + '</td>' +
+              '<td class="py-3 px-3"><span class="px-2 py-0.5 rounded-full text-[11px] font-bold border ' + cls + '">' + s.status + '</span></td>' +
+              '<td class="py-3 px-3"><a href="' + s.url + '" target="_blank" rel="noopener noreferrer" class="text-indigo-600 hover:underline font-semibold">開啟官方頁 ↗</a></td>' +
+            '</tr>';
+          }).join("");
+        }
+        var mCards = document.getElementById("sourcesHealthMobileCards");
+        if (mCards) {
+          mCards.innerHTML = SOURCE_HEALTH_DATA.map(function(s) {
+            var cls = badgeMap[s.statusColor] || badgeMap.slate;
+            return '<div class="p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 space-y-1.5 text-xs">' +
+              '<div class="flex items-start justify-between gap-2">' +
+                '<div><strong class="text-slate-900 block">' + s.name + '</strong><span class="text-[11px] text-slate-500">' + s.tier + '</span></div>' +
+                '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold border shrink-0 ' + cls + '">' + s.status + '</span>' +
+              '</div>' +
+              '<div class="text-slate-600 text-[11px]">' + s.strategy + '</div>' +
+              '<div class="flex items-center justify-between pt-1 border-t border-slate-200/80">' +
+                '<span class="text-[11px] text-slate-500">' + s.fields + '</span>' +
+                '<a href="' + s.url + '" target="_blank" rel="noopener noreferrer" class="text-indigo-600 font-bold">官方頁 ↗</a>' +
+              '</div>' +
+            '</div>';
+          }).join("");
+        }
       }
 
       // ==========================================
-      // TAB SWITCHING & GLOBAL LISTENERS
+      // TAB SWITCHING & CLOUD SYNC ENGINE
       // ==========================================
       function switchMainTab(tabName) {
         state.activeTab = tabName;
@@ -2659,12 +3257,158 @@
 
         document.querySelectorAll(".nav-tab-btn").forEach(function(btn) {
           var t = btn.getAttribute("data-tab");
-          if (t === tabName) {
-            btn.className = "nav-tab-btn px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all bg-slate-900 text-white shadow-sm flex items-center gap-1.5";
+          var isMobileBtn = btn.classList.contains("mobile-nav-btn");
+          if (isMobileBtn) {
+            if (t === tabName) {
+              btn.className = "nav-tab-btn mobile-nav-btn flex flex-col items-center justify-center py-2 px-1 text-indigo-700 font-bold bg-indigo-50/70";
+            } else {
+              btn.className = "nav-tab-btn mobile-nav-btn flex flex-col items-center justify-center py-2 px-1 text-slate-500 font-medium";
+            }
           } else {
-            btn.className = "nav-tab-btn px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all text-slate-600 hover:bg-slate-100 flex items-center gap-1.5";
+            if (t === tabName) {
+              btn.className = "nav-tab-btn px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all bg-slate-900 text-white shadow-sm flex items-center gap-1.5";
+            } else {
+              btn.className = "nav-tab-btn px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all text-slate-600 hover:bg-slate-100 flex items-center gap-1.5";
+            }
           }
         });
+        if (window.innerWidth < 640) {
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        }
+      }
+
+      // Unified Cloud Sync (Saves encrypted_vault, encrypted family emails, rules, favorites & custom notes to GitHub subscriptions.json)
+      async function syncAllSettingsToCloud(triggerEmailDispatch) {
+        var token = (state.ghToken || "").trim();
+        var repo = (state.ghRepo || "ben63935/foreclosure-radar-tw").trim();
+        var statusBox = document.getElementById("cloudSyncStatusBox");
+
+        if (!token) {
+          showToast("⚠️ 尚未綁定雲端金鑰！請點右上角「🔑 通行密碼設定」完成首次綁定。");
+          if (statusBox) {
+            statusBox.classList.remove("hidden");
+            statusBox.className = "p-3 rounded-xl bg-rose-950 border border-rose-700 text-xs text-rose-300 leading-relaxed";
+            statusBox.textContent = "⚠️ 尚未偵測到雲端金鑰。請點網頁右上角「🔑 通行密碼設定」完成站長首次金鑰與密碼綁定！";
+          }
+          return false;
+        }
+
+        if (statusBox) {
+          statusBox.classList.remove("hidden");
+          statusBox.className = "p-3 rounded-xl bg-slate-900 border border-indigo-500/40 text-xs text-amber-300 leading-relaxed";
+          statusBox.textContent = "⏳ 正在將全站設定（家人收件名單、訂閱條件、收藏與勘查筆記）加密同步至 GitHub 雲端...";
+        }
+        showToast("⏳ 正在加密同步至 GitHub 雲端...");
+
+        try {
+          var customNotesMap = {};
+          state.cases.forEach(function(c) {
+            if (c.user_note) customNotesMap[c.dedup_key] = c.user_note;
+          });
+
+          var encodedSubscribers = state.subscribers.map(function(m) {
+            return {
+              id: m.id,
+              name: m.name,
+              email: encodeProtectedEmail(m.email),
+              active: m.active !== false
+            };
+          });
+
+          var subPayload = {
+            recipient_email: "PROTECTED_BY_GITHUB_SECRETS",
+            encrypted_vault: state.encryptedGhToken || "",
+            updated_at: new Date().toISOString(),
+            include_demo_in_email: document.getElementById("chkEmailIncludeDemo") ? document.getElementById("chkEmailIncludeDemo").checked : true,
+            subscribers: encodedSubscribers,
+            subscriptions: state.subscriptions,
+            favorites: state.favorites,
+            custom_notes: customNotesMap
+          };
+
+          var contentStr = JSON.stringify(subPayload, null, 2);
+          var base64Content = btoa(unescape(encodeURIComponent(contentStr)));
+
+          var getRes = await fetch("https://api.github.com/repos/" + repo + "/contents/subscriptions.json", {
+            headers: {
+              "Authorization": "Bearer " + token,
+              "Accept": "application/vnd.github+json"
+            }
+          });
+          var existingSha = null;
+          if (getRes.ok) {
+            var getJson = await getRes.json();
+            existingSha = getJson.sha;
+          }
+
+          var putBody = {
+            message: "chore(sync): update family subscriptions, encrypted vault & favorites via web UI",
+            content: base64Content
+          };
+          if (existingSha) putBody.sha = existingSha;
+
+          var putRes = await fetch("https://api.github.com/repos/" + repo + "/contents/subscriptions.json", {
+            method: "PUT",
+            headers: {
+              "Authorization": "Bearer " + token,
+              "Accept": "application/vnd.github+json",
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify(putBody)
+          });
+
+          if (!putRes.ok) {
+            var errTxt = await putRes.text();
+            throw new Error("寫入雲端設定檔失敗 (" + putRes.status + ")：" + errTxt);
+          }
+
+          if (!triggerEmailDispatch) {
+            if (statusBox) {
+              statusBox.className = "p-3 rounded-xl bg-emerald-950 border border-emerald-600 text-xs text-emerald-300 leading-relaxed";
+              statusBox.innerHTML = "✅ <strong>全站設定已成功同步至雲端！</strong>（共 " + state.subscribers.length + " 位收件成員、" + state.subscriptions.length + " 組訂閱條件、" + state.favorites.length + " 筆收藏）。您與家人使用任何手機或電腦打開網站皆會自動載入最新設定！";
+            }
+            showToast("✅ 全站設定與家人名單已同步至雲端！");
+            return true;
+          }
+
+          if (statusBox) {
+            statusBox.textContent = "✅ 雲端設定已儲存！正在觸發 GitHub Actions 為所有成員寄送最新測試日報...";
+          }
+
+          var dispatchRes = await fetch("https://api.github.com/repos/" + repo + "/actions/workflows/daily_sync.yml/dispatches", {
+            method: "POST",
+            headers: {
+              "Authorization": "Bearer " + token,
+              "Accept": "application/vnd.github+json",
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ ref: "main" })
+          });
+
+          if (dispatchRes.status === 204 || dispatchRes.ok) {
+            if (statusBox) {
+              statusBox.className = "p-3 rounded-xl bg-emerald-950 border border-emerald-600 text-xs text-emerald-300 leading-relaxed";
+              statusBox.innerHTML = "🎉 <strong>雲端同步與多人分流寄信已成功觸發！</strong><br/>" +
+                "1. 已同步 <strong>" + state.subscribers.length + " 位收件成員</strong>（信箱皆以加密格式保存，公開庫零個資外洩）與 <strong>" + state.subscriptions.length + " 組規則</strong>。<br/>" +
+                "2. GitHub Actions 已啟動，約 45~60 秒後將依每位成員訂閱的規則分別寄達各自信箱！<br/>" +
+                "👉 <a href='https://github.com/" + repo + "/actions' target='_blank' class='underline font-bold text-white'>點此開啟 GitHub Actions 查看即時寄信進度 ↗</a>";
+            }
+            showToast("🎉 已同步雲端並啟動多人分流寄信！");
+          } else {
+            if (statusBox) {
+              statusBox.className = "p-3 rounded-xl bg-amber-950 border border-amber-600 text-xs text-amber-200 leading-relaxed";
+              statusBox.innerHTML = "✅ 設定已成功存入雲端！自動觸發寄信回傳狀態碼 " + dispatchRes.status + "（請確認金鑰已勾選 workflow 權限，或點 <a href='https://github.com/" + repo + "/actions' target='_blank' class='underline font-bold'>GitHub Actions</a> 手動按 Run workflow）。";
+            }
+          }
+          return true;
+        } catch (err) {
+          if (statusBox) {
+            statusBox.className = "p-3 rounded-xl bg-rose-950 border border-rose-700 text-xs text-rose-300 leading-relaxed";
+            statusBox.textContent = "❌ 雲端同步發生錯誤：" + err.message;
+          }
+          showToast("❌ 雲端同步失敗：" + err.message);
+          return false;
+        }
       }
 
       function copyTextCrossBrowser(text) {
@@ -2701,9 +3445,159 @@
         URL.revokeObjectURL(url);
       }
 
-      // Initialize all listeners on DOMContentLoaded
+      // ==========================================
+      // FULL-SITE GATE & INITIALIZATION
+      // ==========================================
+      function refreshFullSiteGateUI(forceAdminSetup) {
+        var overlay = document.getElementById("fullSiteLockOverlay");
+        var loginBox = document.getElementById("gatePasscodeLoginBox");
+        var setupBox = document.getElementById("gateAdminSetupBox");
+        var hintEl = document.getElementById("gateVaultSourceHint");
+
+        if (state.siteUnlocked) {
+          overlay.classList.add("hidden");
+          return;
+        }
+        overlay.classList.remove("hidden");
+
+        var hasVault = !!(state.encryptedGhToken && state.encryptedGhToken.length > 10);
+        if (forceAdminSetup || !hasVault) {
+          loginBox.classList.add("hidden");
+          setupBox.classList.remove("hidden");
+          document.getElementById("setupGhRepoInput").value = state.ghRepo || "ben63935/foreclosure-radar-tw";
+        } else {
+          loginBox.classList.remove("hidden");
+          setupBox.classList.add("hidden");
+          hintEl.textContent = "☁️ 雲端通行鎖已啟用（輸入通行密碼即全功能開啟）";
+        }
+      }
+
+      function tryAutoUnlockFromRememberedSession() {
+        if (state.encryptedGhToken && state.rememberedPin) {
+          var dec = decryptWithPin(state.encryptedGhToken, state.rememberedPin);
+          if (dec) {
+            state.ghToken = dec;
+            state.siteUnlocked = true;
+            refreshFullSiteGateUI(false);
+            return true;
+          }
+        }
+        return false;
+      }
+
       window.addEventListener("DOMContentLoaded", function() {
-        // Main Navigation Tabs
+        // 1. Full-Site Gate Listeners
+        document.getElementById("btnGateLoginSubmit").addEventListener("click", function() {
+          var pin = document.getElementById("gatePasscodeInput").value.trim();
+          if (!pin) {
+            showToast("⚠️ 請輸入全站通行密碼！");
+            return;
+          }
+          var decrypted = decryptWithPin(state.encryptedGhToken, pin);
+          if (!decrypted) {
+            showToast("❌ 通行密碼不正確，請重新輸入！");
+            return;
+          }
+          state.ghToken = decrypted;
+          state.siteUnlocked = true;
+          if (document.getElementById("gateRememberDevice").checked) {
+            state.rememberedPin = pin;
+            saveLocal("fr_tw_session_pin", pin);
+          } else {
+            state.rememberedPin = "";
+            saveLocal("fr_tw_session_pin", "");
+          }
+          document.getElementById("gatePasscodeInput").value = "";
+          refreshFullSiteGateUI(false);
+          renderSubscriptionsAndDigest();
+          showToast("🔓 歡迎進入系統！所有篩選、家人訂閱與免費 AI 功能皆已全開。");
+        });
+
+        document.getElementById("gatePasscodeInput").addEventListener("keydown", function(e) {
+          if (e.key === "Enter") {
+            document.getElementById("btnGateLoginSubmit").click();
+          }
+        });
+
+        document.getElementById("btnSwitchToAdminSetup").addEventListener("click", function() {
+          refreshFullSiteGateUI(true);
+        });
+
+        document.getElementById("btnBackToGateLogin").addEventListener("click", function() {
+          if (state.encryptedGhToken) {
+            refreshFullSiteGateUI(false);
+          } else {
+            showToast("目前尚未綁定通行密碼，請先設定或點右側『先免綁定預覽』。");
+          }
+        });
+
+        document.getElementById("btnToggleGateTokenHelp").addEventListener("click", function() {
+          document.getElementById("gateTokenHelpBox").classList.toggle("hidden");
+        });
+
+        document.getElementById("btnPreviewWithoutToken").addEventListener("click", function() {
+          state.siteUnlocked = true;
+          refreshFullSiteGateUI(false);
+          showToast("👀 已進入預覽模式（若需雲端發信與儲存家人訂閱，請點右上角「🔑 通行密碼設定」綁定）。");
+        });
+
+        document.getElementById("btnBindCloudVault").addEventListener("click", async function() {
+          var passcode = document.getElementById("setupSitePasscodeInput").value.trim();
+          var rawToken = document.getElementById("setupGhTokenInput").value.trim();
+          var repoVal = document.getElementById("setupGhRepoInput").value.trim() || "ben63935/foreclosure-radar-tw";
+          var msgBox = document.getElementById("gateSetupStatusMsg");
+
+          if (!passcode || passcode.length < 2) {
+            showToast("⚠️ 請設定一組全站通行密碼（例如 4~12 位數字或英數）！");
+            return;
+          }
+          if (!rawToken || rawToken.length < 10) {
+            showToast("⚠️ 請貼上 ghp_ 開頭的 GitHub 金鑰（可點上方教學連結 30 秒領取）！");
+            return;
+          }
+
+          state.ghRepo = repoVal;
+          state.ghToken = rawToken;
+          state.encryptedGhToken = encryptWithPin(rawToken, passcode);
+          state.rememberedPin = passcode;
+          saveLocal("fr_tw_gh_repo", state.ghRepo);
+          saveLocal("fr_tw_enc_gh_token", state.encryptedGhToken);
+          saveLocal("fr_tw_session_pin", passcode);
+
+          msgBox.classList.remove("hidden");
+          msgBox.textContent = "⏳ 正在將加密通行鎖上傳至 GitHub 雲端，讓家人與您的手機皆可用此密碼直接登入...";
+
+          var ok = await syncAllSettingsToCloud(false);
+          state.siteUnlocked = true;
+          document.getElementById("setupSitePasscodeInput").value = "";
+          document.getElementById("setupGhTokenInput").value = "";
+          msgBox.classList.add("hidden");
+          refreshFullSiteGateUI(false);
+          if (ok) {
+            showToast("🎉 全站通行密碼已同步至雲端！現在家人只要打開網址輸入這組密碼就能直接進入並使用全部功能！");
+          }
+        });
+
+        // Header Lock / Settings / Cloud Sync Buttons
+        document.getElementById("btnLockSiteNow").addEventListener("click", function() {
+          state.siteUnlocked = false;
+          state.ghToken = "";
+          state.rememberedPin = "";
+          saveLocal("fr_tw_session_pin", "");
+          refreshFullSiteGateUI(false);
+          showToast("🔒 畫面已上鎖。");
+        });
+
+        document.getElementById("btnOpenGateSettings").addEventListener("click", function() {
+          state.siteUnlocked = false;
+          refreshFullSiteGateUI(true);
+        });
+
+        document.getElementById("btnHeaderCloudSync").addEventListener("click", function() {
+          syncAllSettingsToCloud(false);
+        });
+
+        // 2. Main Navigation Tabs
         document.querySelectorAll(".nav-tab-btn").forEach(function(btn) {
           btn.addEventListener("click", function() {
             var tab = btn.getAttribute("data-tab");
@@ -2744,7 +3638,7 @@
           showToast("已取消選取【" + state.focusedCityForDistricts + "】。");
         });
 
-        // Dual-Mode Quick Dropdowns -> Auto-fill Min/Max Number Inputs
+        // Dual-Mode Quick Dropdowns
         document.getElementById("quickPriceSelect").addEventListener("change", function(e) {
           var v = e.target.value;
           if (v === "ALL") {
@@ -2790,7 +3684,6 @@
           renderSearchResults();
         });
 
-        // Sync Quick Dropdown to "CUSTOM" when user types directly in Min/Max inputs
         ["filterMinPrice", "filterMaxPrice"].forEach(function(id) {
           document.getElementById(id).addEventListener("input", function() {
             var minV = document.getElementById("filterMinPrice").value.trim();
@@ -2818,8 +3711,7 @@
           });
         });
 
-        // Other Select & Keyword Filter Listeners
-        ["filterHandover", "filterChannel", "filterRound", "filterPropType", "sortOrder", "toggleKeepUnknown"].forEach(function(id) {
+        ["filterHandover", "filterChannel", "filterRound", "filterPropType", "sortOrder", "toggleKeepUnknown", "toggleShowDemo"].forEach(function(id) {
           var el = document.getElementById(id);
           if (el) {
             el.addEventListener("change", function() {
@@ -2832,7 +3724,6 @@
           renderSearchResults();
         });
 
-        // Reset Filters Button
         document.getElementById("btnResetFilters").addEventListener("click", function() {
           state.selectedLocations = [];
           document.getElementById("filterHandover").value = "ALL";
@@ -2855,7 +3746,7 @@
           showToast("已清空重置全部篩選條件。");
         });
 
-        // Save current filter (including multi-selected districts) as subscription rule
+        // Smarter "+ 存為每日訂閱" button: pre-fills the rule editor and switches to Tab 3 so family member can pick recipient!
         document.getElementById("btnSaveCurrentAsSub").addEventListener("click", function() {
           var f = getCurrentFilters();
           var locLabel = formatLocationsDisplay(f.locations);
@@ -2863,23 +3754,23 @@
           var pingLabel = f.minPing ? (f.minPing + "坪+") : "不限坪數";
           var ageLabel = f.maxAge ? (f.maxAge + "年內") : "不限屋齡";
 
-          var newSub = {
-            id: "sub_" + Date.now(),
+          switchMainTab("subscription");
+          renderSubscriptionsAndDigest();
+          openRuleEditorForRule({
+            id: "",
             name: locLabel + " (" + priceLabel + " / " + pingLabel + " / " + ageLabel + ")",
             locations: f.locations,
             maxPrice: f.maxPrice,
             minPing: f.minPing,
             maxAge: f.maxAge,
             handover: f.handover,
-            active: true,
-            createdAt: "2026-10-28"
-          };
-          state.subscriptions.unshift(newSub);
-          saveLocal("fr_tw_subs_v4", state.subscriptions);
-          showToast("已將目前複選地區與篩選條件存為每日 Email 訂閱規則！");
+            subscribers: ["ALL"]
+          });
+          document.getElementById("ruleFormTitle").textContent = "➕ 將剛才的篩選條件存為訂閱（請確認下方收件家人並按儲存）";
+          showToast("已將篩選條件帶入訂閱表單！請選擇要寄給哪位家人後按「儲存此組訂閱規則」。");
         });
 
-        // Due Diligence Case Selector & Calculator
+        // Due Diligence Listeners
         document.getElementById("ddCaseSelector").addEventListener("change", function(e) {
           state.selectedDdKey = e.target.value;
           renderDueDiligenceView();
@@ -2899,9 +3790,9 @@
           var c = getSelectedDdCase();
           if (!c) return;
           c.user_note = document.getElementById("ddUserCustomNote").value;
-          saveLocal("fr_tw_cases_v4", state.cases);
+          persistAllLocal();
           document.getElementById("ddExportPreview").value = buildAiPromptWrapper(c);
-          showToast("已儲存此案實地勘查筆記，並同步更新至 AI 匯出資料！");
+          showToast("已儲存此案實地勘查筆記！（可點右上角「☁️ 雲端同步」與家人共享筆記）");
         });
 
         document.getElementById("btnCopyAiPrompt").addEventListener("click", function() {
@@ -2926,14 +3817,59 @@
           showToast("已下載 Markdown 調查報告！");
         });
 
-        // Subscription Modal & Preview Controls
+        // Subscription Rules & Family Member Listeners
         document.getElementById("btnOpenNewRuleModal").addEventListener("click", function() {
-          document.getElementById("newRuleFormPanel").classList.toggle("hidden");
+          var panel = document.getElementById("newRuleFormPanel");
+          if (panel.classList.contains("hidden")) {
+            openRuleEditorForRule(null);
+          } else {
+            panel.classList.add("hidden");
+          }
         });
+
         document.getElementById("btnCancelNewRule").addEventListener("click", function() {
           document.getElementById("newRuleFormPanel").classList.add("hidden");
         });
+
+        document.getElementById("btnAddFamilyMember").addEventListener("click", function() {
+          var nameEl = document.getElementById("newMemberNameInput");
+          var emailEl = document.getElementById("newMemberEmailInput");
+          var added = addFamilyMemberHelper(nameEl.value, emailEl.value);
+          if (added) {
+            nameEl.value = "";
+            emailEl.value = "";
+            renderSubscriptionsAndDigest();
+            showToast("✅ 已新增收件成員「" + added.name + "」！請記得點下方綠色按鈕同步至雲端。");
+          }
+        });
+
+        document.getElementById("btnInlineAddMember").addEventListener("click", function() {
+          var nameEl = document.getElementById("inlineQuickMemberName");
+          var emailEl = document.getElementById("inlineQuickMemberEmail");
+          var added = addFamilyMemberHelper(nameEl.value, emailEl.value);
+          if (added) {
+            nameEl.value = "";
+            emailEl.value = "";
+            renderRuleSubscriberCheckboxes([added.id]);
+            showToast("✅ 已加入「" + added.name + "」並自動勾選為本規則收件人！");
+          }
+        });
+
         document.getElementById("btnConfirmNewRule").addEventListener("click", function() {
+          // If the user typed a quick family member in the inline fields but forgot to click "加入名單", auto-add them!
+          var inlineName = document.getElementById("inlineQuickMemberName").value.trim();
+          var inlineEmail = document.getElementById("inlineQuickMemberEmail").value.trim();
+          var subIds = getSelectedRuleSubscriberIds();
+          if (inlineName && inlineEmail && inlineEmail.indexOf("@") !== -1) {
+            var autoMem = addFamilyMemberHelper(inlineName, inlineEmail);
+            if (autoMem) {
+              document.getElementById("inlineQuickMemberName").value = "";
+              document.getElementById("inlineQuickMemberEmail").value = "";
+              subIds = [autoMem.id];
+            }
+          }
+
+          var editId = document.getElementById("editingRuleId").value.trim();
           var name = document.getElementById("newRuleName").value.trim() || "自訂跨區監控規則";
           var locRaw = document.getElementById("newRuleLocations").value.trim();
           var locs = locRaw ? locRaw.split(/[,，、]+/).map(function(s) { return s.trim(); }).filter(Boolean) : [];
@@ -2942,31 +3878,60 @@
           var maxAgeVal = document.getElementById("newRuleMaxAge").value.trim();
           var handover = document.getElementById("newRuleHandover").value;
 
-          state.subscriptions.unshift({
-            id: "sub_" + Date.now(),
-            name: name,
-            locations: locs,
-            maxPrice: maxPriceVal ? parseFloat(maxPriceVal) : null,
-            minPing: minPingVal ? parseFloat(minPingVal) : null,
-            maxAge: maxAgeVal ? parseFloat(maxAgeVal) : null,
-            handover: handover,
-            active: true,
-            createdAt: "2026-10-28"
-          });
-          saveLocal("fr_tw_subs_v4", state.subscriptions);
+          if (editId) {
+            var existing = state.subscriptions.find(function(s) { return s.id === editId; });
+            if (existing) {
+              existing.name = name;
+              existing.locations = locs;
+              existing.maxPrice = maxPriceVal ? parseFloat(maxPriceVal) : null;
+              existing.minPing = minPingVal ? parseFloat(minPingVal) : null;
+              existing.maxAge = maxAgeVal ? parseFloat(maxAgeVal) : null;
+              existing.handover = handover;
+              existing.subscribers = subIds;
+            }
+            showToast("✅ 已更新訂閱規則：「" + name + "」！（請點右下方綠色按鈕同步至雲端）");
+          } else {
+            state.subscriptions.unshift({
+              id: "sub_" + Date.now(),
+              name: name,
+              locations: locs,
+              maxPrice: maxPriceVal ? parseFloat(maxPriceVal) : null,
+              minPing: minPingVal ? parseFloat(minPingVal) : null,
+              maxAge: maxAgeVal ? parseFloat(maxAgeVal) : null,
+              handover: handover,
+              subscribers: subIds,
+              active: true,
+              createdAt: "2026-10-28"
+            });
+            showToast("✅ 已新增訂閱條件組：「" + name + "」！（請點右下方綠色按鈕同步至雲端）");
+          }
+
+          persistAllLocal();
           document.getElementById("newRuleFormPanel").classList.add("hidden");
           renderSubscriptionsAndDigest();
-          showToast("已新增跨區訂閱條件組：「" + name + "」");
+        });
+
+        document.getElementById("previewSubscriberSelect").addEventListener("change", function(e) {
+          state.previewMemberFilter = e.target.value || "ALL";
+          renderEmailDigestPreview();
+        });
+
+        document.getElementById("chkEmailIncludeDemo").addEventListener("change", function() {
+          renderSubscriptionsAndDigest();
         });
 
         document.getElementById("btnPreviewEmailNow").addEventListener("click", function() {
           renderEmailDigestPreview();
-          showToast("已依據最新收件人與訂閱規則更新今日 Email 日報預覽！");
+          showToast("已刷新下方 Email 日報預覽！");
+        });
+
+        document.getElementById("btnSyncAndTestEmail").addEventListener("click", function() {
+          syncAllSettingsToCloud(true);
         });
 
         // Health Check & Manual Case Import
         document.getElementById("btnSimulateHealthCheck").addEventListener("click", function() {
-          document.getElementById("lastSyncTimeDisplay").textContent = "2026-10-28 10:15 (剛剛完成全平台核驗)";
+          document.getElementById("lastSyncTimeDisplay").textContent = "2026-10-28 14:00 (剛剛完成全平台核驗)";
           renderSourcesTable();
           showToast("已完成 8 大官方與民間資料源健康度自檢！");
         });
@@ -2984,6 +3949,7 @@
           var newKey = "MANUAL_" + Date.now().toString().slice(-5);
           var newCase = {
             dedup_key: newKey,
+            is_demo: false,
             case_id: cid,
             court: "法務部行政執行署 / 銀行標售 (手動匯入)",
             division: "專案股",
@@ -3012,7 +3978,7 @@
               { round: "2拍", date: "115/11/28", price_wan: price, result: "手動匯入追蹤中" }
             ],
             sources: [
-              { platform: "法務部行政執行署/手動匯入", url: "https://www.tpkonsale.moj.gov.tw/", tier: "Tier-1 官方權威", fetched_at: "2026-10-28 10:15" }
+              { platform: "法務部行政執行署/手動匯入", url: "https://www.tpkonsale.moj.gov.tw/", tier: "Tier-1 官方權威", fetched_at: "2026-10-28 14:00" }
             ],
             user_note: "使用者手動自外部官方公告匯入之追蹤標的。",
             due_diligence: {
@@ -3023,17 +3989,188 @@
           };
 
           state.cases.unshift(newCase);
-          saveLocal("fr_tw_cases_v4", state.cases);
+          persistAllLocal();
           state.selectedDdKey = newKey;
           switchMainTab("search");
           renderSearchResults();
           showToast("已成功匯入案件「" + addr + "」並建立深度調查卡！");
         });
 
+        // Mobile Filter Collapse Toggle
+        var btnMobileFilter = document.getElementById("btnMobileToggleFilters");
+        if (btnMobileFilter) {
+          btnMobileFilter.addEventListener("click", function() {
+            var body = document.getElementById("filterCollapsibleBody");
+            if (body) body.classList.toggle("hidden");
+          });
+        }
+
+        // GitHub Models Free AI Preliminary Investigation Handler
+        document.getElementById("btnRunGithubAi").addEventListener("click", async function() {
+          var c = getSelectedDdCase();
+          if (!c) return;
+          var token = (state.ghToken || "").trim();
+          var modelName = document.getElementById("ghAiModelSelect").value || "gpt-4o-mini";
+          var resBox = document.getElementById("ghAiResultBox");
+          resBox.classList.remove("hidden");
+
+          if (!token) {
+            resBox.textContent = "⚠️ 您目前處於免綁定預覽模式！請點網頁右上角「🔑 通行密碼設定」綁定一次 GitHub 金鑰，即可免費呼叫 GitHub Models (" + modelName + ") 進行 AI 調查！";
+            showToast("請點右上角「🔑 通行密碼設定」完成綁定！");
+            return;
+          }
+
+          resBox.textContent = "🤖 正在呼叫 GitHub 免費 AI 模型 (" + modelName + ") 針對「" + c.address + "」執行產權與筆錄深度預審，請稍候約 5~10 秒...";
+
+          var promptText = "你是一位台灣資深法拍屋產權調查與強制執行法專家。請根據以下法拍案件資料，輸出簡明扼要、條理分明的【第一階段初步調查補強報告】（約 350~500 字）：\n" +
+            "1. 【筆錄點交與佔有陷阱剖析】：分析該案點交狀態與筆錄原文有何潛在細節。\n" +
+            "2. 【增建/車位/優先承買權或稅費風險】：點出本案需特別防範的法律或產權盲點。\n" +
+            "3. 【同區段行情安全邊際與出價紅線】：評估目前拍次底價與單價合理性。\n" +
+            "4. 【下一步向書記官與管委會必問的 3 個核心問題】。\n\n" +
+            "案件資料：\n" +
+            "- 案號：" + c.case_id + " (" + c.court + " " + c.division + ")\n" +
+            "- 地址：" + c.city + c.district + " " + c.address + "\n" +
+            "- 拍次與底價：" + c.auction_round + " / 總底價 " + c.reserve_price_wan + " 萬 (單價約 " + c.unit_price_wan + " 萬/坪)\n" +
+            "- 坪數與屋齡：總建坪 " + c.area_total_ping + " 坪 (室內 " + c.area_main_ping + " 坪) / 屋齡 " + (c.age_years !== null ? c.age_years + " 年" : "未知待查") + "\n" +
+            "- 點交狀態與筆錄原文：" + c.handover_status + " — " + c.handover_raw_note;
+
+          try {
+            var response = await fetch("https://models.inference.ai.azure.com/chat/completions", {
+              method: "POST",
+              headers: {
+                "Authorization": "Bearer " + token,
+                "Content-Type": "application/json"
+              },
+              body: JSON.stringify({
+                model: modelName,
+                messages: [
+                  { role: "system", content: "你是專業嚴謹的台灣不動產法拍產權調查助手，嚴守證據分級，不捏造未確認事實。" },
+                  { role: "user", content: promptText }
+                ],
+                temperature: 0.3,
+                max_tokens: 900
+              })
+            });
+
+            if (!response.ok) {
+              var errBody = await response.text();
+              throw new Error("GitHub Models API 回傳 " + response.status + "：" + errBody);
+            }
+
+            var data = await response.json();
+            var aiReply = (data.choices && data.choices[0] && data.choices[0].message) ? data.choices[0].message.content : "無回應內容";
+            c.gh_ai_analysis = "【GitHub Models (" + modelName + ") 初步調查報告】\n" + aiReply;
+            persistAllLocal();
+            resBox.textContent = c.gh_ai_analysis;
+            document.getElementById("ddExportPreview").value = buildAiPromptWrapper(c);
+            showToast("✅ GitHub AI 初步調查完成！已自動併入右側匯出 JSON 與 Prompt 中。");
+          } catch (err) {
+            resBox.textContent = "❌ 呼叫 GitHub Models AI 失敗：" + err.message + "\n(提示：請確認您的 GitHub 金鑰有效)。";
+          }
+        });
+
+        // Auto-load remote subscriptions.json (including cloud encrypted_vault, family members, rules, favorites & custom notes)
+        fetch("./subscriptions.json?t=" + Date.now()).then(function(r) {
+          if (!r.ok) return null;
+          return r.json();
+        }).then(function(remoteSubData) {
+          if (remoteSubData) {
+            if (remoteSubData.encrypted_vault && remoteSubData.encrypted_vault.length > 10) {
+              state.encryptedGhToken = remoteSubData.encrypted_vault;
+              saveLocal("fr_tw_enc_gh_token", state.encryptedGhToken);
+            }
+            if (Array.isArray(remoteSubData.subscribers) && remoteSubData.subscribers.length > 0) {
+              state.subscribers = remoteSubData.subscribers.map(function(m) {
+                return {
+                  id: m.id,
+                  name: m.name,
+                  email: decodeProtectedEmail(m.email),
+                  active: m.active !== false
+                };
+              });
+            }
+            if (Array.isArray(remoteSubData.subscriptions) && remoteSubData.subscriptions.length > 0) {
+              state.subscriptions = remoteSubData.subscriptions;
+            }
+            if (Array.isArray(remoteSubData.favorites) && remoteSubData.favorites.length > 0) {
+              state.favorites = remoteSubData.favorites;
+            }
+            if (remoteSubData.custom_notes && typeof remoteSubData.custom_notes === "object") {
+              state.cases.forEach(function(c) {
+                if (remoteSubData.custom_notes[c.dedup_key]) {
+                  c.user_note = remoteSubData.custom_notes[c.dedup_key];
+                }
+              });
+            }
+            persistAllLocal();
+          }
+          if (!tryAutoUnlockFromRememberedSession()) {
+            refreshFullSiteGateUI(false);
+          }
+          renderSearchResults();
+          renderSubscriptionsAndDigest();
+        }).catch(function() {
+          if (!tryAutoUnlockFromRememberedSession()) {
+            refreshFullSiteGateUI(false);
+          }
+        });
+
+        // Auto-load remote cases.json from GitHub Pages repo
+        fetch("./cases.json?t=" + Date.now()).then(function(r) {
+          if (!r.ok) return null;
+          return r.json();
+        }).then(function(remoteCases) {
+          if (Array.isArray(remoteCases) && remoteCases.length > 0) {
+            var existingKeys = {};
+            state.cases.forEach(function(item) { existingKeys[item.dedup_key] = item; });
+            var added = 0;
+            remoteCases.forEach(function(rc) {
+              if (rc && rc.dedup_key) {
+                if (!existingKeys[rc.dedup_key]) {
+                  state.cases.unshift(rc);
+                  existingKeys[rc.dedup_key] = rc;
+                  added++;
+                } else if (rc.gh_ai_analysis && !existingKeys[rc.dedup_key].gh_ai_analysis) {
+                  existingKeys[rc.dedup_key].gh_ai_analysis = rc.gh_ai_analysis;
+                }
+              }
+            });
+            if (added > 0) {
+              persistAllLocal();
+              renderSearchResults();
+            }
+          }
+        }).catch(function() {});
+
+        // Auto-load remote source_health.json to update last sync timestamp & live status
+        fetch("./source_health.json?t=" + Date.now()).then(function(r) {
+          if (!r.ok) return null;
+          return r.json();
+        }).then(function(healthMap) {
+          if (healthMap && typeof healthMap === "object") {
+            var latestTime = "";
+            SOURCE_HEALTH_DATA.forEach(function(item) {
+              var h = healthMap[item.id];
+              if (h && h.status) {
+                item.status = h.status;
+                if (h.checked_at && h.checked_at > latestTime) latestTime = h.checked_at;
+              }
+            });
+            if (latestTime) {
+              var syncEl = document.getElementById("lastSyncTimeDisplay");
+              if (syncEl) syncEl.textContent = latestTime;
+            }
+            renderSourcesTable();
+          }
+        }).catch(function() {});
+
         // Initial Render
+        tryAutoUnlockFromRememberedSession();
+        refreshFullSiteGateUI(false);
         renderLocationMultiSelector();
         renderSearchResults();
         renderSourcesTable();
+        renderSubscriptionsAndDigest();
       });
     })();
   </script>

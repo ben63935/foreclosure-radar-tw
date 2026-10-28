@@ -1,0 +1,58 @@
+{
+  "recipient_email": "PROTECTED_BY_GITHUB_SECRETS",
+  "updated_at": "2026-10-28T11:45:00+08:00",
+  "include_demo_in_email": true,
+  "subscriptions": [
+    {
+      "id": "sub_user_main",
+      "name": "新北市新莊區、新北市三重區、新北市板橋區等21區 (850萬內 / 30坪+ / 20年內)",
+      "locations": [
+        "新北市:新莊區",
+        "新北市:三重區",
+        "新北市:板橋區",
+        "新北市:蘆洲區",
+        "新北市:土城區",
+        "新北市:永和區",
+        "新北市:中和區",
+        "新北市:樹林區",
+        "新北市:鶯歌區",
+        "新北市:三峽區",
+        "新北市:林口區",
+        "新北市:泰山區",
+        "新北市:五股區",
+        "桃園市:桃園區",
+        "桃園市:中壢區",
+        "桃園市:蘆竹區",
+        "桃園市:八德區",
+        "桃園市:龜山區",
+        "苗栗縣:頭份市",
+        "苗栗縣:竹南鎮",
+        "苗栗縣:苗栗市"
+      ],
+      "maxPrice": 850,
+      "minPing": 30,
+      "maxAge": 20,
+      "handover": "SAFE_AND_PENDING",
+      "active": true,
+      "createdAt": "2026-10-28",
+      "subscribers": [
+        "ALL"
+      ]
+    }
+  ],
+  "encrypted_vault": "",
+  "subscribers": [
+    {
+      "id": "mem_owner",
+      "name": "👑 站長主信箱 (GitHub 保險箱預設信箱)",
+      "email": "GITHUB_SECRET_DEFAULT",
+      "active": true
+    }
+  ],
+  "favorites": [
+    "PCD_114_42910_甲",
+    "PCD_114_51033_1",
+    "MLD_114_11208_1"
+  ],
+  "custom_notes": {}
+}
