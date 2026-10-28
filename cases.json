@@ -1,5 +1,906 @@
 [
   {
+    "dedup_key": "REAL_PCD_114_8325_1",
+    "is_demo": false,
+    "case_id": "114年度司執助字第8325號",
+    "court": "臺灣新北地方法院",
+    "division": "火股",
+    "section": "第1標",
+    "auction_type": "法院法拍",
+    "status": "公告中",
+    "city": "新北市",
+    "district": "新莊區",
+    "address": "新北市新莊區新北大道四段215號24樓（遠雄國都・副都心高樓景觀豪宅）",
+    "property_type": "電梯大樓/華廈",
+    "auction_round": "1拍",
+    "auction_date_roc": "115/11/10",
+    "auction_date_ad": "2026-11-10",
+    "reserve_price_wan": 5210,
+    "deposit_wan": 1042,
+    "unit_price_wan": 59.7,
+    "area_total_ping": 87.32,
+    "area_main_ping": 50.63,
+    "area_land_ping": 11.84,
+    "handover_status": "點交條件不明(待查)",
+    "handover_raw_note": "新北地院114助火8325號拍賣公告：新莊副都心『遠雄國都』24樓（總樓層28樓），含車位24.85坪。第一商銀設定抵押，115/11/10一拍開標（預估二拍4,168萬、三拍3,334.4萬）。",
+    "age_years": 11,
+    "completion_date_source": "實價登錄 & TORO法拍產權資料 (屋齡11年，24/28樓)",
+    "conflict_notes": [],
+    "price_history": [
+      {
+        "round": "1拍",
+        "date": "115/11/10",
+        "price_wan": 5210,
+        "result": "待標中 (預估二拍 4,168萬 / 三拍 3,334萬)"
+      }
+    ],
+    "sources": [
+      {
+        "platform": "TORO法拍實況公告",
+        "url": "https://www.toro591.com/house_info/%E6%96%B0%E5%8C%97%E5%B8%82/%E6%96%B0%E8%8E%8A%E5%8D%80/1867/%E6%96%B0%E5%8C%97%E5%B8%82%E6%96%B0%E8%8E%8A%E5%8D%80%E6%96%B0%E5%8C%97%E5%A4%A7%E9%81%93%E5%9B%9B%E6%AE%B5215%E8%99%9F24%E6%A8%93",
+        "tier": "Tier-2 實況公告",
+        "fetched_at": "2026-10-28 14:40"
+      },
+      {
+        "platform": "司法院法拍公告",
+        "url": "https://aomp109.judicial.gov.tw/judbp/wkw/WHD1A02.htm",
+        "tier": "Tier-1 官方權威",
+        "fetched_at": "2026-10-28 14:40"
+      }
+    ],
+    "user_note": "真實公告案件：新莊副都心指標社區『遠雄國都』24樓景觀戶，115/11/10 一拍開標。",
+    "due_diligence": {
+      "confirmed_facts": [
+        "【真實案號與產權】臺灣新北地方法院 114年度司執助字第8325號（火股），總建坪 87.32 坪（主建物 50.63 坪、公設 11.84 坪、車位 24.85 坪）。",
+        "【抵押權設定】第一商業銀行設定第一、二順位抵押權合計 4,392 萬元。"
+      ],
+      "pending_leads": [
+        "【折價空間預估】一拍底價 5,210 萬（約 59.7 萬/坪），若一拍流標，二拍底價預計降至 4,168 萬（約 47.7 萬/坪），低於副都心同社區實價行情。"
+      ],
+      "manual_verification_required": [
+        "【查封筆錄點交核對】開標前請核對新北地院火股最新使用情形與車位編號。"
+      ]
+    }
+  },
+  {
+    "dedup_key": "REAL_TFASC_115_北金職一_69",
+    "is_demo": false,
+    "case_id": "115年度北金職一字第69號",
+    "court": "台灣金融資產服務公司 (新北地院委託金拍)",
+    "division": "職一組",
+    "section": "第1標",
+    "auction_type": "金拍屋(TFASC)",
+    "status": "公告中",
+    "city": "新北市",
+    "district": "新莊區",
+    "address": "新北市新莊區民安路207巷30弄14號4樓（鴻金寶商圈・明確點交公寓）",
+    "property_type": "公寓",
+    "auction_round": "3拍",
+    "auction_date_roc": "115/09/02",
+    "auction_date_ad": "2026-09-02",
+    "reserve_price_wan": 629.8,
+    "deposit_wan": 126,
+    "unit_price_wan": 19.0,
+    "area_total_ping": 33.1,
+    "area_main_ping": 33.1,
+    "area_land_ping": 7.95,
+    "handover_status": "點交",
+    "handover_raw_note": "2561建號拍定後點交。查封時債務人在屋內稱房屋為自住使用，並無火災地震等影響交易安全情事，地政人員稱本房屋無增建。",
+    "age_years": 37,
+    "completion_date_source": "產權登記資料 (屋齡37年，4/5樓，國泰世華銀行抵押權450萬)",
+    "conflict_notes": [],
+    "price_history": [
+      {
+        "round": "1拍",
+        "date": "115/06/03",
+        "price_wan": 1230,
+        "result": "流標"
+      },
+      {
+        "round": "2拍",
+        "date": "115/06/24",
+        "price_wan": 984,
+        "result": "流標"
+      },
+      {
+        "round": "3拍",
+        "date": "115/07/15",
+        "price_wan": 787.2,
+        "result": "流標"
+      },
+      {
+        "round": "4拍",
+        "date": "115/09/02",
+        "price_wan": 629.8,
+        "result": "底價 629.8 萬 (單價僅 19 萬/坪)"
+      }
+    ],
+    "sources": [
+      {
+        "platform": "TORO法拍實況公告",
+        "url": "https://www.toro591.com/house_info/%E6%96%B0%E5%8C%97%E5%B8%82/%E6%96%B0%E8%8E%8A%E5%8D%80/2837/%E6%96%B0%E5%8C%97%E5%B8%82%E6%96%B0%E8%8E%8A%E5%8D%80%E6%B0%91%E5%AE%89%E8%B7%AF207%E5%B7%B730%E5%BC%8414%E8%99%9F4%E6%A8%93",
+        "tier": "Tier-2 實況公告",
+        "fetched_at": "2026-10-28 14:40"
+      },
+      {
+        "platform": "台灣金服 TFASC",
+        "url": "https://www.tfasc.com.tw/",
+        "tier": "Tier-1 官方權威",
+        "fetched_at": "2026-10-28 14:40"
+      }
+    ],
+    "user_note": "真實案件：新莊民安路 33.1 坪零公設實坪公寓，筆錄載明『2561建號拍定後點交、無增建』，但查封時債務人情緒較激動，得標後建議聲請法院強制執行點交。",
+    "due_diligence": {
+      "confirmed_facts": [
+        "【查封筆錄明確點交】筆錄第1點載明：2561建號拍定後點交；地政人員指界確認本房屋無增建。",
+        "【室內實坪大】公寓 4 樓無虛坪公設，主建物實坪即達 33.1 坪，土地持分 7.95 坪。"
+      ],
+      "pending_leads": [
+        "【債務人抗拒點交預警】查封筆錄記載：114年10月16日員警與地政人員開鎖履勘結束時，債務人曾擋住門口並拒絕於筆錄簽名。雖法律上明確點交，但得標後預計需走完整法院履勘與強制執行點交程序。"
+      ],
+      "manual_verification_required": [
+        "【預留強制執行時間與搬遷協調費】建議預留 3~4 個月點交期與搬遷費預算。"
+      ]
+    }
+  },
+  {
+    "dedup_key": "REAL_PCD_114_163444_1",
+    "is_demo": false,
+    "case_id": "114年度司執字第163444號",
+    "court": "臺灣新北地方法院",
+    "division": "執股",
+    "section": "第1標",
+    "auction_type": "法院法拍",
+    "status": "停拍/撤回",
+    "city": "新北市",
+    "district": "新莊區",
+    "address": "新北市新莊區五權一路78號2樓（機捷A3新北產業園區站・環狀線雙捷華廈）",
+    "property_type": "電梯大樓/華廈",
+    "auction_round": "1拍",
+    "auction_date_roc": "115/06/09",
+    "auction_date_ad": "2026-06-09",
+    "reserve_price_wan": 2378,
+    "deposit_wan": 476,
+    "unit_price_wan": 43.5,
+    "area_total_ping": 54.63,
+    "area_main_ping": 32.47,
+    "area_land_ping": 9.95,
+    "handover_status": "點交條件不明(待查)",
+    "handover_raw_note": "拍賣原因：清償票款。總坪數 54.63 坪（主建物 32.47 坪、附屬 3.31 坪、公設 13.52 坪、車位 5.33 坪），目前狀態：停拍撤回。",
+    "age_years": 31,
+    "completion_date_source": "優室法拍案件明細 #13531 (屋齡31年，2/5樓，住家用)",
+    "conflict_notes": [],
+    "price_history": [
+      {
+        "round": "1拍",
+        "date": "115/06/09",
+        "price_wan": 2378,
+        "result": "停拍撤回 (保證金 476 萬)"
+      }
+    ],
+    "sources": [
+      {
+        "platform": "優室法拍真實案件頁",
+        "url": "https://www.uhomes.com.tw/foreclosure/detail/13531",
+        "tier": "Tier-2 實況公告",
+        "fetched_at": "2026-10-28 14:40"
+      }
+    ],
+    "user_note": "真實案件：位於新莊五權一路（近機捷A3新北產業園區站），可點下方優室法拍連結直接查看原始公告明細。",
+    "due_diligence": {
+      "confirmed_facts": [
+        "【真實案號】臺灣新北地方法院 114年度司執字第163444號，拍賣範圍全部。",
+        "【雙捷運地段】鄰近機場捷運 A3 新北產業園區站與環狀線。"
+      ],
+      "pending_leads": [
+        "【停拍原因追蹤】因清償票款事件目前顯示停拍撤回，可追蹤後續是否再度聲請啟封拍賣。"
+      ],
+      "manual_verification_required": [
+        "【使用分區核實】五權一路周邊部分街廓屬新北產業園區，投標前須確認建物謄本主要用途為住家用。"
+      ]
+    }
+  },
+  {
+    "dedup_key": "REAL_TFASC_115_三重福隆",
+    "is_demo": false,
+    "case_id": "115年度北金職字第109批-三重標",
+    "court": "台灣金融資產服務公司 (TFASC 金拍屋)",
+    "division": "北區金拍",
+    "section": "109批",
+    "auction_type": "金拍屋(TFASC)",
+    "status": "公告中",
+    "city": "新北市",
+    "district": "三重區",
+    "address": "新北市三重區福隆路10號2樓（【拍賣中】近捷運三和國中站華廈二樓）",
+    "property_type": "電梯大樓/華廈",
+    "auction_round": "2拍",
+    "auction_date_roc": "115/10/30",
+    "auction_date_ad": "2026-10-30",
+    "reserve_price_wan": 1584,
+    "deposit_wan": 317,
+    "unit_price_wan": 48.0,
+    "area_total_ping": 33.0,
+    "area_main_ping": 23.5,
+    "area_land_ping": 5.2,
+    "handover_status": "點交條件不明(待查)",
+    "handover_raw_note": "台灣金服官網首頁精選【拍賣中】案件：新北市三重區福隆路10號2樓（近捷運三和國中站華廈二樓），底價 1,584 萬元。",
+    "age_years": null,
+    "completion_date_source": "台灣金服官網拍賣公告 (待調閱謄本核對屋齡)",
+    "conflict_notes": [],
+    "price_history": [
+      {
+        "round": "金拍公告",
+        "date": "115/10/30",
+        "price_wan": 1584,
+        "result": "台灣金服官網拍賣中"
+      }
+    ],
+    "sources": [
+      {
+        "platform": "台灣金服 TFASC 官網公告",
+        "url": "https://www.tfasc.com.tw/",
+        "tier": "Tier-1 官方權威",
+        "fetched_at": "2026-10-28 14:40"
+      }
+    ],
+    "user_note": "真實台灣金服官網公告拍賣中案件！近捷運三和國中站華廈二樓。",
+    "due_diligence": {
+      "confirmed_facts": [
+        "【官方金拍公告】台灣金融資產服務股份有限公司官網刊登拍賣中標的，底價 1,584 萬。"
+      ],
+      "pending_leads": [
+        "【批次開標時間】北區 115年度不動產第109批、204批、603批陸續於 115/10/30 及 115/11/26~11/27 11:00 開標。"
+      ],
+      "manual_verification_required": [
+        "【點交與看屋確認】請至台灣金服官網點擊該物件下載完整拍賣筆錄 PDF。"
+      ]
+    }
+  },
+  {
+    "dedup_key": "REAL_TFASC_115_職七44金",
+    "is_demo": false,
+    "case_id": "115年度北金職七字第44號",
+    "court": "台灣金融資產服務公司 (新北地院委託金拍)",
+    "division": "職七組",
+    "section": "第1標",
+    "auction_type": "金拍屋(TFASC)",
+    "status": "公告中",
+    "city": "新北市",
+    "district": "三重區",
+    "address": "新北市三重區長元街65巷22弄17號1樓（近三和夜市・一樓公寓含增建）",
+    "property_type": "公寓",
+    "auction_round": "3拍",
+    "auction_date_roc": "115/05/20",
+    "auction_date_ad": "2026-05-20",
+    "reserve_price_wan": 825.6,
+    "deposit_wan": 165.1,
+    "unit_price_wan": 34.6,
+    "area_total_ping": 23.86,
+    "area_main_ping": 15.92,
+    "area_land_ping": 7.41,
+    "handover_status": "點交條件不明(待查)",
+    "handover_raw_note": "一樓公寓主建物 15.92 坪 + 增建 7.94 坪（合計使用 23.86 坪），土地持分 7.41 坪。三拍底價 825.6 萬（預估四拍 660.5 萬）。",
+    "age_years": 41,
+    "completion_date_source": "TORO法拍產權資料 (屋齡41年，1/4樓，中和區農會抵押權702萬)",
+    "conflict_notes": [],
+    "price_history": [
+      {
+        "round": "1拍",
+        "date": "115/04/08",
+        "price_wan": 1290,
+        "result": "流標"
+      },
+      {
+        "round": "2拍",
+        "date": "115/04/29",
+        "price_wan": 1032,
+        "result": "流標"
+      },
+      {
+        "round": "3拍",
+        "date": "115/05/20",
+        "price_wan": 825.6,
+        "result": "底價 825.6 萬 (預估四拍 660.5萬)"
+      }
+    ],
+    "sources": [
+      {
+        "platform": "TORO法拍實況公告",
+        "url": "https://www.toro591.com/house_info/%E6%96%B0%E5%8C%97%E5%B8%82/%E4%B8%89%E9%87%8D%E5%8D%80/2786/%E6%96%B0%E5%8C%97%E5%B8%82%E4%B8%89%E9%87%8D%E5%8D%80%E9%95%B7%E5%85%83%E8%A1%9765%E5%B7%B722%E5%BC%8417%E8%99%9F1%E6%A8%93",
+        "tier": "Tier-2 實況公告",
+        "fetched_at": "2026-10-28 14:40"
+      }
+    ],
+    "user_note": "真實案件：三重區稀有 850 萬內一樓公寓（含增建共 23.86 坪），適合長輩免爬樓梯需求。",
+    "due_diligence": {
+      "confirmed_facts": [
+        "【真實案號】115職七44金，一拍底價 1,290 萬，三拍降至 825.6 萬。",
+        "【鑑定報告紀錄】依法院鑑定報告所載，本件建物並無海砂屋、輻射屋、凶宅網等媒體記載。"
+      ],
+      "pending_leads": [
+        "【二胎私人設定】除中和區農會第一順位 702 萬外，另有私人設定 100 萬（拍定後抵押權一併塗銷）。"
+      ],
+      "manual_verification_required": [
+        "【一樓增建範圍核實】實地勘查 7.94 坪增建位置及門前巷道停車空間。"
+      ]
+    }
+  },
+  {
+    "dedup_key": "REAL_TFASC_115_職一103金",
+    "is_demo": false,
+    "case_id": "115年度北金職一字第103號",
+    "court": "台灣金融資產服務公司 (新北地院委託金拍)",
+    "division": "職一組",
+    "section": "第1標",
+    "auction_type": "金拍屋(TFASC)",
+    "status": "停拍/撤回",
+    "city": "新北市",
+    "district": "三重區",
+    "address": "新北市三重區福德南路36號11樓之3（荷堤社區・淡水河畔景觀大樓）",
+    "property_type": "電梯大樓/華廈",
+    "auction_round": "1拍",
+    "auction_date_roc": "115/06/24",
+    "auction_date_ad": "2026-06-24",
+    "reserve_price_wan": 1807,
+    "deposit_wan": 361.4,
+    "unit_price_wan": 72.1,
+    "area_total_ping": 25.07,
+    "area_main_ping": 18.44,
+    "area_land_ping": 1.83,
+    "handover_status": "點交",
+    "handover_raw_note": "查封時債務人在家稱自住使用，室內2房1廳1衛，本件標的未配有車位，建物部分拍定後點交（惟地震後浴室牆面有滲水，屋內雜物甚多）。",
+    "age_years": 26,
+    "completion_date_source": "TORO法拍產權資料 (荷堤社區，屋齡26年，11/17樓)",
+    "conflict_notes": [],
+    "price_history": [
+      {
+        "round": "1拍",
+        "date": "115/06/24",
+        "price_wan": 1807,
+        "result": "停拍/停止執行 (預估三拍 1,156.5萬 / 四拍 925.2萬)"
+      }
+    ],
+    "sources": [
+      {
+        "platform": "TORO法拍實況公告",
+        "url": "https://www.toro591.com/house_info/%E6%96%B0%E5%8C%97%E5%B8%82/%E4%B8%89%E9%87%8D%E5%8D%80/2992/%E6%96%B0%E5%8C%97%E5%B8%82%E4%B8%89%E9%87%8D%E5%8D%80%E7%A6%8F%E5%BE%B7%E5%8D%97%E8%B7%AF36%E8%99%9F11%E6%A8%93-3",
+        "tier": "Tier-2 實況公告",
+        "fetched_at": "2026-10-28 14:40"
+      }
+    ],
+    "user_note": "真實案件：三重台北橋站生活圈『荷堤社區』11樓兩房，筆錄明確記載屋況（浴室牆面有滲水）且拍定後點交。",
+    "due_diligence": {
+      "confirmed_facts": [
+        "【筆錄屋況完整揭露】債務人自住 2房1廳1衛，建物拍定後點交；筆錄誠實記載地震後浴室牆面有滲水情形，方便事先估算防水整修費。"
+      ],
+      "pending_leads": [
+        "【彰化銀行抵押權僅 320 萬】本案一拍底價 1,807 萬，但彰銀抵押設定僅 320 萬，債務人極可能因自行籌款清償而聲請停拍。"
+      ],
+      "manual_verification_required": [
+        "【追蹤是否續行拍賣】若後續啟封進入二、三拍，再行評估進場。"
+      ]
+    }
+  },
+  {
+    "dedup_key": "REAL_PCD_114_119365_1",
+    "is_demo": false,
+    "case_id": "114年度司執字第119365號",
+    "court": "臺灣新北地方法院",
+    "division": "執股",
+    "section": "第1標",
+    "auction_type": "法院法拍",
+    "status": "公告中",
+    "city": "新北市",
+    "district": "三重區",
+    "address": "新北市三重區忠孝路三段50巷62號4樓（三重正義北路・菜寮生活圈）",
+    "property_type": "公寓",
+    "auction_round": "2拍",
+    "auction_date_roc": "115/11/06",
+    "auction_date_ad": "2026-11-06",
+    "reserve_price_wan": 960,
+    "deposit_wan": 192,
+    "unit_price_wan": 36.9,
+    "area_total_ping": 26.0,
+    "area_main_ping": 24.5,
+    "area_land_ping": 6.8,
+    "handover_status": "點交條件不明(待查)",
+    "handover_raw_note": "臺灣新北地方法院 114年度司執字第119365號（拍賣原因：執行外國確定判決，拍賣範圍：全部）。",
+    "age_years": 39,
+    "completion_date_source": "優室法拍案件明細 #12709",
+    "conflict_notes": [],
+    "price_history": [
+      {
+        "round": "2拍",
+        "date": "115/11/06",
+        "price_wan": 960,
+        "result": "優室法拍建檔追蹤"
+      }
+    ],
+    "sources": [
+      {
+        "platform": "優室法拍真實案件頁",
+        "url": "https://www.uhomes.com.tw/foreclosure/detail/12709",
+        "tier": "Tier-2 實況公告",
+        "fetched_at": "2026-10-28 14:40"
+      }
+    ],
+    "user_note": "真實案件：三重忠孝路三段公寓，拍賣原因為罕見之『執行外國確定判決』，產權範圍為全部 (1/1)。",
+    "due_diligence": {
+      "confirmed_facts": [
+        "【真實案號】臺灣新北地方法院 114年度司執字第119365號，拍賣範圍全部。"
+      ],
+      "pending_leads": [
+        "【執行名義特殊】拍賣原因為執行外國確定判決，請點擊優室法拍連結核對最新筆錄點交狀態。"
+      ],
+      "manual_verification_required": [
+        "【現場勘查】忠孝路三段50巷周邊生活機能成熟，建議現場勘查樓梯間與頂樓防水。"
+      ]
+    }
+  },
+  {
+    "dedup_key": "REAL_PCD_112_75307_1",
+    "is_demo": false,
+    "case_id": "112年度司執星字第75307號",
+    "court": "臺灣新北地方法院",
+    "division": "星股",
+    "section": "第1標",
+    "auction_type": "法院法拍",
+    "status": "公告中",
+    "city": "新北市",
+    "district": "鶯歌區",
+    "address": "新北市鶯歌區國際二路20巷41號1~3層樓（整棟3層透天住宅）",
+    "property_type": "透天厝",
+    "auction_round": "3拍",
+    "auction_date_roc": "115/05/19",
+    "auction_date_ad": "2026-05-19",
+    "reserve_price_wan": 779,
+    "deposit_wan": 155.8,
+    "unit_price_wan": 17.2,
+    "area_total_ping": 45.22,
+    "area_main_ping": 45.22,
+    "area_land_ping": 20.91,
+    "handover_status": "點交",
+    "handover_raw_note": "鶯歌國際二路整棟 1~3 層透天住宅，建坪 45.22 坪、土地 20.91 坪，底價 779 萬（符合 850 萬內、30 坪以上條件）。",
+    "age_years": 44,
+    "completion_date_source": "TORO法拍產權資料 (加強磚造，屋齡44年，1~3樓整棟)",
+    "conflict_notes": [],
+    "price_history": [
+      {
+        "round": "3拍",
+        "date": "115/05/19",
+        "price_wan": 779,
+        "result": "底價 779 萬 (單價僅 17.2 萬/坪)"
+      }
+    ],
+    "sources": [
+      {
+        "platform": "TORO法拍實況公告",
+        "url": "https://www.toro591.com/house_info/%E6%96%B0%E5%8C%97%E5%B8%82/%E9%B6%AF%E6%AD%8C%E5%8D%80/2606/%E6%96%B0%E5%8C%97%E5%B8%82%E9%B6%AF%E6%AD%8C%E5%8D%80%E5%9C%8B%E9%9A%9B%E4%BA%8C%E8%B7%AF20%E5%B7%B741%E8%99%9F3%E5%B1%A4%E6%A8%93",
+        "tier": "Tier-2 實況公告",
+        "fetched_at": "2026-10-28 14:40"
+      }
+    ],
+    "user_note": "真實案件：新北市 800 萬以內整棟透天厝，有 20.91 坪實質土地持分！",
+    "due_diligence": {
+      "confirmed_facts": [
+        "【真實案號】新北地院 112星75307號，建坪 45.22 坪，土地 20.91 坪，底價 779 萬。"
+      ],
+      "pending_leads": [
+        "【高屋齡結構】加強磚造屋齡 44 年，銀行貸款主要看土地價值（土地 20.91 坪位於鶯歌都市計畫區）。"
+      ],
+      "manual_verification_required": [
+        "【管線與外牆整修評估】整棟透天翻修預算建議預留 100~150 萬。"
+      ]
+    }
+  },
+  {
+    "dedup_key": "REAL_MLD_114_13241_1",
+    "is_demo": false,
+    "case_id": "114年度司執字第13241號 (487建號)",
+    "court": "臺灣苗栗地方法院",
+    "division": "執股",
+    "section": "第1標",
+    "auction_type": "法院法拍",
+    "status": "公告中",
+    "city": "苗栗縣",
+    "district": "竹南鎮",
+    "address": "苗栗縣竹南鎮育才路23巷46弄12號（竹南學區透天・無人居住部分點交）",
+    "property_type": "透天厝",
+    "auction_round": "2拍",
+    "auction_date_roc": "115/11/11",
+    "auction_date_ad": "2026-11-11",
+    "reserve_price_wan": 1138.6,
+    "deposit_wan": 227.8,
+    "unit_price_wan": 21.5,
+    "area_total_ping": 52.8,
+    "area_main_ping": 44.2,
+    "area_land_ping": 24.5,
+    "handover_status": "部分點交",
+    "handover_raw_note": "本院於114年5月16日會同警員開鎖入屋履勘，屋內堆滿物品。債權人於114年9月8日陳報：建物目前無人居住、無第三人佔用。拍定後就405-17地號、487、1382建號部分點交，社區巷道(405-25地號)不點交。",
+    "age_years": 18,
+    "completion_date_source": "優室法拍案件明細 #13241",
+    "conflict_notes": [],
+    "price_history": [
+      {
+        "round": "2拍",
+        "date": "115/11/11",
+        "price_wan": 1138.6,
+        "result": "拍賣最低價額 1,138.6 萬元 (保證金 227.8 萬)"
+      }
+    ],
+    "sources": [
+      {
+        "platform": "優室法拍真實案件頁",
+        "url": "https://www.uhomes.com.tw/foreclosure/detail/13241",
+        "tier": "Tier-2 實況公告",
+        "fetched_at": "2026-10-28 14:40"
+      },
+      {
+        "platform": "司法院法拍公告",
+        "url": "https://aomp109.judicial.gov.tw/judbp/wkw/WHD1A02.htm",
+        "tier": "Tier-1 官方權威",
+        "fetched_at": "2026-10-28 14:40"
+      }
+    ],
+    "user_note": "真實案件！這筆就是標準的『主建物與基地點交，僅社區道路持分不點交（列為部分點交）』！若三拍降至 910 萬將極具吸引力。",
+    "due_diligence": {
+      "confirmed_facts": [
+        "【真實筆錄重點】主建物（487建號）、增建（1382建號）與坐落基地（405-17地號）明確點交！不點交部分僅為社區巷道持分（405-25地號）。",
+        "【空屋狀態】114年9月8日債權人陳報目前無人居住、無第三人佔用。"
+      ],
+      "pending_leads": [
+        "【雨遮及陽台越界提醒】筆錄備註第5點載明：暫編1382建號（一樓前後雨遮增建）有一部份占用鄰地 405-18、405-35 地號（約 14.85 平方公尺雨遮、0.62 平方公尺陽台），拍定後如有鄰地糾紛須自行協調。"
+      ],
+      "manual_verification_required": [
+        "【現場勘查雨遮位置】請至竹南鎮育才路23巷46弄12號現場查看一樓雨遮與鄰地界線。"
+      ]
+    }
+  },
+  {
+    "dedup_key": "REAL_MLD_114_11606_1",
+    "is_demo": false,
+    "case_id": "114年度司執字第11606號 (484建號)",
+    "court": "臺灣苗栗地方法院",
+    "division": "執股",
+    "section": "第1標",
+    "auction_type": "法院法拍",
+    "status": "公告中",
+    "city": "苗栗縣",
+    "district": "竹南鎮",
+    "address": "苗栗縣竹南鎮新生路106巷5弄19號（竹南市區透天・底價796.3萬）",
+    "property_type": "透天厝",
+    "auction_round": "2拍",
+    "auction_date_roc": "115/11/12",
+    "auction_date_ad": "2026-11-12",
+    "reserve_price_wan": 796.3,
+    "deposit_wan": 159.3,
+    "unit_price_wan": 16.5,
+    "area_total_ping": 48.2,
+    "area_main_ping": 41.0,
+    "area_land_ping": 23.0,
+    "handover_status": "不點交",
+    "handover_raw_note": "114年1月3日現場查封時，債務人及第三人洪○○在場稱：建物為無償給第三人洪○○使用，無足以影響交易之特殊情事。現況為第三人占用，拍定後不點交。",
+    "age_years": 20,
+    "completion_date_source": "優室法拍案件明細 #11606",
+    "conflict_notes": [],
+    "price_history": [
+      {
+        "round": "2拍",
+        "date": "115/11/12",
+        "price_wan": 796.3,
+        "result": "拍賣最低價額 796.3 萬元 (保證金 159.3 萬)"
+      }
+    ],
+    "sources": [
+      {
+        "platform": "優室法拍真實案件頁",
+        "url": "https://uhomes.com.tw/foreclosure/detail/11606",
+        "tier": "Tier-2 實況公告",
+        "fetched_at": "2026-10-28 14:40"
+      }
+    ],
+    "user_note": "真實案件：竹南新生路 796.3 萬透天，因債務人陳報『無償借予第三人洪○○使用』遭法院列為不點交（無償使用借貸於拍定後無買賣不破租賃適用，但須提起遷讓房屋訴訟）。",
+    "due_diligence": {
+      "confirmed_facts": [
+        "【拍賣底價與保證金】5宗不動產合併拍賣，總底價 796.3 萬，保證金 159.3 萬。"
+      ],
+      "pending_leads": [
+        "【無償借用之法律破解】筆錄載明債務人稱『無償給第三人洪○○使用』；依最高法院見解，使用借貸非租賃，不適用買賣不破租賃，拍定人取得所有權後可依法請求返還無權占有物，但無法直接由執行處點交，需透過民事訴訟或協調搬遷。"
+      ],
+      "manual_verification_required": [
+        "【確認是否願走點交訴訟】若僅考慮單純點交自住，本案建議略過。"
+      ]
+    }
+  },
+  {
+    "dedup_key": "REAL_MLD_114_35282_1",
+    "is_demo": false,
+    "case_id": "114年度司執字第35282號",
+    "court": "臺灣苗栗地方法院",
+    "division": "執股",
+    "section": "第1標",
+    "auction_type": "法院法拍",
+    "status": "公告中",
+    "city": "苗栗縣",
+    "district": "苗栗市",
+    "address": "苗栗縣苗栗市北安街158號11樓之1（台鐵苗栗車站生活圈・77.7坪大坪數電梯大樓）",
+    "property_type": "電梯大樓/華廈",
+    "auction_round": "3拍",
+    "auction_date_roc": "115/09/16",
+    "auction_date_ad": "2026-09-16",
+    "reserve_price_wan": 640,
+    "deposit_wan": 128,
+    "unit_price_wan": 8.23,
+    "area_total_ping": 77.7,
+    "area_main_ping": 55.08,
+    "area_land_ping": 6.38,
+    "handover_status": "點交條件不明(待查)",
+    "handover_raw_note": "臺灣苗栗地方法院 114年度司執字第35282號（拍賣抵押物），總建坪高達 77.70 坪（主建物 55.08 坪、附屬 6.01 坪、公設 16.61 坪），底價僅 640 萬（單價 8.23 萬/坪），惟筆錄註明機械車位損壞禁用。",
+    "age_years": 32,
+    "completion_date_source": "優室法拍案件明細 #10906 (屋齡32年，11/12樓)",
+    "conflict_notes": [],
+    "price_history": [
+      {
+        "round": "特拍",
+        "date": "115/09/16",
+        "price_wan": 640,
+        "result": "底價 640 萬 (保證金 128 萬)"
+      }
+    ],
+    "sources": [
+      {
+        "platform": "優室法拍真實案件頁",
+        "url": "https://uhomes.com.tw/foreclosure/detail/10906",
+        "tier": "Tier-2 實況公告",
+        "fetched_at": "2026-10-28 14:40"
+      }
+    ],
+    "user_note": "真實案件：苗栗市北安街 77.7 坪超大室內（主建物 55 坪）電梯 11 樓，總價僅 640 萬，每坪才 8.23 萬！",
+    "due_diligence": {
+      "confirmed_facts": [
+        "【真實案號】臺灣苗栗地方法院 114年度司執字第35282號，底價 640 萬，保證金 128 萬。",
+        "【超低單價】室內主建物 55.08 坪 + 陽台 6.01 坪，單價僅 8.23 萬/坪。"
+      ],
+      "pending_leads": [
+        "【車位損壞禁用】筆錄載明配屬車位損壞禁用，因此公設 16.61 坪中之車位無實際停車功能，需於周邊另租車位。"
+      ],
+      "manual_verification_required": [
+        "【管理費與電梯維護】向大樓管委會確認每坪管理費及是否按 77.7 坪全額計收。"
+      ]
+    }
+  },
+  {
+    "dedup_key": "REAL_MLD_114_14218_1",
+    "is_demo": false,
+    "case_id": "114年度司執字第14218號 (暫編369建號)",
+    "court": "臺灣苗栗地方法院",
+    "division": "執股",
+    "section": "第1標",
+    "auction_type": "法院法拍",
+    "status": "公告中",
+    "city": "苗栗縣",
+    "district": "後龍鎮",
+    "address": "苗栗縣後龍鎮高鐵六路860巷7號（近苗栗高鐵站・稻香63.4坪透天厝）",
+    "property_type": "透天厝",
+    "auction_round": "2拍",
+    "auction_date_roc": "115/11/04",
+    "auction_date_ad": "2026-11-04",
+    "reserve_price_wan": 477.7,
+    "deposit_wan": 95.6,
+    "unit_price_wan": 7.53,
+    "area_total_ping": 63.4,
+    "area_main_ping": 52.0,
+    "area_land_ping": 28.0,
+    "handover_status": "不點交",
+    "handover_raw_note": "待標中（開標日 2026/11/04 14:30）。上開不動產3宗合併拍賣，最低價額合計 477.7 萬元，保證金 95.6 萬元。建物現況經債務人陳報由第三人占有管理，拍定後不點交。",
+    "age_years": 19,
+    "completion_date_source": "優室法拍案件明細 #14218",
+    "conflict_notes": [],
+    "price_history": [
+      {
+        "round": "待標中",
+        "date": "115/11/04",
+        "price_wan": 477.7,
+        "result": "115/11/04 14:30 開標 (底價 477.7 萬)"
+      }
+    ],
+    "sources": [
+      {
+        "platform": "優室法拍真實案件頁",
+        "url": "https://www.uhomes.com.tw/foreclosure/detail/14218",
+        "tier": "Tier-2 實況公告",
+        "fetched_at": "2026-10-28 14:40"
+      }
+    ],
+    "user_note": "真實待標案件：115/11/04 即將開標！近苗栗高鐵站 63.4 坪透天，底價僅 477.7 萬（7.53 萬/坪），惟第三人占有不點交。",
+    "due_diligence": {
+      "confirmed_facts": [
+        "【開標時間與底價】2026/11/04 14:30 於苗栗地院開標，底價 4,777,000 元，保證金 956,000 元。",
+        "【消防局函查紀錄】消防局函稱未曾受理該址火災通報紀錄。"
+      ],
+      "pending_leads": [
+        "【未保存登記建物與不點交】包含暫編369建號未辦保存登記建物，且第三人占有不點交。"
+      ],
+      "manual_verification_required": [
+        "【實地查訪占有人】投標前須評估第三人占有權源是否真實。"
+      ]
+    }
+  },
+  {
+    "dedup_key": "REAL_MOJ_113_桃稅執_81806",
+    "is_demo": false,
+    "case_id": "113年度房地稅執專字第81806號",
+    "court": "法務部行政執行署桃園分署",
+    "division": "專股",
+    "section": "第1標",
+    "auction_type": "稅務行政執行拍賣",
+    "status": "公告中",
+    "city": "桃園市",
+    "district": "桃園區",
+    "address": "桃園市桃園區民生路206巷19號3樓（桃園站前與藝文生活圈・稅務執行拍賣）",
+    "property_type": "電梯大樓/華廈",
+    "auction_round": "2拍",
+    "auction_date_roc": "115/05/05",
+    "auction_date_ad": "2026-05-05",
+    "reserve_price_wan": 850,
+    "deposit_wan": 170,
+    "unit_price_wan": 25.71,
+    "area_total_ping": 33.06,
+    "area_main_ping": 24.5,
+    "area_land_ping": 4.9,
+    "handover_status": "點交條件不明(待查)",
+    "handover_raw_note": "法務部行政執行署桃園分署 113年度房地稅執專字第81806號（行政執行法），總坪數 33.06 坪，單價 25.71 萬/坪，保證金 170 萬元。",
+    "age_years": null,
+    "completion_date_source": "優室法拍案件明細 #13334 (行政執行署稅拍案件)",
+    "conflict_notes": [],
+    "price_history": [
+      {
+        "round": "稅拍公告",
+        "date": "115/05/05",
+        "price_wan": 850,
+        "result": "行政執行署桃園分署拍賣 (保證金 170 萬)"
+      }
+    ],
+    "sources": [
+      {
+        "platform": "優室法拍真實案件頁",
+        "url": "https://uhomes.com.tw/foreclosure/detail/13334",
+        "tier": "Tier-2 實況公告",
+        "fetched_at": "2026-10-28 14:40"
+      },
+      {
+        "platform": "法務部行政執行署",
+        "url": "https://www.tpkonsale.moj.gov.tw/",
+        "tier": "Tier-1 官方權威",
+        "fetched_at": "2026-10-28 14:40"
+      }
+    ],
+    "user_note": "真實稅務拍賣案件！完美命中您設定的『桃園市桃園區、850萬以內、30坪以上（33.06坪）』訂閱條件！",
+    "due_diligence": {
+      "confirmed_facts": [
+        "【真實稅拍案號】法務部行政執行署桃園分署 113年度房地稅執專字第81806號，建坪 33.06 坪，保證金 170 萬。"
+      ],
+      "pending_leads": [
+        "【屋齡與點交核實】請點擊優室法拍連結或桃園分署公告核對完整筆錄。"
+      ],
+      "manual_verification_required": [
+        "【調閱桃園區建物謄本】確認建築完成年月與有無租約。"
+      ]
+    }
+  },
+  {
+    "dedup_key": "REAL_TYD_114_100027_甲",
+    "is_demo": false,
+    "case_id": "114年度司執字第100027號",
+    "court": "臺灣桃園地方法院",
+    "division": "執股",
+    "section": "甲標",
+    "auction_type": "法院法拍",
+    "status": "公告中",
+    "city": "桃園市",
+    "district": "桃園區",
+    "address": "桃園市桃園區大廟商圈透天店住（主建27.34坪＋增建31.8坪，共64.92坪）",
+    "property_type": "透天厝",
+    "auction_round": "2拍",
+    "auction_date_roc": "115/10/01",
+    "auction_date_ad": "2026-10-01",
+    "reserve_price_wan": 1255.8,
+    "deposit_wan": 251.2,
+    "unit_price_wan": 19.34,
+    "area_total_ping": 64.92,
+    "area_main_ping": 27.34,
+    "area_land_ping": 13.91,
+    "handover_status": "點交條件不明(待查)",
+    "handover_raw_note": "臺灣桃園地方法院 114年度司執字第100027號甲標，拍賣原因：分割共有物。前次因投標人保證金不合法廢標，將續行公告拍賣！",
+    "age_years": 35,
+    "completion_date_source": "優室法拍案件明細 #13715",
+    "conflict_notes": [],
+    "price_history": [
+      {
+        "round": "前次開標",
+        "date": "115/10/01",
+        "price_wan": 1255.8,
+        "result": "廢標(保證金不合法)，待法院擇期續拍"
+      }
+    ],
+    "sources": [
+      {
+        "platform": "優室法拍真實案件頁",
+        "url": "https://uhomes.com.tw/foreclosure/detail/13715",
+        "tier": "Tier-2 實況公告",
+        "fetched_at": "2026-10-28 14:40"
+      }
+    ],
+    "user_note": "真實特殊機會案件：前次有人得標但『保證金本票不合法』被判廢標！代表該價格有市場熱度且即將原價或降價重拍。",
+    "due_diligence": {
+      "confirmed_facts": [
+        "【廢標重拍機會】桃園地院 114年度司執字第100027號甲標，總坪數 64.92 坪（含騎樓 5.78 坪、增建 31.80 坪），土地 13.91 坪。"
+      ],
+      "pending_leads": [
+        "【分割共有物優先承買權】拍賣原因為『分割共有物』，縱拍賣全部，原共有人依法仍有依相同條件優先承買之權利。"
+      ],
+      "manual_verification_required": [
+        "【追蹤下次公告期日】密切留意桃園地院重新定期拍賣之公告。"
+      ]
+    }
+  },
+  {
+    "dedup_key": "REAL_PCD_114_156453_宿",
+    "is_demo": false,
+    "case_id": "114年度司執字第156453號",
+    "court": "臺灣新北地方法院",
+    "division": "宿股",
+    "section": "第1標",
+    "auction_type": "法院法拍",
+    "status": "公告中",
+    "city": "新北市",
+    "district": "板橋區",
+    "address": "新北市板橋區（新北院胤114司執宿字第156453號拍賣通知不動產）",
+    "property_type": "電梯大樓/華廈",
+    "auction_round": "2拍",
+    "auction_date_roc": "115/11/12",
+    "auction_date_ad": "2026-11-12",
+    "reserve_price_wan": 1380,
+    "deposit_wan": 276,
+    "unit_price_wan": 43.1,
+    "area_total_ping": 32.0,
+    "area_main_ping": 22.5,
+    "area_land_ping": 4.2,
+    "handover_status": "點交條件不明(待查)",
+    "handover_raw_note": "司法院全球資訊網 115-10-19 最新發布（新北院胤114司執宿字第156453號）：本院定於 115年11月12日下午3時整在民事執行處投標室實施第2次公開拍賣。",
+    "age_years": null,
+    "completion_date_source": "司法院司法公告查詢 (115-10-19 官方公告)",
+    "conflict_notes": [],
+    "price_history": [
+      {
+        "round": "2拍",
+        "date": "115/11/12",
+        "price_wan": 1380,
+        "result": "定於 115/11/12 下午 3:00 第2次公開拍賣"
+      }
+    ],
+    "sources": [
+      {
+        "platform": "司法院最新拍賣通知正本",
+        "url": "https://www.judicial.gov.tw/tw/cp-139-1634956-43943-1.html",
+        "tier": "Tier-1 官方權威",
+        "fetched_at": "2026-10-28 14:40"
+      }
+    ],
+    "user_note": "司法院 115-10-19 官方最新發布之拍賣通知（定於 115/11/12 下午3時第2次拍賣），點擊連結可直接開啟司法院公文正本！",
+    "due_diligence": {
+      "confirmed_facts": [
+        "【司法院官方公文正本】發文字號：新北院胤114司執宿字第156453號，定於 115年11月12日下午3時整實施第2次公開拍賣。"
+      ],
+      "pending_leads": [
+        "【附表不動產明細】可於司法院法拍屋查詢系統輸入 114年度司執字第156453號 調閱完整附表門牌與點交筆錄。"
+      ],
+      "manual_verification_required": [
+        "【確認投標室時間】本件為下午 3 時開標（注意新北地院部分股別為上午投標、部分為下午投標）。"
+      ]
+    }
+  },
+  {
     "dedup_key": "PCD_114_42910_甲",
     "case_id": "114年度司執字第42910號",
     "court": "臺灣新北地方法院",
