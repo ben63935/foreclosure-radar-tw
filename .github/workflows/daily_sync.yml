@@ -4,6 +4,15 @@ on:
   schedule:
     - cron: '30 23 * * *'
   workflow_dispatch:
+    inputs:
+      target_districts:
+        description: '動態指定搜尋行政區 (選填，空白則自動讀取 subscriptions.json)'
+        required: false
+        default: ''
+      max_price_wan:
+        description: '動態指定預算上限萬元 (選填，空白則自動讀取 subscriptions.json)'
+        required: false
+        default: '0'
 
 permissions:
   contents: write
@@ -27,10 +36,16 @@ jobs:
       - name: Install Dependencies
         run: pip install -r requirements.txt
 
-      - name: Run Multi-Platform Foreclosure Scraper & Free GitHub AI Pre-Audit
+      - name: Run Dynamic Search Foreclosure Scraper & Free GitHub AI Pre-Audit
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: python scraper_pipeline.py --output cases.json --health source_health.json
+        run: |
+          python scraper_pipeline.py \
+            --output cases.json \
+            --health source_health.json \
+            --subscriptions subscriptions.json \
+            --districts "${{ github.event.inputs.target_districts }}" \
+            --max-price "${{ github.event.inputs.max_price_wan || '0' }}"
 
       - name: Run Subscription Filter & Send Daily Email
         env:
@@ -44,4 +59,4 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "ForeclosureRadar-Bot"
           git add cases.json source_health.json latest_digest_preview.html || true
-          git diff --staged --quiet || (git commit -m "chore(data): daily foreclosure sync $(date +'%Y-%m-%d %H:%M')" && git push)
+          git diff --staged --quiet || (git commit -m "chore(data): dynamic foreclosure search sync $(date +'%Y-%m-%d %H:%M')" && git push)
