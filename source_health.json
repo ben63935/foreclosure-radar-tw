@@ -1,4 +1,14 @@
 {
+  "tfasc_gold": {
+    "source_id": "tfasc_gold",
+    "name": "台灣金融資產服務公司 (TFASC 金拍屋)",
+    "mode": "自動同步",
+    "status": "正常同步 (抓取 4 筆)",
+    "records_fetched": 4,
+    "note": "公開列表擷取完成",
+    "url": "https://www.tfasc.com.tw/",
+    "checked_at": "2026-10-28 15:33"
+  },
   "judicial_aomp": {
     "source_id": "judicial_aomp",
     "name": "司法院法拍屋查詢系統",
@@ -7,76 +17,66 @@
     "records_fetched": 0,
     "note": "低頻合規巡檢完成",
     "url": "https://aomp109.judicial.gov.tw/judbp/wkw/WHD1A02.htm",
-    "checked_at": "2026-10-28 11:52:33"
-  },
-  "tfasc_gold": {
-    "source_id": "tfasc_gold",
-    "name": "台灣金融資產服務公司 (TFASC 金拍屋)",
-    "mode": "自動同步 (公開列表擷取)",
-    "status": "已設防護或需驗證 (URLError)",
-    "records_fetched": 0,
-    "note": "低頻合規巡檢完成",
-    "url": "https://www.tfasc.com.tw/",
-    "checked_at": "2026-10-28 11:52:34"
+    "checked_at": "2026-10-28 15:34"
   },
   "tcb_silver": {
     "source_id": "tcb_silver",
     "name": "合作金庫銀行—銀拍屋及法拍屋專區",
     "mode": "自動同步 (HTML 解析)",
-    "status": "已設防護或需驗證 (URLError)",
+    "status": "正常同步 (HTTP 200)",
     "records_fetched": 0,
     "note": "低頻合規巡檢完成",
     "url": "https://www.tcb-bank.com.tw/about-tcb/announcement/items/foreclosure",
-    "checked_at": "2026-10-28 11:52:34"
+    "checked_at": "2026-10-28 15:34"
   },
   "bot_foreclosure": {
     "source_id": "bot_foreclosure",
     "name": "臺灣銀行—法拍屋資訊查詢",
     "mode": "自動同步 (表單查詢)",
-    "status": "已設防護或需驗證 (URLError)",
+    "status": "正常同步 (HTTP 200)",
     "records_fetched": 0,
     "note": "低頻合規巡檢完成",
     "url": "https://wwwap.bot.com.tw/house/",
-    "checked_at": "2026-10-28 11:52:35"
+    "checked_at": "2026-10-28 15:34"
   },
   "woo104": {
     "source_id": "woo104",
     "name": "透明房訊 / 104法拍網",
     "mode": "輔助交叉比對 (補齊屋齡與拍次歷程)",
-    "status": "已設防護或需驗證 (URLError)",
+    "status": "正常同步 (HTTP 200)",
     "records_fetched": 0,
     "note": "低頻合規巡檢完成",
     "url": "https://www.104woo.com.tw/",
-    "checked_at": "2026-10-28 11:52:35"
+    "checked_at": "2026-10-28 15:34"
   },
   "uhomes": {
     "source_id": "uhomes",
     "name": "優室法拍屋案件查詢系統",
     "mode": "輔助交叉比對 (補齊建築完成日與實價)",
-    "status": "已設防護或需驗證 (URLError)",
+    "status": "正常同步 (HTTP 200)",
     "records_fetched": 0,
     "note": "低頻合規巡檢完成",
     "url": "https://uhomes.com.tw/",
-    "checked_at": "2026-10-28 11:52:36"
+    "checked_at": "2026-10-28 15:34"
   },
   "moj_tpkonsale": {
     "source_id": "moj_tpkonsale",
     "name": "法務部行政執行署拍賣公告系統 (稅拍)",
     "mode": "官方同步 + 驗證碼橋接",
-    "status": "已設防護或需驗證 (URLError)",
+    "status": "正常同步 (HTTP 200)",
     "records_fetched": 0,
     "note": "低頻合規巡檢完成",
     "url": "https://www.tpkonsale.moj.gov.tw/",
-    "checked_at": "2026-10-28 11:52:36"
+    "checked_at": "2026-10-28 15:34"
   },
   "moi_pip": {
     "source_id": "moi_pip",
     "name": "內政部不動產資訊平台 (拍賣整合頁)",
     "mode": "官方目錄基準",
-    "status": "已設防護或需驗證 (URLError)",
+    "status": "正常同步 (HTTP 200)",
     "records_fetched": 0,
     "note": "低頻合規巡檢完成",
     "url": "https://pip.moi.gov.tw/Publicize/Info/D1010",
-    "checked_at": "2026-10-28 11:52:37"
+    "checked_at": "2026-10-28 15:34"
   }
 }
