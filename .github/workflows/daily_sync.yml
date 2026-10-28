@@ -7,6 +7,7 @@ on:
 
 permissions:
   contents: write
+  models: read
 
 jobs:
   sync-and-notify:
@@ -26,7 +27,9 @@ jobs:
       - name: Install Dependencies
         run: pip install -r requirements.txt
 
-      - name: Run Multi-Platform Foreclosure Scraper
+      - name: Run Multi-Platform Foreclosure Scraper & Free GitHub AI Pre-Audit
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: python scraper_pipeline.py --output cases.json --health source_health.json
 
       - name: Run Subscription Filter & Send Daily Email
@@ -34,11 +37,11 @@ jobs:
           SMTP_USER: ${{ secrets.SMTP_USER }}
           SMTP_PASS: ${{ secrets.SMTP_PASS }}
           NOTIFY_EMAIL: ${{ secrets.NOTIFY_EMAIL }}
-        run: python email_notifier.py --cases cases.json
+        run: python email_notifier.py --cases cases.json --subscriptions subscriptions.json
 
       - name: Commit & Push Updated Data
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "ForeclosureRadar-Bot"
-          git add cases.json source_health.json || true
+          git add cases.json source_health.json latest_digest_preview.html || true
           git diff --staged --quiet || (git commit -m "chore(data): daily foreclosure sync $(date +'%Y-%m-%d %H:%M')" && git push)
