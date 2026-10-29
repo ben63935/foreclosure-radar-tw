@@ -87,6 +87,26 @@ def infer_court_from_city(city: str, raw_text: str = "") -> str:
     }
     return mapping.get(city.replace("台", "臺"), "臺灣地方法院民事執行處")
 
+def is_historical_or_invalid_case(c: dict) -> bool:
+    if not isinstance(c, dict) or not c.get("dedup_key"):
+        return True
+    cid = str(c.get("case_id", ""))
+    m_yr = re.match(r"^(\d{2,3})\s*年", cid)
+    if m_yr and int(m_yr.group(1)) < 111:
+        return True
+    roc_d = str(c.get("auction_date_roc", ""))
+    if "近期開標" in roc_d:
+        return True
+    m_dy = re.match(r"^(\d{2,3})/", roc_d)
+    if m_dy and int(m_dy.group(1)) < 114:
+        return True
+    for s in c.get("sources", []):
+        u = str(s.get("url", ""))
+        m_uh = re.search(r"uhomes\.com\.tw/foreclosure/detail/(\d+)", u)
+        if m_uh and int(m_uh.group(1)) < 5500:
+            return True
+    return False
+
 def roc_to_ad_date(roc_str: str) -> str:
     if not roc_str:
         return (datetime.now(TW_TZ) + timedelta(days=14)).strftime("%Y-%m-%d")
@@ -250,13 +270,25 @@ def parse_foreclosure_detail_html(html: str, url: str, platform_name: str = "外
     if district == "待查行政區":
         return None
 
-    # 2. Extract Case ID (案號)
+    # 0. Strict URL ID check: Reject old archived Uhomes pages (IDs < 11500 are from 2018-2023)
+    m_uh_id = re.search(r"uhomes\.com\.tw/foreclosure/detail/(\d+)", str(url))
+    if m_uh_id and int(m_uh_id.group(1)) < 11500:
+        return None
+
+    # 2. Extract Case ID (案號) & Enforce ROC Year >= 112 (Reject old historical cases like 107年度!)
     m_case = re.search(r"(\d{2,3}\s*年度?\s*[\u4e00-\u9fa5]{1,4}字\s*第?\s*\d+\s*號)", clean_text)
     if not m_case:
         m_case2 = re.search(r"案號[：:\s]*(\d{2,3}[\u4e00-\u9fa5]{1,5}第?\d+號?)", clean_text)
-        case_id = m_case2.group(1).strip() if m_case2 else f"拍賣公告-{abs(hash(address)) % 100000}"
+        if not m_case2:
+            return None
+        case_id = m_case2.group(1).strip()
     else:
         case_id = re.sub(r"\s+", "", m_case.group(1))
+
+    m_case_year = re.match(r"^(\d{2,3})", case_id)
+    if m_case_year and int(m_case_year.group(1)) < 112:
+        # Strictly reject historical cases prior to ROC 112 (e.g. 107年度司執字第87896號)
+        return None
 
     # 3. Extract Court (執行法院)
     court = infer_court_from_city(city, clean_text)
@@ -358,8 +390,15 @@ def parse_foreclosure_detail_html(html: str, url: str, platform_name: str = "外
 
     m_date = re.search(r"(?:拍賣日期|開標日期|投標日期|開標時間)[：:\s]*(?:民國)?\s*(\d{2,3}\s*[年/.-]\s*\d{1,2}\s*[月/.-]\s*\d{1,2})", clean_text)
     if not m_date:
-        m_date = re.search(r"(11[3456]\s*[/.-]\s*\d{1,2}\s*[/.-]\s*\d{1,2})", clean_text)
-    auction_date_roc = re.sub(r"\s+", "", m_date.group(1)).replace("年", "/").replace("月", "/").replace("-", "/") if m_date else "近期開標(詳見公告)"
+        m_date = re.search(r"(11[456]\s*[/.-]\s*\d{1,2}\s*[/.-]\s*\d{1,2})", clean_text)
+    if not m_date:
+        # Do NOT fabricate "近期開標(詳見公告)" if no valid auction date is found!
+        return None
+    auction_date_roc = re.sub(r"\s+", "", m_date.group(1)).replace("年", "/").replace("月", "/").replace("-", "/")
+    m_roc_y = re.match(r"^(\d{2,3})/", auction_date_roc)
+    if not m_roc_y or int(m_roc_y.group(1)) < 114:
+        # Reject historical auctions from ROC 107~113
+        return None
     auction_date_ad = roc_to_ad_date(auction_date_roc)
 
     # 10. Property Type & Status
@@ -481,8 +520,8 @@ class DynamicForeclosureSearchEngine:
             for i in range(0, len(dists), 4):
                 chunk = dists[i:i+4]
                 dist_expr = " ".join(chunk)
-                search_queries.append(f"site:uhomes.com.tw/foreclosure/detail {city} {dist_expr}")
-                search_queries.append(f"site:toro591.com/house_info {city} {dist_expr}")
+                search_queries.append(f'site:uhomes.com.tw/foreclosure/detail {city} {dist_expr} ("114年度" OR "115年度")')
+                search_queries.append(f'site:toro591.com/house_info {city} {dist_expr} ("114" OR "115")')
 
         # Limit per run to respect rate limits while rotating through user's districts
         day_offset = datetime.now(TW_TZ).timetuple().tm_yday
@@ -592,7 +631,7 @@ class DynamicForeclosureSearchEngine:
                     continue
                 city, dist = normalize_city_district(addr)
                 ping_m = re.search(r"(\d+(?:\.\d+)?)\s*坪", addr)
-                ping_val = float(ping_m.group(1)) if ping_m else 32.5
+                ping_val = float(ping_m.group(1)) if ping_m else None
                 dkey = f"LIVE_TFASC_{abs(hash(addr[:14])) % 1000000}"
                 self.discovered_cases.append({
                     "dedup_key": dkey,
@@ -612,13 +651,13 @@ class DynamicForeclosureSearchEngine:
                     "auction_date_ad": datetime.now(TW_TZ).strftime("%Y-%m-%d"),
                     "reserve_price_wan": price_wan,
                     "deposit_wan": round(price_wan * 0.2, 1),
-                    "unit_price_wan": round(price_wan / ping_val, 1),
+                    "unit_price_wan": round(price_wan / ping_val, 1) if ping_val else None,
                     "area_total_ping": ping_val,
-                    "area_main_ping": round(ping_val * 0.72, 1),
-                    "area_land_ping": 5.2,
-                    "handover_status": "部分點交",
-                    "handover_raw_note": f"由系統自動自台灣金服 (TFASC) 官網即時抓取之拍賣中物件：{addr}，總底價 {price_wan} 萬。",
-                    "age_years": 18,
+                    "area_main_ping": round(ping_val * 0.72, 1) if ping_val else None,
+                    "area_land_ping": None,
+                    "handover_status": "點交條件不明(待查)",
+                    "handover_raw_note": f"由系統自動自台灣金服 (TFASC) 官網即時抓取之拍賣中物件：{addr}，總底價 {price_wan} 萬（詳見金服完整公告 PDF）。",
+                    "age_years": None,
                     "completion_date_source": "台灣金服官網即時抓取",
                     "conflict_notes": [],
                     "price_history": [{"round": "金拍公告", "date": now_str[:10], "price_wan": price_wan, "result": "官網拍賣中"}],
@@ -707,7 +746,12 @@ if __name__ == "__main__":
     if os.path.exists(args.output):
         try:
             with open(args.output, "r", encoding="utf-8") as f:
-                existing_cases = json.load(f)
+                raw_existing = json.load(f)
+            if isinstance(raw_existing, list):
+                purged_cnt = sum(1 for x in raw_existing if is_historical_or_invalid_case(x))
+                existing_cases = [x for x in raw_existing if not is_historical_or_invalid_case(x)]
+                if purged_cnt > 0:
+                    print(f"[Sanitizer] 已自動從資料庫清除 {purged_cnt} 筆過期歷史舊案（如 107~110 年度結案物件）！")
         except Exception:
             existing_cases = []
 

@@ -4129,8 +4129,36 @@
         return maskedName + "@" + parts[1];
       }
 
-      // Unified LocalStorage state with seamless migration to v10 (preserving ALL dynamically scraped/imported cases, custom notes & clean real favorites)
+      // Strict validator to purge historical archived cases (e.g. 107年度司執字第87896號 from 2019) & faked dates
+      function isHistoricalOrInvalidCase(c) {
+        if (!c || !c.dedup_key) return true;
+        var cid = String(c.case_id || "");
+        var mYear = cid.match(/^(\d{2,3})\s*年/);
+        if (mYear) {
+          var rocY = parseInt(mYear[1], 10);
+          if (rocY < 111) return true; // Strictly purge 100~110年度 historical closed cases (like 107年度司執字第87896號)
+        }
+        var rocDate = String(c.auction_date_roc || "");
+        if (rocDate.indexOf("近期開標") !== -1) return true; // Purge any dynamically scraped case that lacked a real auction date
+        var mDateY = rocDate.match(/^(\d{2,3})\//);
+        if (mDateY && parseInt(mDateY[1], 10) < 114) return true; // Purge auctions prior to ROC 114
+        // Also check if Uhomes URL ID is an old 2018-2022 archive (< 5000, like #1563)
+        var srcs = c.sources || [];
+        for (var i = 0; i < srcs.length; i++) {
+          var u = String(srcs[i].url || "");
+          var mUh = u.match(/uhomes\.com\.tw\/foreclosure\/detail\/(\d+)/);
+          if (mUh && parseInt(mUh[1], 10) < 5500) return true;
+        }
+        return false;
+      }
+
+      // Unified LocalStorage state with seamless migration to v11 (purging historical ghost cases & preserving clean real favorites)
       var LEGACY_FAKE_FAV_KEYS = { "PCD_114_42910_甲": true, "PCD_114_51033_1": true, "MLD_114_11208_1": true };
+      var deletedKeysArr = loadLocal("fr_tw_deleted_keys_v11", []);
+      var deletedKeysMap = {};
+      if (Array.isArray(deletedKeysArr)) {
+        deletedKeysArr.forEach(function(k) { deletedKeysMap[k] = true; });
+      }
       var prevCases = loadLocal("fr_tw_cases_v10", null) || loadLocal("fr_tw_cases_v8", null) || loadLocal("fr_tw_cases_v7", []);
       var savedCases = INITIAL_CASES.slice();
       if (Array.isArray(prevCases) && prevCases.length > 0) {
@@ -4138,17 +4166,20 @@
         savedCases.forEach(function(ic) { initMap[ic.dedup_key] = ic; });
         prevCases.forEach(function(pc) {
           if (!pc || !pc.dedup_key) return;
+          if (deletedKeysMap[pc.dedup_key]) return;
+          if (isHistoricalOrInvalidCase(pc)) return; // Auto-purge 107年度司執字第87896號 and any old archived cases!
           if (initMap[pc.dedup_key]) {
             if (pc.user_note) initMap[pc.dedup_key].user_note = pc.user_note;
             if (pc.gh_ai_analysis) initMap[pc.dedup_key].gh_ai_analysis = pc.gh_ai_analysis;
             if (pc.ai_is_real_llm) initMap[pc.dedup_key].ai_is_real_llm = pc.ai_is_real_llm;
             if (pc.ai_meta_badge) initMap[pc.dedup_key].ai_meta_badge = pc.ai_meta_badge;
           } else {
-            // Preserve ALL dynamically searched, pasted, or manually imported cases so favorited new cases NEVER disappear!
+            // Preserve valid dynamically searched, pasted, or manually imported cases
             savedCases.unshift(pc);
             initMap[pc.dedup_key] = pc;
           }
         });
+      savedCases = savedCases.filter(function(c) { return !deletedKeysMap[c.dedup_key] && !isHistoricalOrInvalidCase(c); });
       }
 
       // Migrate favorites cleanly: purge the 3 old hardcoded fake demo favorites unless user explicitly re-favorites them in v10
@@ -4335,6 +4366,12 @@
 
         if (c.status === "停拍/撤回") {
           pendingReasons.push("最新公告為「停拍/撤回」請勿貿然開票");
+        }
+
+        // Check if the auction date has already passed (Judicial Yuan removes announcements once the auction date passes!)
+        var todayAd = new Date(Date.now() + 8 * 3600 * 1000).toISOString().slice(0, 10);
+        if (c.auction_date_ad && c.auction_date_ad < todayAd) {
+          pendingReasons.push("前次開標日 (" + c.auction_date_roc + ") 已過，司法院官網已下架，待查最新續拍公告或點下方實況存檔連結");
         }
 
         if (pendingReasons.length > 0) {
@@ -4714,10 +4751,13 @@
                   getHandoverBadgeHtml(c.handover_status) +
                   '<span class="text-xs text-slate-500 font-mono bg-slate-100 px-2 py-0.5 rounded">' + c.property_type + '</span>' +
                 '</div>' +
-                '<button type="button" data-favkey="' + c.dedup_key + '" class="btn-toggle-fav px-2.5 py-1 rounded-lg text-xs font-semibold border transition shrink-0 ' +
-                  (isFav ? 'bg-amber-100 text-amber-900 border-amber-300' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50') + '">' +
-                  (isFav ? '★ 已收藏' : '☆ 收藏') +
-                '</button>' +
+                '<div class="flex items-center gap-1 shrink-0">' +
+                  '<button type="button" data-favkey="' + c.dedup_key + '" class="btn-toggle-fav px-2.5 py-1 rounded-lg text-xs font-semibold border transition ' +
+                    (isFav ? 'bg-amber-100 text-amber-900 border-amber-300' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50') + '">' +
+                    (isFav ? '★ 已收藏' : '☆ 收藏') +
+                  '</button>' +
+                  '<button type="button" data-delkey="' + c.dedup_key + '" title="從我的案件庫永久隱藏/刪除此案" class="btn-delete-case px-2 py-1 rounded-lg text-xs text-slate-400 hover:text-rose-600 hover:bg-rose-50 border border-transparent hover:border-rose-200 transition">🗑️</button>' +
+                '</div>' +
               '</div>' +
 
               '<div>' +
@@ -4809,6 +4849,22 @@
             scheduleBackgroundCloudSync();
             renderSearchResults();
             renderSubscriptionsAndDigest();
+          });
+        });
+
+        container.querySelectorAll(".btn-delete-case").forEach(function(btn) {
+          btn.addEventListener("click", function() {
+            var dkey = btn.getAttribute("data-delkey");
+            if (!dkey) return;
+            deletedKeysMap[dkey] = true;
+            saveLocal("fr_tw_deleted_keys_v11", Object.keys(deletedKeysMap));
+            state.cases = state.cases.filter(function(c) { return c.dedup_key !== dkey; });
+            state.favorites = state.favorites.filter(function(k) { return k !== dkey; });
+            persistAllLocal(true);
+            scheduleBackgroundCloudSync();
+            renderSearchResults();
+            renderSubscriptionsAndDigest();
+            showToast("🗑️ 已從案件庫永久移除該筆案件！");
           });
         });
 
@@ -5139,31 +5195,37 @@
           '</div>' +
 
           '<div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm space-y-3">' +
-            '<h3 class="text-sm font-bold text-slate-900">🔗 6 大公開權威資料庫深度挖掘一鍵跳轉 (自動預帶本案關鍵字)</h3>' +
+            '<div class="space-y-1">' +
+              '<h3 class="text-sm font-bold text-slate-900">🔗 6 大權威資料庫與原始筆錄一鍵查核 (已修正法拍案號檢索邏輯)</h3>' +
+              '<div class="p-2.5 rounded-lg bg-amber-50 border border-amber-200 text-[11px] text-amber-950 leading-relaxed">' +
+                '💡 <strong>為什麼在「司法院裁判書系統」查不到 <code>司執字</code> 案號？</strong><br/>' +
+                '因為 <code>' + c.case_id + '</code> 是民事執行處的<strong>「拍賣執行案號」</strong>，不是法官審判的「訴訟判決案號（如訴字、重訴字）」！一般法拍只會發拍賣公告、<strong>不會有裁判書</strong>。要看本案完整查封筆錄，請直接點下方<strong>「第 1 項：本案原始拍賣筆錄明細頁」</strong>或<strong>「第 2 項：跨網檢索本案公文與筆錄」</strong>！' +
+              '</div>' +
+            '</div>' +
             '<div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">' +
-              '<a href="https://judgment.judicial.gov.tw/FJUD/default.aspx" target="_blank" rel="noopener noreferrer" class="p-3 rounded-lg border border-slate-200 hover:border-indigo-400 hover:bg-indigo-50/40 transition flex flex-col justify-between">' +
-                '<strong class="text-slate-900">1. 司法院裁判書查詢系統 ↗</strong>' +
-                '<span class="text-slate-500 mt-1">檢索關鍵字：<code class="bg-slate-100 px-1 rounded text-indigo-700">' + c.case_id + '</code>（查塗銷抵押、除租抗告、共有物分割訴訟）</span>' +
+              '<a href="' + ((c.sources && c.sources[0] && c.sources[0].url) ? c.sources[0].url : 'https://aomp109.judicial.gov.tw/judbp/wkw/WHD1A02.htm') + '" target="_blank" rel="noopener noreferrer" class="p-3 rounded-lg border-2 border-indigo-500 bg-indigo-50/40 hover:bg-indigo-100/60 transition flex flex-col justify-between">' +
+                '<strong class="text-indigo-950">1. 📄 開啟本案原始拍賣筆錄明細頁 (' + ((c.sources && c.sources[0]) ? c.sources[0].platform : '官方來源') + ') ↗</strong>' +
+                '<span class="text-indigo-800 mt-1">直接查看本案查封筆錄原文、地號建號、保證金與歷次拍賣紀錄</span>' +
               '</a>' +
-              '<a href="https://lvr.land.moi.gov.tw/" target="_blank" rel="noopener noreferrer" class="p-3 rounded-lg border border-slate-200 hover:border-indigo-400 hover:bg-indigo-50/40 transition flex flex-col justify-between">' +
-                '<strong class="text-slate-900">2. 內政部不動產交易實價查詢 ↗</strong>' +
-                '<span class="text-slate-500 mt-1">檢索：<code class="bg-slate-100 px-1 rounded text-indigo-700">' + c.city + c.district + '</code> 查同社區歷年成交單價與建築完成年月</span>' +
-              '</a>' +
-              '<a href="https://findbiz.nat.gov.tw/fts/query/QueryBar/queryInit.do" target="_blank" rel="noopener noreferrer" class="p-3 rounded-lg border border-slate-200 hover:border-indigo-400 hover:bg-indigo-50/40 transition flex flex-col justify-between">' +
-                '<strong class="text-slate-900">3. 經濟部商工登記公示資料 ↗</strong>' +
-                '<span class="text-slate-500 mt-1">查該門牌是否設籍公司行號、債務人是否涉及公司破產清算</span>' +
-              '</a>' +
-              '<a href="https://luz.tcd.gov.tw/" target="_blank" rel="noopener noreferrer" class="p-3 rounded-lg border border-slate-200 hover:border-indigo-400 hover:bg-indigo-50/40 transition flex flex-col justify-between">' +
-                '<strong class="text-slate-900">4. 全國土地使用分區查詢 ↗</strong>' +
-                '<span class="text-slate-500 mt-1">核驗基地是否屬住宅區、工業住宅、農業區或法定空地</span>' +
-              '</a>' +
-              '<a href="https://www.google.com/search?q=' + encodeURIComponent(c.city + c.district + ' ' + c.address.split('（')[0] + ' 命案 OR 墜樓 OR 火警 OR 海砂 OR 凶宅') + '" target="_blank" rel="noopener noreferrer" class="p-3 rounded-lg border border-slate-200 hover:border-indigo-400 hover:bg-indigo-50/40 transition flex flex-col justify-between">' +
-                '<strong class="text-slate-900">5. 社區事故 / 凶宅 / 社會新聞檢索 ↗</strong>' +
-                '<span class="text-slate-500 mt-1">自動組合門牌與社區名稱搜尋歷年社會新聞</span>' +
+              '<a href="https://www.google.com/search?q=' + encodeURIComponent('"' + c.case_id.split(' ')[0] + '" OR "' + c.address.split('（')[0] + '" 法拍') + '" target="_blank" rel="noopener noreferrer" class="p-3 rounded-lg border border-slate-200 hover:border-indigo-400 hover:bg-indigo-50/40 transition flex flex-col justify-between">' +
+                '<strong class="text-slate-900">2. 🔍 跨網精準檢索本案案號與門牌筆錄 ↗</strong>' +
+                '<span class="text-slate-500 mt-1">自動以 <code class="bg-slate-100 px-1 rounded text-indigo-700">' + c.case_id.split(' ')[0] + '</code> ＋ 門牌搜尋司法院公示送達與各法拍庫存檔</span>' +
               '</a>' +
               '<a href="https://aomp109.judicial.gov.tw/judbp/wkw/WHD1A02.htm" target="_blank" rel="noopener noreferrer" class="p-3 rounded-lg border border-slate-200 hover:border-indigo-400 hover:bg-indigo-50/40 transition flex flex-col justify-between">' +
-                '<strong class="text-slate-900">6. 司法院拍賣公告正本與停拍核對 ↗</strong>' +
-                '<span class="text-slate-500 mt-1">開標前一日必查是否有最新變更公告或延緩執行停拍</span>' +
+                '<strong class="text-slate-900">3. 🏛️ 司法院法拍屋查詢系統 (查目前待標中公告) ↗</strong>' +
+                '<span class="text-slate-500 mt-1">注意：司法院官網僅列出「尚未開標」之案件，開標日一過即自動下架</span>' +
+              '</a>' +
+              '<a href="https://lvr.land.moi.gov.tw/" target="_blank" rel="noopener noreferrer" class="p-3 rounded-lg border border-slate-200 hover:border-indigo-400 hover:bg-indigo-50/40 transition flex flex-col justify-between">' +
+                '<strong class="text-slate-900">4. 📊 內政部不動產交易實價登錄查詢 ↗</strong>' +
+                '<span class="text-slate-500 mt-1">檢索：<code class="bg-slate-100 px-1 rounded text-indigo-700">' + c.city + c.district + '</code> 查同社區歷年成交單價與建築完成年月</span>' +
+              '</a>' +
+              '<a href="https://www.google.com/search?q=' + encodeURIComponent(c.city + c.district + ' ' + c.address.split('（')[0] + ' 命案 OR 墜樓 OR 火警 OR 海砂 OR 凶宅') + '" target="_blank" rel="noopener noreferrer" class="p-3 rounded-lg border border-slate-200 hover:border-indigo-400 hover:bg-indigo-50/40 transition flex flex-col justify-between">' +
+                '<strong class="text-slate-900">5. 🚨 社區事故 / 凶宅 / 社會新聞檢索 ↗</strong>' +
+                '<span class="text-slate-500 mt-1">自動組合門牌與社區名稱搜尋歷年社會新聞</span>' +
+              '</a>' +
+              '<a href="https://www.google.com/search?q=' + encodeURIComponent('site:judgment.judicial.gov.tw "' + c.address.split('（')[0].replace(c.city, '').replace(c.district, '') + '" OR "' + c.case_id.split(' ')[0] + '"') + '" target="_blank" rel="noopener noreferrer" class="p-3 rounded-lg border border-slate-200 hover:border-indigo-400 hover:bg-indigo-50/40 transition flex flex-col justify-between">' +
+                '<strong class="text-slate-900">6. ⚖️ 司法院裁判書關聯檢索 (以門牌反查訴訟) ↗</strong>' +
+                '<span class="text-slate-500 mt-1">以門牌地址與案號反查該屋是否曾發生租賃糾紛、袋地通行或分割共有物判決</span>' +
               '</a>' +
             '</div>' +
           '</div>';
@@ -6425,11 +6487,16 @@
         });
 
         document.getElementById("btnImportManualCase").addEventListener("click", function() {
-          var cid = document.getElementById("impCaseId").value.trim() || ("115年度執字第" + Math.floor(1000 + Math.random() * 9000) + "號");
+          var cid = document.getElementById("impCaseId").value.trim();
           var city = document.getElementById("impCity").value;
-          var dist = document.getElementById("impDistrict").value.trim() || "新莊區";
-          var addr = document.getElementById("impAddress").value.trim() || (city + dist + "示範路88號5樓");
-          var price = parseFloat(document.getElementById("impPrice").value) || 650;
+          var dist = document.getElementById("impDistrict").value.trim();
+          var addr = document.getElementById("impAddress").value.trim();
+          var price = parseFloat(document.getElementById("impPrice").value);
+          if (!addr || !dist || isNaN(price) || price <= 0) {
+            showToast("⚠️ 請填寫真實「行政區」、「門牌地址」與「總底價(萬元)」後再匯入！");
+            return;
+          }
+          if (!cid) cid = "手動建檔-" + city + dist;
           var pingVal = document.getElementById("impPing").value.trim();
           var ping = pingVal ? parseFloat(pingVal) : null;
           var handover = document.getElementById("impHandover").value;
@@ -6545,9 +6612,9 @@
           var pingMatch = rawText.match(/(\d+(?:\.\d+)?)\s*坪/);
           var areaPing = pingMatch ? parseFloat(pingMatch[1]) : null;
 
-          // Extract Age (年)
-          var ageMatch = rawText.match(/(?:屋齡)?\s*(\d{1,2})\s*年/);
-          var ageYears = ageMatch ? parseInt(ageMatch[1], 10) : null;
+          // Extract Age (年) - Must explicitly have 屋齡 keyword so dates like 114年2月 are never mistaken for age!
+          var ageMatch = rawText.match(/屋齡[：:\s約]*(\d{1,2}(?:\.\d+)?)\s*年/);
+          var ageYears = ageMatch ? Math.round(parseFloat(ageMatch[1])) : null;
 
           // Extract Handover
           var handover = "點交條件不明(待查)";
@@ -6686,10 +6753,17 @@
           var city = cdMatch[1];
           var district = cdMatch[2];
 
-          // Extract Case ID (案號)
+          // 0. Strict URL ID check: Reject old archived Uhomes pages (IDs < 11500 are from 2018-2023, like #1563 from 2019!)
+          var uhIdMatch = String(sourceUrl || "").match(/uhomes\.com\.tw\/foreclosure\/detail\/(\d+)/);
+          if (uhIdMatch && parseInt(uhIdMatch[1], 10) < 11500) return null;
+
+          // Extract Case ID (案號) & Enforce ROC Year >= 112 (Strictly block old cases like 107年度司執字第87896號!)
           var caseM = clean.match(/(\d{2,3}\s*年度?\s*[\u4e00-\u9fa5]{1,4}字\s*第?\s*\d+\s*號)/) ||
                       clean.match(/案號[：:\s]*(\d{2,3}[\u4e00-\u9fa5]{1,5}第?\d+號?)/);
-          var caseId = caseM ? caseM[1].replace(/\s+/g, "") : ("動態檢索公告-" + Math.floor(10000 + Math.random() * 90000));
+          if (!caseM) return null;
+          var caseId = caseM[1].replace(/\s+/g, "");
+          var caseYearM = caseId.match(/^(\d{2,3})/);
+          if (caseYearM && parseInt(caseYearM[1], 10) < 112) return null;
 
           // Extract Court
           var courtMap = {
@@ -6760,8 +6834,15 @@
           var roundM = clean.slice(0, 1000).match(/(第?[一二三四1234]拍|應買|特拍)/);
           var roundStr = roundM ? roundM[1].replace("第", "").replace("一", "1").replace("二", "2").replace("三", "3").replace("四", "4") : "2拍";
 
-          var dateM = clean.match(/(11[456]\s*[年/.-]\s*\d{1,2}\s*[月/.-]\s*\d{1,2})/);
-          var dateRoc = dateM ? dateM[1].replace(/\s+/g, "").replace(/[年月-]/g, "/") : "115/06/18";
+          var dateM = clean.match(/(?:拍賣日期|開標日期|投標日期|開標時間)[：:\s]*(?:民國)?\s*(\d{2,3}\s*[年/.-]\s*\d{1,2}\s*[月/.-]\s*\d{1,2})/) ||
+                      clean.match(/(11[456]\s*[年/.-]\s*\d{1,2}\s*[月/.-]\s*\d{1,2})/);
+          if (!dateM) return null; // Never fabricate a fake date if the page has no valid 114~116 auction date!
+          var dateRoc = dateM[1].replace(/\s+/g, "").replace(/[年月-]/g, "/");
+          var rocParts = dateRoc.split("/");
+          var rocYearNum = parseInt(rocParts[0], 10);
+          if (isNaN(rocYearNum) || rocYearNum < 114) return null; // Strictly reject historical auctions from ROC 107~113!
+          var adYearNum = rocYearNum + 1911;
+          var dateAd = adYearNum + "-" + String(rocParts[1] || "01").padStart(2, "0") + "-" + String(rocParts[2] || "01").padStart(2, "0");
 
           var nowStr = new Date().toISOString().slice(0, 16).replace("T", " ");
           var newCase = {
@@ -6779,7 +6860,7 @@
             property_type: clean.slice(0, 600).indexOf("透天") !== -1 ? "透天厝" : (clean.slice(0, 600).indexOf("公寓") !== -1 ? "公寓" : "電梯大樓/華廈"),
             auction_round: roundStr,
             auction_date_roc: dateRoc,
-            auction_date_ad: "2026-06-18",
+            auction_date_ad: dateAd,
             reserve_price_wan: priceWan,
             deposit_wan: +(priceWan * 0.2).toFixed(1),
             unit_price_wan: areaTotalPing ? +(priceWan / areaTotalPing).toFixed(1) : 25.0,
@@ -6881,8 +6962,8 @@
               var searchQueries = [];
               Object.keys(groupedByCity).forEach(function(city) {
                 var distStr = groupedByCity[city].join(" ");
-                searchQueries.push("site:uhomes.com.tw/foreclosure/detail " + city + " " + distStr + (curF.keyword ? (" " + curF.keyword) : ""));
-                searchQueries.push("site:toro591.com/house_info " + city + " " + distStr + (curF.keyword ? (" " + curF.keyword) : ""));
+                searchQueries.push('site:uhomes.com.tw/foreclosure/detail ' + city + ' ' + distStr + ' ("114年度" OR "115年度")' + (curF.keyword ? (" " + curF.keyword) : ""));
+                searchQueries.push('site:toro591.com/house_info ' + city + ' ' + distStr + ' ("114" OR "115")' + (curF.keyword ? (" " + curF.keyword) : ""));
               });
 
               for (var qi = 0; qi < Math.min(2, searchQueries.length); qi++) {
@@ -6900,6 +6981,8 @@
                   var trMatches = unescaped.match(/https?:\/\/(?:www\.)?toro591\.com\/house_info\/[^\s"'<>&#]+/g) || [];
                   uhMatches.concat(trMatches).forEach(function(u) {
                     var cleanU = u.split("#")[0].split("?")[0];
+                    var mUhId = cleanU.match(/uhomes\.com\.tw\/foreclosure\/detail\/(\d+)/);
+                    if (mUhId && parseInt(mUhId[1], 10) < 11500) return; // Skip old archived 2018-2023 Uhomes IDs!
                     if (discoveredDetailUrls.indexOf(cleanU) === -1) {
                       discoveredDetailUrls.push(cleanU);
                     }
@@ -6974,13 +7057,13 @@
                     auction_date_ad: "2026-11-15",
                     reserve_price_wan: pWan,
                     deposit_wan: +(pWan * 0.2).toFixed(1),
-                    unit_price_wan: +(pWan / 32.5).toFixed(1),
-                    area_total_ping: 32.5,
-                    area_main_ping: 23.4,
-                    area_land_ping: 4.8,
-                    handover_status: "部分點交",
-                    handover_raw_note: "由瀏覽器即時連線台灣金服 (www.tfasc.com.tw) 抓取之拍賣中物件，總底價 " + pWan + " 萬元。",
-                    age_years: 18,
+                    unit_price_wan: null,
+                    area_total_ping: null,
+                    area_main_ping: null,
+                    area_land_ping: null,
+                    handover_status: "點交條件不明(待查)",
+                    handover_raw_note: "由瀏覽器即時連線台灣金服 (www.tfasc.com.tw) 抓取之拍賣中物件，總底價 " + pWan + " 萬元（建坪與屋齡請點官網核對公告PDF）。",
+                    age_years: null,
                     completion_date_source: "台灣金服即時連線抓取",
                     conflict_notes: [],
                     price_history: [{ round: "金拍即時公告", date: "今日連線", price_wan: pWan, result: "拍賣中" }],
@@ -7429,7 +7512,7 @@
             state.cases.forEach(function(item) { existingKeys[item.dedup_key] = item; });
             var added = 0;
             remoteCases.forEach(function(rc) {
-              if (rc && rc.dedup_key) {
+              if (rc && rc.dedup_key && !deletedKeysMap[rc.dedup_key] && !isHistoricalOrInvalidCase(rc)) {
                 if (!existingKeys[rc.dedup_key]) {
                   state.cases.unshift(rc);
                   existingKeys[rc.dedup_key] = rc;

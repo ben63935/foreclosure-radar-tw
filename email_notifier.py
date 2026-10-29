@@ -105,6 +105,18 @@ def evaluate_case_bucket(case: dict, rule: dict, show_demo: bool = True) -> tupl
         if h_status == "點交條件不明(待查)":
             pending_reasons.append(f"點交狀態為「{h_status}」")
 
+    cid = str(case.get("case_id", ""))
+    import re
+    m_yr = re.match(r"^(\d{2,3})\s*年", cid)
+    if m_yr and int(m_yr.group(1)) < 111:
+        return ("EXCLUDED", ["歷史舊案排除"])
+    if "近期開標" in str(case.get("auction_date_roc", "")):
+        return ("EXCLUDED", ["無明確開標日排除"])
+
+    today_ad = datetime.now(TW_TZ).strftime("%Y-%m-%d")
+    if case.get("auction_date_ad") and str(case.get("auction_date_ad")) < today_ad:
+        pending_reasons.append(f"前次開標日({case.get('auction_date_roc')})已過，待查最新續拍公告")
+
     if case.get("status") == "停拍/撤回":
         pending_reasons.append("最新公告為停拍/撤回")
 
