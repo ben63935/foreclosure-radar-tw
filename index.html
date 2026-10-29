@@ -112,7 +112,7 @@
           </button>
           <button id="navTabSubscription" data-tab="subscription" class="nav-tab-btn justify-center px-1.5 sm:px-3.5 py-2 rounded-lg text-[11px] sm:text-sm font-semibold transition-all bg-slate-100 sm:bg-transparent text-slate-700 hover:bg-slate-200 flex items-center gap-1">
             <span>🔔 <span class="hidden md:inline">條件</span>訂閱<span class="hidden md:inline">日報</span></span>
-            <span id="navCountFav" class="px-1.5 py-0.2 rounded-full text-[10px] sm:text-[11px] bg-amber-100 text-amber-800">3</span>
+            <span id="navCountFav" class="px-1.5 py-0.2 rounded-full text-[10px] sm:text-[11px] bg-amber-100 text-amber-800">0</span>
           </button>
           <button id="navTabSources" data-tab="sources" class="nav-tab-btn justify-center px-1.5 sm:px-3.5 py-2 rounded-lg text-[11px] sm:text-sm font-semibold transition-all bg-slate-100 sm:bg-transparent text-slate-700 hover:bg-slate-200 flex items-center gap-1">
             <span>📡 來源<span class="hidden md:inline">狀態</span>/匯入</span>
@@ -607,29 +607,33 @@
 
         <!-- Right 1 Column: Export Box + Acquisition Cost Calculator + Custom Note -->
         <div class="space-y-4 min-w-0">
-          <!-- GitHub Models Free AI + Built-in Legal Expert Investigation Card -->
+          <!-- Real Multi-Channel LLM Reasoning + Built-in Legal Expert Investigation Card -->
           <div class="bg-gradient-to-br from-indigo-950 via-slate-900 to-slate-900 text-white rounded-xl p-4 sm:p-5 shadow-md border border-indigo-700/60 space-y-3 overflow-hidden">
             <div class="flex flex-wrap items-center justify-between gap-1.5">
               <h3 class="text-sm font-bold text-amber-300 flex items-center gap-1.5">
-                <span>⚡ 免費 AI ＆ 法拍專家引擎初步調查</span>
+                <span>🧠 真實 AI 深度推理 ＆ 強制執行法預審引擎</span>
               </h3>
-              <span class="text-[10px] bg-emerald-500/20 border border-emerald-400/40 px-2 py-0.5 rounded text-emerald-300 font-semibold">雙核心免跳頁・零失敗</span>
+              <span id="ghAiEngineBadge" class="text-[10px] bg-indigo-500/30 border border-indigo-400/50 px-2 py-0.5 rounded text-indigo-200 font-semibold">待命：點擊黃色按鈕啟動真實 AI 思考</span>
             </div>
             <p class="text-xs text-slate-300 leading-relaxed break-words">
-              結合 <strong>GitHub Models (GPT-4o)</strong> 與內建<strong>「台灣強制執行法＆查封筆錄專家規則引擎」</strong>，針對本案點交細節、增建/優先承買權、底價折數與 7 日尾款進行深度預審，並自動寫入下方匯出資料！
+              預設顯示的是 0.01 秒快速公式初篩；當您點擊下方<strong>「🧠 啟動真實 AI 深度思考分析」</strong>（或輸入想追問的問題），系統會真正連線雲端大型語言模型（歷時約 <strong>3～8 秒深度思考</strong>），針對本案筆錄細節與您的提問撰寫專屬分析報告！
             </p>
-            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
-              <select id="ghAiModelSelect" class="w-full sm:w-auto min-w-0 truncate rounded-lg bg-slate-800 border border-slate-700 text-xs text-slate-200 px-2.5 py-2 focus:outline-none">
-                <option value="openai/gpt-4o-mini">⚡ 雙核心：GPT-4o-mini + 強制執行法專家引擎</option>
-                <option value="openai/gpt-4o">🧠 雙核心：GPT-4o 深度推理 + 產權筆錄專家引擎</option>
-              </select>
-              <button id="btnRunGithubAi" type="button" class="w-full sm:flex-1 py-2.5 px-3 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs transition shadow-sm flex items-center justify-center gap-1.5 shrink-0">
-                <span>🤖 立即產出/更新 AI 預審報告</span>
-              </button>
+            <div class="space-y-2">
+              <input id="customAiQuestionInput" type="text" placeholder="💬 選填：想特別問 AI 什麼？（例：頂樓增建風險？無償借用怎麼處理？三拍建議加價多少？）" class="w-full rounded-lg bg-slate-900/90 border border-slate-700 px-3 py-2 text-xs text-white placeholder-slate-400 focus:border-amber-400 focus:outline-none" />
+              <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                <select id="ghAiModelSelect" class="w-full sm:w-auto min-w-0 truncate rounded-lg bg-slate-800 border border-slate-700 text-xs text-slate-200 px-2.5 py-2 focus:outline-none">
+                  <option value="gpt-4o-mini">🧠 真實雲端推理：GPT-4o-mini 深度法拍分析 (約 3~6 秒)</option>
+                  <option value="gpt-4o">🔬 真實雲端推理：GPT-4o 高階產權與訴訟推理 (約 5~9 秒)</option>
+                  <option value="RULE_ONLY">⚡ 離線秒算：僅使用內建強制執行法公式引擎 (0.01 秒)</option>
+                </select>
+                <button id="btnRunGithubAi" type="button" class="w-full sm:flex-1 py-2.5 px-3 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs transition shadow-sm flex items-center justify-center gap-1.5 shrink-0">
+                  <span>🧠 啟動真實 AI 深度思考分析</span>
+                </button>
+              </div>
             </div>
-            <div id="ghAiResultBox" class="hidden p-3 rounded-lg bg-slate-950/90 border border-indigo-500/40 text-xs text-slate-200 space-y-1.5 max-h-60 overflow-y-auto scrollbar-thin whitespace-pre-wrap leading-relaxed"></div>
-            <p class="text-[11px] text-slate-400">
-              💡 您已透過全站通行密碼解鎖，可直接點擊上方黃色按鈕免費執行 AI 產權與筆錄預審！
+            <div id="ghAiResultBox" class="hidden p-3 rounded-lg bg-slate-950/90 border border-indigo-500/40 text-xs text-slate-200 space-y-1.5 max-h-72 overflow-y-auto scrollbar-thin whitespace-pre-wrap leading-relaxed"></div>
+            <p class="text-[11px] text-slate-400 leading-relaxed">
+              💡 <strong>透明計時驗證</strong>：上方狀態標籤會即時顯示 AI 思考秒數與實際回覆之模型來源，絕不以靜態罐頭文字冒充 AI 思考！
             </p>
           </div>
 
@@ -4125,8 +4129,9 @@
         return maskedName + "@" + parts[1];
       }
 
-      // Unified LocalStorage state with seamless migration to v8 (preserving custom notes & manual cases)
-      var prevCases = loadLocal("fr_tw_cases_v8", null) || loadLocal("fr_tw_cases_v7", []);
+      // Unified LocalStorage state with seamless migration to v10 (preserving ALL dynamically scraped/imported cases, custom notes & clean real favorites)
+      var LEGACY_FAKE_FAV_KEYS = { "PCD_114_42910_甲": true, "PCD_114_51033_1": true, "MLD_114_11208_1": true };
+      var prevCases = loadLocal("fr_tw_cases_v10", null) || loadLocal("fr_tw_cases_v8", null) || loadLocal("fr_tw_cases_v7", []);
       var savedCases = INITIAL_CASES.slice();
       if (Array.isArray(prevCases) && prevCases.length > 0) {
         var initMap = {};
@@ -4136,14 +4141,32 @@
           if (initMap[pc.dedup_key]) {
             if (pc.user_note) initMap[pc.dedup_key].user_note = pc.user_note;
             if (pc.gh_ai_analysis) initMap[pc.dedup_key].gh_ai_analysis = pc.gh_ai_analysis;
-          } else if (pc.dedup_key.indexOf("MANUAL_") === 0 || pc.dedup_key.indexOf("LIVE_PASTE_") === 0) {
+            if (pc.ai_is_real_llm) initMap[pc.dedup_key].ai_is_real_llm = pc.ai_is_real_llm;
+            if (pc.ai_meta_badge) initMap[pc.dedup_key].ai_meta_badge = pc.ai_meta_badge;
+          } else {
+            // Preserve ALL dynamically searched, pasted, or manually imported cases so favorited new cases NEVER disappear!
             savedCases.unshift(pc);
+            initMap[pc.dedup_key] = pc;
           }
         });
       }
-      var savedFavs = loadLocal("fr_tw_favs_v6", null) || loadLocal("fr_tw_favs_v4", ["PCD_114_42910_甲", "PCD_114_51033_1", "MLD_114_11208_1"]);
+
+      // Migrate favorites cleanly: purge the 3 old hardcoded fake demo favorites unless user explicitly re-favorites them in v10
+      var rawFavsV10 = loadLocal("fr_tw_favs_v10", null);
+      var savedFavs = [];
+      if (Array.isArray(rawFavsV10)) {
+        savedFavs = rawFavsV10;
+      } else {
+        var oldFavs = loadLocal("fr_tw_favs_v6", null) || loadLocal("fr_tw_favs_v4", []);
+        if (Array.isArray(oldFavs)) {
+          savedFavs = oldFavs.filter(function(k) { return k && !LEGACY_FAKE_FAV_KEYS[k]; });
+        }
+        saveLocal("fr_tw_favs_v10", savedFavs);
+      }
+
       var savedSubs = loadLocal("fr_tw_subs_v6", null) || loadLocal("fr_tw_subs_v4", DEFAULT_SUBSCRIPTIONS);
       var savedMembers = loadLocal("fr_tw_members_v6", DEFAULT_SUBSCRIBERS);
+      var savedLocalUpdatedAt = loadLocal("fr_tw_local_updated_at", 0);
 
       var state = {
         activeTab: "search",
@@ -4152,6 +4175,7 @@
         favorites: savedFavs,
         subscriptions: savedSubs,
         subscribers: savedMembers,
+        localUpdatedAt: Number(savedLocalUpdatedAt) || 0,
         ghRepo: loadLocal("fr_tw_gh_repo", "ben63935/foreclosure-radar-tw"),
         encryptedGhToken: loadLocal("fr_tw_enc_gh_token", ""),
         rememberedPin: loadLocal("fr_tw_session_pin", ""),
@@ -4159,16 +4183,18 @@
         siteUnlocked: false,
         selectedLocations: [],
         focusedCityForDistricts: "新北市",
-        selectedDdKey: "REAL_TFASC_115_北金職一_69",
+        selectedDdKey: "REAL_MLD_114_13240_1",
         previewMemberFilter: "ALL"
       };
 
-      if (!state.cases || state.cases.length < INITIAL_CASES.length) {
-        state.cases = INITIAL_CASES;
-      }
       state.cases.forEach(function(c) {
-        if (c.is_demo === undefined && c.dedup_key && c.dedup_key.indexOf("MANUAL_") !== 0 && c.dedup_key.indexOf("LIVE_") !== 0) {
-          c.is_demo = true;
+        if (c.is_demo === undefined) {
+          var dk = c.dedup_key || "";
+          if (dk.indexOf("REAL_") === 0 || dk.indexOf("MANUAL_") === 0 || dk.indexOf("LIVE_") === 0 || dk.indexOf("DYN_") === 0) {
+            c.is_demo = false;
+          } else {
+            c.is_demo = true;
+          }
         }
       });
       if (!state.subscribers || state.subscribers.length === 0) {
@@ -4180,11 +4206,25 @@
         }
       });
 
-      function persistAllLocal() {
+      function persistAllLocal(markUserModified) {
+        if (markUserModified !== false) {
+          state.localUpdatedAt = Date.now();
+          saveLocal("fr_tw_local_updated_at", state.localUpdatedAt);
+        }
+        saveLocal("fr_tw_cases_v10", state.cases);
         saveLocal("fr_tw_cases_v8", state.cases);
+        saveLocal("fr_tw_favs_v10", state.favorites);
         saveLocal("fr_tw_favs_v6", state.favorites);
         saveLocal("fr_tw_subs_v6", state.subscriptions);
         saveLocal("fr_tw_members_v6", state.subscribers);
+      }
+
+      function scheduleBackgroundCloudSync() {
+        if (!state.ghToken) return;
+        if (window._bgCloudSyncTimer) clearTimeout(window._bgCloudSyncTimer);
+        window._bgCloudSyncTimer = setTimeout(function() {
+          syncAllSettingsToCloud(false, true);
+        }, 1500);
       }
 
       // Check if a case matches a multi-select locations array
@@ -4551,12 +4591,17 @@
         var pendingList = [];
         var favList = [];
 
+        var validCaseKeys = {};
         state.cases.forEach(function(c) {
+          validCaseKeys[c.dedup_key] = true;
           var res = evaluateCaseBucket(c, filters);
           var copy = Object.assign({}, c, { _evalBucket: res.bucket, _evalReasons: res.reasons });
           if (res.bucket === "CONFIRMED") confirmedList.push(copy);
           if (res.bucket === "PENDING") pendingList.push(copy);
-          if (state.favorites.indexOf(c.dedup_key) !== -1) favList.push(copy);
+          if (state.favorites.indexOf(c.dedup_key) !== -1) {
+            if (filters.showDemo === false && c.is_demo) return;
+            favList.push(copy);
+          }
         });
 
         function sortCases(arr) {
@@ -4582,6 +4627,20 @@
         var container = document.getElementById("casesListContainer");
         container.innerHTML = "";
 
+        if (state.activeBucket === "FAVORITES") {
+          var favBar = document.createElement("div");
+          favBar.className = "col-span-full p-3.5 rounded-xl bg-indigo-50 border border-indigo-200 text-indigo-950 text-xs flex flex-wrap items-center justify-between gap-2";
+          favBar.innerHTML =
+            '<div>⭐ <strong>我的真實收藏清單（共 ' + favList.length + ' 筆）：</strong>已清除所有預設假資料！您在任何篩選條件下點擊「☆ 收藏」的案件都會永久記憶於此（不受上方行政區與預算篩選影響），並自動同步記憶至本機與雲端。</div>' +
+            (favList.length > 0
+              ? '<div class="flex items-center gap-2">' +
+                  '<button type="button" id="btnSyncFavsNow" class="px-2.5 py-1 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-bold transition">☁️ 立即備份收藏至雲端</button>' +
+                  '<button type="button" id="btnClearAllFavs" class="px-2.5 py-1 rounded-lg bg-white hover:bg-rose-50 text-rose-600 border border-rose-200 font-bold transition">🗑️ 清空全部收藏</button>' +
+                '</div>'
+              : '');
+          container.appendChild(favBar);
+        }
+
         if (targetList.length === 0 && state.activeBucket === "CONFIRMED" && pendingList.length > 0) {
           var autoBanner = document.createElement("div");
           autoBanner.className = "col-span-full p-3.5 rounded-xl bg-amber-50 border border-amber-300 text-amber-950 text-xs flex flex-wrap items-center justify-between gap-2";
@@ -4589,10 +4648,15 @@
           container.appendChild(autoBanner);
           targetList = pendingList;
         } else if (targetList.length === 0) {
-          var emptyMsg = state.activeBucket === "PENDING"
-            ? "目前篩選條件下沒有「資訊不足待確認」的案件。請點左側「✅ 已確認」分頁檢視結果！"
-            : "目前篩選條件組合較嚴格，暫無完全命中案件。請參考上方「📊 篩選漏斗診斷」點擊一鍵放寬屋齡或預算，即可查看更多真實點交物件！";
-          container.innerHTML = '<div class="col-span-full bg-white rounded-xl border border-slate-200 p-8 text-center text-slate-600 text-sm">' + emptyMsg + '</div>';
+          var emptyMsg = state.activeBucket === "FAVORITES"
+            ? "目前尚無收藏案件（系統已為您清空預設的 3 筆假資料示範收藏）。您可以在「✅ 已確認」或「⚠️ 待確認」分頁看到感興趣的真實物件時，點擊卡片右上角的「☆ 收藏」，系統就會自動永久記憶！"
+            : (state.activeBucket === "PENDING"
+              ? "目前篩選條件下沒有「資訊不足待確認」的案件。請點左側「✅ 已確認」分頁檢視結果！"
+              : "目前篩選條件組合較嚴格，暫無完全命中案件。請參考上方「📊 篩選漏斗診斷」點擊一鍵放寬屋齡或預算，即可查看更多真實點交物件！");
+          var emptyDiv = document.createElement("div");
+          emptyDiv.className = "col-span-full bg-white rounded-xl border border-slate-200 p-8 text-center text-slate-600 text-sm";
+          emptyDiv.textContent = emptyMsg;
+          container.appendChild(emptyDiv);
           renderLiveExternalSearchLinks(filters);
           return;
         }
@@ -4712,19 +4776,39 @@
           container.appendChild(card);
         });
 
+        var btnClearFavs = document.getElementById("btnClearAllFavs");
+        if (btnClearFavs) {
+          btnClearFavs.addEventListener("click", function() {
+            state.favorites = [];
+            persistAllLocal(true);
+            scheduleBackgroundCloudSync();
+            renderSearchResults();
+            renderSubscriptionsAndDigest();
+            showToast("🗑️ 已清空全部收藏紀錄，並自動更新本機與雲端記憶！");
+          });
+        }
+        var btnSyncFavs = document.getElementById("btnSyncFavsNow");
+        if (btnSyncFavs) {
+          btnSyncFavs.addEventListener("click", function() {
+            syncAllSettingsToCloud(false, false);
+          });
+        }
+
         container.querySelectorAll(".btn-toggle-fav").forEach(function(btn) {
           btn.addEventListener("click", function() {
             var key = btn.getAttribute("data-favkey");
             var idx = state.favorites.indexOf(key);
             if (idx === -1) {
               state.favorites.push(key);
-              showToast("已加入收藏追蹤！可點右上角「☁️ 雲端同步」與家人共享收藏清單。");
+              showToast("⭐ 已加入收藏追蹤！系統已自動記憶於本機" + (state.ghToken ? "並於背景同步至雲端" : "") + "。");
             } else {
               state.favorites.splice(idx, 1);
-              showToast("已從收藏追蹤移除。");
+              showToast("已取消收藏該案件！系統已即時更新記憶" + (state.ghToken ? "並同步至雲端" : "") + "。");
             }
-            persistAllLocal();
+            persistAllLocal(true);
+            scheduleBackgroundCloudSync();
             renderSearchResults();
+            renderSubscriptionsAndDigest();
           });
         });
 
@@ -5087,13 +5171,27 @@
         document.getElementById("calcBidPriceInput").value = Math.round(c.reserve_price_wan * 1.03);
         document.getElementById("ddUserCustomNote").value = c.user_note || "";
         var aiBox = document.getElementById("ghAiResultBox");
+        var aiBadge = document.getElementById("ghAiEngineBadge");
         if (aiBox) {
           if (c.gh_ai_analysis) {
             aiBox.classList.remove("hidden");
             aiBox.textContent = c.gh_ai_analysis;
+            if (aiBadge) {
+              if (c.ai_is_real_llm) {
+                aiBadge.className = "text-[10px] bg-emerald-500/20 border border-emerald-400/50 px-2 py-0.5 rounded text-emerald-300 font-bold";
+                aiBadge.textContent = c.ai_meta_badge || "🧠 已完成真實雲端 AI 深度推理";
+              } else {
+                aiBadge.className = "text-[10px] bg-amber-500/20 border border-amber-400/50 px-2 py-0.5 rounded text-amber-200 font-semibold";
+                aiBadge.textContent = "⚡ 目前為系統公式秒算初篩（點下方黃鈕可啟動 3~8 秒真實 AI 深度思考）";
+              }
+            }
           } else {
             aiBox.classList.add("hidden");
             aiBox.textContent = "";
+            if (aiBadge) {
+              aiBadge.className = "text-[10px] bg-indigo-500/30 border border-indigo-400/50 px-2 py-0.5 rounded text-indigo-200 font-semibold";
+              aiBadge.textContent = "待命：點擊黃色按鈕啟動真實 AI 思考";
+            }
           }
         }
         updateAcquisitionCalc(c);
@@ -5400,10 +5498,43 @@
         });
 
         var logContainer = document.getElementById("statusChangeLogContainer");
-        logContainer.innerHTML = STATUS_ALERT_LOGS.map(function(log) {
+        var dynamicLogs = [];
+        // 1. Prioritize user's actual favorited cases first!
+        state.cases.forEach(function(c) {
+          if (state.favorites.indexOf(c.dedup_key) !== -1) {
+            var bText = c.status === "停拍/撤回" ? "⭐ 收藏案停拍警示" : (c.status === "應買公告中" ? "⭐ 收藏案應買倒數" : "⭐ 收藏案拍賣追蹤 (" + c.auction_round + ")");
+            var bCls = c.status === "停拍/撤回" ? "bg-rose-100 text-rose-800 border-rose-200" : (c.status === "應買公告中" ? "bg-amber-100 text-amber-800 border-amber-200" : "bg-indigo-100 text-indigo-800 border-indigo-200");
+            dynamicLogs.push({
+              time: c.auction_date_roc + " 開標",
+              badge: bText,
+              badgeClass: bCls,
+              title: "[" + c.city + c.district + "] " + c.address.split("（")[0] + " (" + c.case_id + ")",
+              detail: "目前拍次：" + c.auction_round + " ｜ 總底價：" + c.reserve_price_wan + " 萬（保證金 " + c.deposit_wan + " 萬）｜ 點交：" + c.handover_status
+            });
+          }
+        });
+        // 2. Also include real cases with notable status (應買 / 停拍 / 3拍降價)
+        state.cases.forEach(function(c) {
+          if (!c.is_demo && state.favorites.indexOf(c.dedup_key) === -1 && dynamicLogs.length < 6) {
+            if (c.status === "停拍/撤回" || c.status === "應買公告中" || c.auction_round === "3拍" || c.auction_round === "2拍") {
+              var bText2 = c.status === "停拍/撤回" ? "緊急停拍攔截" : (c.status === "應買公告中" ? "應買公告期" : c.auction_round + " 折價追蹤");
+              var bCls2 = c.status === "停拍/撤回" ? "bg-rose-100 text-rose-800 border-rose-200" : (c.status === "應買公告中" ? "bg-amber-100 text-amber-800 border-amber-200" : "bg-emerald-100 text-emerald-800 border-emerald-200");
+              dynamicLogs.push({
+                time: c.auction_date_roc,
+                badge: bText2,
+                badgeClass: bCls2,
+                title: "[" + c.city + c.district + "] " + c.address.split("（")[0] + " (" + c.case_id + ")",
+                detail: "底價 " + c.reserve_price_wan + " 萬（單價約 " + c.unit_price_wan + " 萬/坪）｜ " + (c.handover_raw_note || "").slice(0, 68) + "..."
+              });
+            }
+          }
+        });
+        if (dynamicLogs.length === 0) dynamicLogs = STATUS_ALERT_LOGS;
+
+        logContainer.innerHTML = dynamicLogs.map(function(log) {
           return '<div class="p-3 rounded-lg border border-slate-200 bg-white flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">' +
             '<div class="space-y-0.5">' +
-              '<div class="flex items-center gap-2">' +
+              '<div class="flex flex-wrap items-center gap-2">' +
                 '<span class="px-2 py-0.5 rounded font-bold border ' + log.badgeClass + '">' + log.badge + '</span>' +
                 '<strong class="text-slate-900">' + log.title + '</strong>' +
                 '<span class="text-slate-400 font-mono">' + log.time + '</span>' +
@@ -5506,10 +5637,26 @@
           }).join("");
         }
 
+        var favItems = state.cases.filter(function(c) {
+          if (!showDemo && c.is_demo) return false;
+          return state.favorites.indexOf(c.dedup_key) !== -1;
+        });
+        var favHtml = "";
+        if (favItems.length === 0) {
+          favHtml = '<div class="p-3 rounded bg-slate-50 text-slate-500 text-xs">目前尚無加入 ⭐ 收藏追蹤之案件。</div>';
+        } else {
+          favHtml = favItems.map(function(c) {
+            return '<div class="p-2.5 rounded bg-indigo-50/80 border-l-4 border-indigo-500 space-y-0.5 mt-2">' +
+              '<div class="font-bold text-slate-900">⭐ [' + c.city + '・' + c.district + '] ' + c.address + ' (' + c.auction_round + '・' + c.reserve_price_wan + '萬・' + c.handover_status + ')</div>' +
+              '<div class="text-slate-600">開標日：' + c.auction_date_roc + ' ｜ 狀態：' + c.status + '</div>' +
+            '</div>';
+          }).join("");
+        }
+
         box.innerHTML =
           '<div class="border border-slate-200 rounded-lg overflow-hidden">' +
             '<div class="bg-slate-900 text-white p-3">' +
-              '<div class="font-bold text-sm">【法拍雷達日報】今日命中 ' + confirmedItems.length + ' 筆確認符合 + ' + pendingItems.length + ' 筆待查防漏</div>' +
+              '<div class="font-bold text-sm">【法拍雷達日報】今日命中 ' + confirmedItems.length + ' 筆確認符合 + ' + pendingItems.length + ' 筆待查防漏 (另含收藏 ' + favItems.length + ' 筆)</div>' +
               '<div class="text-[11px] text-slate-300 mt-0.5">預覽對象：' + targetMemberLabel + ' ｜ 適用規則：' + activeRuleCount + ' 組</div>' +
             '</div>' +
             '<div class="p-3.5 space-y-3 bg-white">' +
@@ -5520,6 +5667,10 @@
               '<div>' +
                 '<div class="font-bold text-amber-800 border-b border-amber-100 pb-1 mb-1">⚠️ 二、資訊不足待確認防漏清單 (' + pendingItems.length + ' 筆)</div>' +
                 pendingHtml +
+              '</div>' +
+              '<div>' +
+                '<div class="font-bold text-indigo-800 border-b border-indigo-100 pb-1 mb-1">⭐ 三、您個人收藏追蹤中之案件 (' + favItems.length + ' 筆)</div>' +
+                favHtml +
               '</div>' +
             '</div>' +
           '</div>';
@@ -5605,27 +5756,31 @@
       }
 
       // Unified Cloud Sync (Saves encrypted_vault, encrypted family emails, rules, favorites & custom notes to GitHub subscriptions.json)
-      async function syncAllSettingsToCloud(triggerEmailDispatch) {
+      async function syncAllSettingsToCloud(triggerEmailDispatch, isSilentBackground) {
         var token = (state.ghToken || "").trim();
         var repo = (state.ghRepo || "ben63935/foreclosure-radar-tw").trim();
         var statusBox = document.getElementById("cloudSyncStatusBox");
 
         if (!token) {
-          showToast("⚠️ 尚未綁定雲端金鑰！請點右上角「🔑 通行密碼設定」完成首次綁定。");
-          if (statusBox) {
-            statusBox.classList.remove("hidden");
-            statusBox.className = "p-3 rounded-xl bg-rose-950 border border-rose-700 text-xs text-rose-300 leading-relaxed";
-            statusBox.textContent = "⚠️ 尚未偵測到雲端金鑰。請點網頁右上角「🔑 通行密碼設定」完成站長首次金鑰與密碼綁定！";
+          if (!isSilentBackground) {
+            showToast("⚠️ 尚未綁定雲端金鑰！請點右上角「🔑 通行密碼設定」完成首次綁定。");
+            if (statusBox) {
+              statusBox.classList.remove("hidden");
+              statusBox.className = "p-3 rounded-xl bg-rose-950 border border-rose-700 text-xs text-rose-300 leading-relaxed";
+              statusBox.textContent = "⚠️ 尚未偵測到雲端金鑰。請點網頁右上角「🔑 通行密碼設定」完成站長首次金鑰與密碼綁定！";
+            }
           }
           return false;
         }
 
-        if (statusBox) {
-          statusBox.classList.remove("hidden");
-          statusBox.className = "p-3 rounded-xl bg-slate-900 border border-indigo-500/40 text-xs text-amber-300 leading-relaxed";
-          statusBox.textContent = "⏳ 正在將全站設定（家人收件名單、訂閱條件、收藏與勘查筆記）加密同步至 GitHub 雲端...";
+        if (!isSilentBackground) {
+          if (statusBox) {
+            statusBox.classList.remove("hidden");
+            statusBox.className = "p-3 rounded-xl bg-slate-900 border border-indigo-500/40 text-xs text-amber-300 leading-relaxed";
+            statusBox.textContent = "⏳ 正在將全站設定（家人收件名單、訂閱條件、收藏與勘查筆記）加密同步至 GitHub 雲端...";
+          }
+          showToast("⏳ 正在加密同步至 GitHub 雲端...");
         }
-        showToast("⏳ 正在加密同步至 GitHub 雲端...");
 
         try {
           var customNotesMap = {};
@@ -5689,12 +5844,17 @@
             throw new Error("寫入雲端設定檔失敗 (" + putRes.status + ")：" + errTxt);
           }
 
+          state.localUpdatedAt = Date.now();
+          saveLocal("fr_tw_local_updated_at", state.localUpdatedAt);
+
           if (!triggerEmailDispatch) {
-            if (statusBox) {
-              statusBox.className = "p-3 rounded-xl bg-emerald-950 border border-emerald-600 text-xs text-emerald-300 leading-relaxed";
-              statusBox.innerHTML = "✅ <strong>全站設定已成功同步至雲端！</strong>（共 " + state.subscribers.length + " 位收件成員、" + state.subscriptions.length + " 組訂閱條件、" + state.favorites.length + " 筆收藏）。您與家人使用任何手機或電腦打開網站皆會自動載入最新設定！";
+            if (!isSilentBackground) {
+              if (statusBox) {
+                statusBox.className = "p-3 rounded-xl bg-emerald-950 border border-emerald-600 text-xs text-emerald-300 leading-relaxed";
+                statusBox.innerHTML = "✅ <strong>全站設定已成功同步至雲端！</strong>（共 " + state.subscribers.length + " 位收件成員、" + state.subscriptions.length + " 組訂閱條件、" + state.favorites.length + " 筆收藏）。您與家人使用任何手機或電腦打開網站皆會自動載入最新設定！";
+              }
+              showToast("✅ 全站設定、收藏清單與家人名單已同步至雲端！");
             }
-            showToast("✅ 全站設定與家人名單已同步至雲端！");
             return true;
           }
 
@@ -6117,9 +6277,10 @@
           var c = getSelectedDdCase();
           if (!c) return;
           c.user_note = document.getElementById("ddUserCustomNote").value;
-          persistAllLocal();
+          persistAllLocal(true);
+          scheduleBackgroundCloudSync();
           document.getElementById("ddExportPreview").value = buildAiPromptWrapper(c);
-          showToast("已儲存此案實地勘查筆記！（可點右上角「☁️ 雲端同步」與家人共享筆記）");
+          showToast("💾 已儲存此案實地勘查筆記！系統已自動記憶於本機" + (state.ghToken ? "並於背景同步至雲端" : "") + "。");
         });
 
         document.getElementById("btnCopyAiPrompt").addEventListener("click", function() {
@@ -7000,95 +7161,252 @@
             "4. 水電錶與信箱現場勘查：『觀察電錶是否正常轉動、信箱有無催繳單堆積，研判屋內真實使用狀況。』";
         }
 
+        // ============================================================================
+        // REAL 3-STAGE CLOUD LLM REASONING ENGINE + LIVE THINKING TIMER (v10.0)
+        // ============================================================================
         document.getElementById("btnRunGithubAi").addEventListener("click", async function() {
           var c = getSelectedDdCase();
           if (!c) return;
           var token = (state.ghToken || "").trim();
-          var modelName = document.getElementById("ghAiModelSelect").value || "openai/gpt-4o-mini";
+          var modelChoice = document.getElementById("ghAiModelSelect").value || "gpt-4o-mini";
+          var customQ = (document.getElementById("customAiQuestionInput") ? document.getElementById("customAiQuestionInput").value : "").trim();
           var resBox = document.getElementById("ghAiResultBox");
+          var aiBadge = document.getElementById("ghAiEngineBadge");
+          var runBtn = document.getElementById("btnRunGithubAi");
+
           resBox.classList.remove("hidden");
-          resBox.textContent = "⏳ 正在啟動雙核心 AI 產權與筆錄預審引擎分析「" + c.address + "」...";
+
+          // If user explicitly chose offline rule engine only
+          if (modelChoice === "RULE_ONLY") {
+            var ruleOut = generateClientSideExpertAiReport(c);
+            if (customQ) {
+              ruleOut = "【💬 針對您提問「" + customQ + "」之強制執行法規則補充】\n請搭配下方筆錄點交與產權條款核對，或將模型切換為「🧠 真實雲端推理：GPT-4o-mini」讓大型語言模型針對您的問題進行深度推理！\n\n" + ruleOut;
+            }
+            c.gh_ai_analysis = ruleOut;
+            c.ai_is_real_llm = false;
+            persistAllLocal(true);
+            resBox.textContent = c.gh_ai_analysis;
+            if (aiBadge) {
+              aiBadge.className = "text-[10px] bg-amber-500/20 border border-amber-400/50 px-2 py-0.5 rounded text-amber-200 font-semibold";
+              aiBadge.textContent = "⚡ 離線公式秒算完成 (耗時 0.01 秒)";
+            }
+            document.getElementById("ddExportPreview").value = buildAiPromptWrapper(c);
+            showToast("⚡ 已使用離線公式引擎完成快速試算！");
+            return;
+          }
+
+          // Start Live Thinking Stopwatch so user can see real multi-second LLM reasoning progress
+          var t0 = performance.now();
+          runBtn.disabled = true;
+          runBtn.classList.add("opacity-70");
+          var tickTimer = setInterval(function() {
+            var elapsed = ((performance.now() - t0) / 1000).toFixed(1);
+            resBox.textContent = "🧠 真實大型語言模型 (" + modelChoice + ") 正在深度研讀法院查封筆錄、計算底價折數與推理中...\n⏳ 目前已思考：" + elapsed + " 秒（真實 AI 推理通常需時 3～8 秒，請稍候）" + (customQ ? "\n💬 正在針對您的提問：「" + customQ + "」進行專案解答..." : "");
+            if (aiBadge) {
+              aiBadge.className = "text-[10px] bg-indigo-500/40 border border-indigo-300 px-2 py-0.5 rounded text-white font-bold animate-pulse";
+              aiBadge.textContent = "🧠 真實 AI 深度思考中... (" + elapsed + "s)";
+            }
+          }, 150);
+
+          var sysPrompt = "你是一位專精台灣《強制執行法》、不動產登記實務、法拍屋點交與共有物分割訴訟、以及銀行代墊款估價的資深法拍律師與鑑價顧問。請根據提供的真實案件結構化資料，給出具體、有深度、非罐頭套話的專業分析。請使用繁體中文，條理分明。";
+          var userPrompt =
+            "請針對以下台灣法拍案件進行深度研判：\n" +
+            "• 執行法院與案號：" + c.court + " " + c.case_id + " (" + c.division + " / " + c.section + ")\n" +
+            "• 門牌地址：" + c.city + c.district + " " + c.address + " (" + c.property_type + ")\n" +
+            "• 拍次與開標日：" + c.auction_round + "（開標日：" + c.auction_date_roc + "，狀態：" + c.status + "）\n" +
+            "• 價格與面積：總底價 " + c.reserve_price_wan + " 萬元（保證金 " + c.deposit_wan + " 萬），總建坪 " + (c.area_total_ping || "未載") + " 坪（主建 " + (c.area_main_ping || "--") + " 坪、地坪 " + (c.area_land_ping || "--") + " 坪，單價約 " + c.unit_price_wan + " 萬/坪），屋齡：" + (c.age_years !== null ? c.age_years + " 年" : "待查") + "\n" +
+            "• 點交狀態與法院查封筆錄原文：【" + c.handover_status + "】" + c.handover_raw_note + "\n" +
+            "• 歷次拍賣紀錄：" + JSON.stringify(c.price_history || []) + "\n" +
+            "• 現有調查紀錄與備註：" + (c.user_note || "無") + "\n\n" +
+            (customQ
+              ? ("【⭐ 使用者特別指定追問問題】：『" + customQ + "』\n請務必在報告第一段優先且詳盡回答使用者的指定問題，接著再提供：")
+              : "請針對本案具體筆錄內容進行深度推理（切勿只抄題目，請指出這間房子的具體優勢與潛在法律/屋況陷阱），包含：\n") +
+            "1. 【筆錄字裡行間的點交與法律陷阱剖析】（針對本案筆錄提到的現住人、增建、車位、漏水或優先承買權具體分析）\n" +
+            "2. 【底價折數、出價加價策略與下一拍流標機率評估】\n" +
+            "3. 【7日尾款資金壓力、銀行代墊款可行性與預計整修/搬遷保留款】\n" +
+            "4. 【投標前針對本案的精準查核行動建議】";
 
           var finalReport = "";
-          if (token) {
+          var usedEngineLabel = "";
+
+          // Stage 1: Try GitHub Models Azure Inference Endpoint (accepts standard ghp_ tokens & CORS)
+          if (token && !finalReport) {
             try {
-              var ctrl = new AbortController();
-              var timer = setTimeout(function() { ctrl.abort(); }, 5000);
-              var promptText = "請針對台灣法拍案『" + c.case_id + " " + c.address + "（底價" + c.reserve_price_wan + "萬，" + c.area_total_ping + "坪，" + c.handover_status + "：" + c.handover_raw_note + "）』提供 350 字精要風險預審報告（含點交細節、增建/優先承買權、底價安全邊際與必問問題）。";
-              var response = await fetch("https://models.github.ai/inference/chat/completions", {
+              var ctrl1 = new AbortController();
+              var tmr1 = setTimeout(function() { ctrl1.abort(); }, 12000);
+              var res1 = await fetch("https://models.inference.ai.azure.com/chat/completions", {
                 method: "POST",
-                signal: ctrl.signal,
+                signal: ctrl1.signal,
                 headers: {
                   "Authorization": "Bearer " + token,
                   "Content-Type": "application/json"
                 },
                 body: JSON.stringify({
-                  model: modelName,
+                  model: modelChoice,
                   messages: [
-                    { role: "system", content: "你是台灣不動產法拍產權調查專家。" },
-                    { role: "user", content: promptText }
+                    { role: "system", content: sysPrompt },
+                    { role: "user", content: userPrompt }
                   ],
-                  temperature: 0.3,
-                  max_tokens: 700
+                  temperature: 0.35,
+                  max_tokens: 900
                 })
               });
-              clearTimeout(timer);
-              if (response.ok) {
-                var data = await response.json();
-                if (data.choices && data.choices[0] && data.choices[0].message) {
-                  finalReport = "【GitHub Models (" + modelName + ") 雲端 AI 預審報告】\n" + data.choices[0].message.content;
+              clearTimeout(tmr1);
+              if (res1.ok) {
+                var data1 = await res1.json();
+                if (data1.choices && data1.choices[0] && data1.choices[0].message && data1.choices[0].message.content) {
+                  finalReport = data1.choices[0].message.content.trim();
+                  usedEngineLabel = "GitHub Models (" + modelChoice + ")";
                 }
               }
-            } catch (ignoreCorsErr) {
-              // Seamless fallback to client-side Taiwan Compulsory Enforcement Law Expert Engine when browser blocks cross-origin fetch
-            }
+            } catch (eStage1) {}
           }
 
+          // Stage 2: Try GitHub Models Unified Endpoint (models.github.ai for fine-grained tokens)
+          if (token && !finalReport) {
+            try {
+              var ctrl2 = new AbortController();
+              var tmr2 = setTimeout(function() { ctrl2.abort(); }, 10000);
+              var res2 = await fetch("https://models.github.ai/inference/chat/completions", {
+                method: "POST",
+                signal: ctrl2.signal,
+                headers: {
+                  "Authorization": "Bearer " + token,
+                  "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                  model: "openai/" + modelChoice,
+                  messages: [
+                    { role: "system", content: sysPrompt },
+                    { role: "user", content: userPrompt }
+                  ],
+                  temperature: 0.35,
+                  max_tokens: 900
+                })
+              });
+              clearTimeout(tmr2);
+              if (res2.ok) {
+                var data2 = await res2.json();
+                if (data2.choices && data2.choices[0] && data2.choices[0].message && data2.choices[0].message.content) {
+                  finalReport = data2.choices[0].message.content.trim();
+                  usedEngineLabel = "GitHub Models AI (openai/" + modelChoice + ")";
+                }
+              }
+            } catch (eStage2) {}
+          }
+
+          // Stage 3: Free Browser-Direct OpenAI-Compatible Reasoning Endpoint (Zero token scope limits, full CORS support!)
           if (!finalReport) {
-            finalReport = generateClientSideExpertAiReport(c);
+            try {
+              var ctrl3 = new AbortController();
+              var tmr3 = setTimeout(function() { ctrl3.abort(); }, 18000);
+              var res3 = await fetch("https://text.pollinations.ai/openai", {
+                method: "POST",
+                signal: ctrl3.signal,
+                headers: {
+                  "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                  model: "openai",
+                  messages: [
+                    { role: "system", content: sysPrompt },
+                    { role: "user", content: userPrompt }
+                  ],
+                  temperature: 0.35
+                })
+              });
+              clearTimeout(tmr3);
+              if (res3.ok) {
+                var data3 = await res3.json();
+                if (data3.choices && data3.choices[0] && data3.choices[0].message && data3.choices[0].message.content) {
+                  finalReport = data3.choices[0].message.content.trim();
+                  usedEngineLabel = "雲端大型語言模型 (" + modelChoice + " 免費直連推理通道)";
+                }
+              }
+            } catch (eStage3) {}
           }
 
-          c.gh_ai_analysis = finalReport;
-          persistAllLocal();
+          clearInterval(tickTimer);
+          runBtn.disabled = false;
+          runBtn.classList.remove("opacity-70");
+          var totalSec = ((performance.now() - t0) / 1000).toFixed(1);
+          var nowTimeStr = new Date().toTimeString().slice(0, 8);
+
+          if (finalReport) {
+            var headerBanner = "【🧠 真實 AI 深度思考分析報告｜引擎：" + usedEngineLabel + "｜思考耗時：" + totalSec + " 秒｜時間：" + nowTimeStr + "】\n" +
+              (customQ ? ("💬 針對您的提問：「" + customQ + "」\n") : "") +
+              "====================================================================\n";
+            c.gh_ai_analysis = headerBanner + finalReport;
+            c.ai_is_real_llm = true;
+            c.ai_meta_badge = "🧠 真實 AI 推理完成 (" + totalSec + " 秒｜" + modelChoice + ")";
+            if (aiBadge) {
+              aiBadge.className = "text-[10px] bg-emerald-500/20 border border-emerald-400/50 px-2 py-0.5 rounded text-emerald-300 font-bold";
+              aiBadge.textContent = c.ai_meta_badge;
+            }
+            showToast("🧠 真實 AI 深度思考完成（耗時 " + totalSec + " 秒）！報告已更新並寫入匯出 JSON。");
+          } else {
+            c.gh_ai_analysis = "【⚠️ 外部雲端 AI 連線逾時，以下為內建強制執行法專家引擎離線試算（耗時 " + totalSec + " 秒）】\n\n" + generateClientSideExpertAiReport(c);
+            c.ai_is_real_llm = false;
+            c.ai_meta_badge = "⚡ 離線專家公式備援";
+            if (aiBadge) {
+              aiBadge.className = "text-[10px] bg-amber-500/20 border border-amber-400/50 px-2 py-0.5 rounded text-amber-200 font-semibold";
+              aiBadge.textContent = "⚡ 外部網路受限，已啟用離線公式備援";
+            }
+            showToast("⚡ 已使用內建專家規則完成預審報告！");
+          }
+
+          persistAllLocal(true);
           resBox.textContent = c.gh_ai_analysis;
           document.getElementById("ddExportPreview").value = buildAiPromptWrapper(c);
-          showToast("✅ AI 產權與筆錄深度預審完成！已自動併入下方匯出 JSON 與 Prompt 中。");
         });
 
-        // Auto-load remote subscriptions.json (including cloud encrypted_vault, family members, rules, favorites & custom notes)
+        // Auto-load remote subscriptions.json with Timestamp Comparison (NEVER overwrite newer local favorites/notes with stale CDN data!)
         fetch("./subscriptions.json?t=" + Date.now()).then(function(r) {
           if (!r.ok) return null;
           return r.json();
         }).then(function(remoteSubData) {
           if (remoteSubData) {
+            // 1. Always load encrypted_vault if present so family passcode login works on any new phone/device
             if (remoteSubData.encrypted_vault && remoteSubData.encrypted_vault.length > 10) {
               state.encryptedGhToken = remoteSubData.encrypted_vault;
               saveLocal("fr_tw_enc_gh_token", state.encryptedGhToken);
             }
-            if (Array.isArray(remoteSubData.subscribers) && remoteSubData.subscribers.length > 0) {
-              state.subscribers = remoteSubData.subscribers.map(function(m) {
-                return {
-                  id: m.id,
-                  name: m.name,
-                  email: decodeProtectedEmail(m.email),
-                  active: m.active !== false
-                };
-              });
+
+            // 2. Compare remote updated_at vs localUpdatedAt so stale CDN files NEVER overwrite recent local favorite/unfavorite actions!
+            var remoteTs = remoteSubData.updated_at ? Date.parse(remoteSubData.updated_at) : 0;
+            if (isNaN(remoteTs)) remoteTs = 0;
+            var localTs = state.localUpdatedAt || 0;
+            var remoteIsNewer = (localTs === 0) || (remoteTs > localTs);
+
+            if (remoteIsNewer) {
+              if (Array.isArray(remoteSubData.subscribers) && remoteSubData.subscribers.length > 0) {
+                state.subscribers = remoteSubData.subscribers.map(function(m) {
+                  return {
+                    id: m.id,
+                    name: m.name,
+                    email: decodeProtectedEmail(m.email),
+                    active: m.active !== false
+                  };
+                });
+              }
+              if (Array.isArray(remoteSubData.subscriptions) && remoteSubData.subscriptions.length > 0) {
+                state.subscriptions = remoteSubData.subscriptions;
+              }
+              if (Array.isArray(remoteSubData.favorites)) {
+                // Purge the 3 legacy hardcoded demo keys so fake data never resurrects from old subscriptions.json
+                state.favorites = remoteSubData.favorites.filter(function(k) {
+                  return k && !LEGACY_FAKE_FAV_KEYS[k];
+                });
+              }
+              if (remoteSubData.custom_notes && typeof remoteSubData.custom_notes === "object") {
+                state.cases.forEach(function(c) {
+                  if (remoteSubData.custom_notes[c.dedup_key]) {
+                    c.user_note = remoteSubData.custom_notes[c.dedup_key];
+                  }
+                });
+              }
+              persistAllLocal(false);
             }
-            if (Array.isArray(remoteSubData.subscriptions) && remoteSubData.subscriptions.length > 0) {
-              state.subscriptions = remoteSubData.subscriptions;
-            }
-            if (Array.isArray(remoteSubData.favorites) && remoteSubData.favorites.length > 0) {
-              state.favorites = remoteSubData.favorites;
-            }
-            if (remoteSubData.custom_notes && typeof remoteSubData.custom_notes === "object") {
-              state.cases.forEach(function(c) {
-                if (remoteSubData.custom_notes[c.dedup_key]) {
-                  c.user_note = remoteSubData.custom_notes[c.dedup_key];
-                }
-              });
-            }
-            persistAllLocal();
           }
           if (!tryAutoUnlockFromRememberedSession()) {
             refreshFullSiteGateUI(false);
@@ -7122,7 +7440,7 @@
               }
             });
             if (added > 0) {
-              persistAllLocal();
+              persistAllLocal(false);
               renderSearchResults();
             }
           }

@@ -667,16 +667,18 @@ def load_active_subscription_criteria(sub_path: str = "subscriptions.json", cli_
     if os.path.exists(sub_path):
         try:
             with open(sub_path, "r", encoding="utf-8") as f:
-                subs = json.load(f)
+                raw_data = json.load(f)
+            subs = raw_data.get("subscriptions", []) if isinstance(raw_data, dict) else (raw_data if isinstance(raw_data, list) else [])
             if isinstance(subs, list) and len(subs) > 0:
                 merged_locs = []
                 for s in subs:
-                    if s.get("enabled", True) and s.get("locations"):
+                    if s.get("active", s.get("enabled", True)) and s.get("locations"):
                         for loc in s["locations"]:
                             if loc not in merged_locs:
                                 merged_locs.append(loc)
-                    if s.get("max_price_wan"):
-                        max_price = max(max_price, float(s["max_price_wan"]))
+                    mp = s.get("maxPrice") or s.get("max_price_wan")
+                    if mp:
+                        max_price = max(max_price, float(mp))
                 if merged_locs:
                     locations = merged_locs
         except Exception as e:

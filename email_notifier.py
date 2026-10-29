@@ -241,7 +241,7 @@ if __name__ == "__main__":
             print(f"[Warn] Could not parse {args.subscriptions}: {e}")
 
     rules = sub_config.get("subscriptions", [])
-    show_demo = sub_config.get("include_demo_in_email", True)
+    show_demo = sub_config.get("include_demo_in_email", False)
     raw_subscribers = sub_config.get("subscribers", [])
 
     default_secret_email = (os.environ.get("NOTIFY_EMAIL") or os.environ.get("SMTP_USER") or "").strip()
