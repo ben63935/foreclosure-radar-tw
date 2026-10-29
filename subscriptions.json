@@ -1,7 +1,7 @@
 {
   "recipient_email": "PROTECTED_BY_GITHUB_SECRETS",
   "encrypted_vault": "NCQieHVvc2tsYS0uK38LClJRQ2ovNg1+a3FRcAVBCQo/dUcJAFxnZShdOQUFWkMIZF5SPwBAQno=",
-  "updated_at": "2026-10-29T02:51:32.891Z",
+  "updated_at": "2026-10-29T02:51:45.409Z",
   "include_demo_in_email": false,
   "subscribers": [
     {
@@ -50,7 +50,8 @@
     }
   ],
   "favorites": [
-    "REAL_MOJ_113_桃稅執_81806"
+    "REAL_MOJ_113_桃稅執_81806",
+    "DYN_9224500"
   ],
   "custom_notes": {
     "LIVE_TFASC_767101": "雲端爬蟲自動自台灣金服官網抓取之最新物件。",
