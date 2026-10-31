@@ -7,7 +7,7 @@
     "records_fetched": 4,
     "note": "公開列表擷取完成",
     "url": "https://www.tfasc.com.tw/",
-    "checked_at": "2026-10-30 10:45"
+    "checked_at": "2026-10-31 10:37"
   },
   "uhomes": {
     "source_id": "uhomes",
@@ -17,7 +17,7 @@
     "records_fetched": 0,
     "note": "已依訂閱之 21 個行政區動態檢索並解析屋齡、建坪與點交筆錄",
     "url": "https://www.uhomes.com.tw/",
-    "checked_at": "2026-10-30 10:45"
+    "checked_at": "2026-10-31 10:37"
   },
   "woo104": {
     "source_id": "woo104",
@@ -27,7 +27,7 @@
     "records_fetched": 2,
     "note": "自動交叉比對拍次底價與建築完成屋齡",
     "url": "https://www.toro591.com/",
-    "checked_at": "2026-10-30 10:45"
+    "checked_at": "2026-10-31 10:37"
   },
   "judicial_aomp": {
     "source_id": "judicial_aomp",
@@ -37,7 +37,7 @@
     "records_fetched": 0,
     "note": "低頻合規巡檢完成",
     "url": "https://aomp109.judicial.gov.tw/judbp/wkw/WHD1A02.htm",
-    "checked_at": "2026-10-30 10:45"
+    "checked_at": "2026-10-31 10:38"
   },
   "tcb_silver": {
     "source_id": "tcb_silver",
@@ -47,7 +47,7 @@
     "records_fetched": 0,
     "note": "低頻合規巡檢完成",
     "url": "https://www.tcb-bank.com.tw/about-tcb/announcement/items/foreclosure",
-    "checked_at": "2026-10-30 10:45"
+    "checked_at": "2026-10-31 10:38"
   },
   "bot_foreclosure": {
     "source_id": "bot_foreclosure",
@@ -57,7 +57,7 @@
     "records_fetched": 0,
     "note": "低頻合規巡檢完成",
     "url": "https://wwwap.bot.com.tw/house/",
-    "checked_at": "2026-10-30 10:45"
+    "checked_at": "2026-10-31 10:38"
   },
   "moj_tpkonsale": {
     "source_id": "moj_tpkonsale",
@@ -67,7 +67,7 @@
     "records_fetched": 0,
     "note": "低頻合規巡檢完成",
     "url": "https://www.tpkonsale.moj.gov.tw/",
-    "checked_at": "2026-10-30 10:46"
+    "checked_at": "2026-10-31 10:38"
   },
   "moi_pip": {
     "source_id": "moi_pip",
@@ -77,6 +77,6 @@
     "records_fetched": 0,
     "note": "低頻合規巡檢完成",
     "url": "https://pip.moi.gov.tw/Publicize/Info/D1010",
-    "checked_at": "2026-10-30 10:46"
+    "checked_at": "2026-10-31 10:38"
   }
 }
